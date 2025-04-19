@@ -16,7 +16,7 @@
     "environment": "*",
     "entrypoints": {
         "main": [
-            "com.example.examplemod.ExampleMod"
+            "net.xun.lib.fabric.internal.XunLibFabric"
         ]
     },
     "mixins": [
