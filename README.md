@@ -16,7 +16,22 @@ A **common code library mod** for Minecraft, providing reusable utilities for in
 ---
 
 ## Installation
-Through Curse Maven
+Add the jar file to your project and write this in your **`build.gradle`** file:
+   ```gradle  
+   dependencies {  
+       // Other dependencies...  
+       implementation files("libs/xunlib-[loader]-[version].jar")  // basically the path, if you put that inside of api/ instead libs/, change it.
+   }  
+   ```  
+   - Replace `[loader]` with the loader that you use.
+   - Replace `[version]` with the version that you want.
+---
+
+### **Notes**  
+- **Path Troubleshooting**: If Gradle fails to find the JAR, double-check:  
+  - The JAR is in the correct folder (e.g., `libs`).  
+  - The filename in `build.gradle` matches the actual JAR filename **exactly** (case-sensitive).  
+- **Distribution**: If you plan to distribute your mod, ensure the library JAR is included in your build outputs (see Gradle documentation for packaging).  
 
 ---
 
