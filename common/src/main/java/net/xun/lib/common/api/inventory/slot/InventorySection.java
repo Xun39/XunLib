@@ -7,8 +7,8 @@ import java.util.function.IntPredicate;
  * <p>
  * Provides both predefined player inventory sections and tools for creating custom
  * slot ranges. Handles container size validation and inverted ranges automatically.
- *
- * <h3>Predefined Sections (Minecraft Player Inventory):</h3>
+ * <p>
+ * <strong>Predefined Sections (Minecraft Player Inventory):</strong>
  * <ul>
  *   <li>{@code HOTBAR} (0-8 inclusive)</li>
  *   <li>{@code MAIN_INVENTORY} (9-35 inclusive)</li>

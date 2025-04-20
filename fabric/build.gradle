@@ -35,3 +35,38 @@ loom {
         }
     }
 }
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId = rootProject.mod_id + "-" + project.name
+
+            pom {
+                name = "XunLib"
+                description = "A common code library"
+                url = 'https://github.com/Xun39/XunLib'
+                scm {
+                    url = 'https://github.com/Xun39/XunLib'
+                    connection = 'scm:git:git://github.com/Xun39/XunLib.git'
+                    developerConnection = 'scm:git:ssh://git@github.com:Xun39/XunLib.git'
+                }
+                licenses {
+                    license {
+                        name = 'MIT'
+                        url = 'https://github.com/Xun39/XunLib/blob/main/LICENSE'
+                        distribution = 'repo'
+                    }
+                }
+                developers {
+                    developer {
+                        name = 'Xun'
+                        email = 'kaixunsu@outlook.com'
+                    }
+                }
+            }
+        }
+    }
+    repositories {
+        mavenLocal()
+    }
+}

@@ -2,8 +2,11 @@ package net.xun.lib.common.api.util;
 
 import com.google.common.collect.ImmutableList;
 import net.minecraft.world.Container;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.xun.lib.common.api.inventory.predicates.InventoryPredicate;
 import net.xun.lib.common.api.inventory.slot.InventoryCycleOrder;
 import net.xun.lib.common.api.inventory.slot.InventorySection;
@@ -380,7 +383,14 @@ public class InventoryUtils {
     public static void validateContainer(Container container, boolean allowClientSide) {
         Objects.requireNonNull(container, "Container cannot be null");
 
-        if (!allowClientSide && container instanceof Player player && player.level().isClientSide) {
+        Level level = null;
+        if (container instanceof Entity e) {
+            level = e.level();
+        } else if (container instanceof BlockEntity be) {
+            level = be.getLevel();
+        }
+
+        if (!allowClientSide && level != null && level.isClientSide) {
             throw new IllegalStateException("Client-side inventory modifications are not allowed");
         }
 
@@ -398,6 +408,7 @@ public class InventoryUtils {
         }
     }
 
+    // Disable Client-side by default
     public static void validateContainer(Container container) {
         validateContainer(container, false);
     }

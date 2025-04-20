@@ -1,5 +1,6 @@
 package net.xun.lib.common.api.util;
 
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -39,6 +40,10 @@ public class PlayerInventoryUtils {
         validatePlayer(player);
         return player.getMainHandItem().isEmpty() ||
                 player.getOffhandItem().isEmpty();
+    }
+
+    public static boolean hasEmptyHand(@NotNull Player player, InteractionHand hand) {
+        return player.getItemInHand(hand).isEmpty();
     }
 
     public static boolean hasItemCount(Player player, InventoryPredicate predicate, int minCount, InventorySection section) {
@@ -123,21 +128,17 @@ public class PlayerInventoryUtils {
      *
      * @param player the target player, not null
      * @param item   the item to add, not null
-     * @return true if the item was added to a hand, false otherwise
      * @throws NullPointerException if player or item is null
      */
-    public static boolean addItemToHands(@NotNull Player player, @NotNull ItemStack item) {
+    public static void addItemToHands(@NotNull Player player, @NotNull ItemStack item) {
         validatePlayer(player);
         Objects.requireNonNull(item, "Item cannot be null");
 
-        if (player.getMainHandItem().isEmpty()) {
+        if (hasEmptyHand(player, InteractionHand.MAIN_HAND)) {
             setItemInMainHand(player, item);
-            return true;
-        } else if (player.getOffhandItem().isEmpty()) {
+        } else if (hasEmptyHand(player, InteractionHand.OFF_HAND)) {
             setItemInOffHand(player, item);
-            return true;
         }
-        return false;
     }
 
     public static void removeItems(Player player, InventoryPredicate predicate, int amount, InventorySection section, InventoryCycleOrder order) {

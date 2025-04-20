@@ -1,11 +1,7 @@
 package net.xun.lib.common.api.item.fuzzy;
 
-import net.minecraft.core.component.DataComponentType;
-import net.minecraft.tags.TagKey;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.xun.lib.common.api.inventory.predicates.InventoryPredicate;
-import net.xun.lib.common.api.item.InvalidMatcherConfigurationException;
 
 import java.util.*;
 
@@ -18,32 +14,36 @@ import java.util.*;
  *
  * <h2>Features</h2>
  * <ul>
- *   <li>Durability/enchantment/data component control</li>
+ *   <li>Durability comparison control</li>
+ *   <li>Enchantment matching toggle</li>
+ *   <li>Data component filtering (whitelist/blacklist)</li>
  *   <li>Tag-based category matching</li>
- *   <li>Single-item predicates ({@link InventoryPredicate})</li>
- *   <li>Data component whitelisting/blacklisting</li>
+ *   <li>Count comparison modes (exact, at-least, ignore)</li>
+ *   <li>Custom validation rules via {@link InventoryPredicate}</li>
  *   <li>Empty item handling</li>
- *   <li>Count comparison modes</li>
  * </ul>
  *
  * <h2>Preconfigured Matchers</h2>
  * <ul>
- *   <li>{@link #BASIC} - Ignores durability, enchantments, and all data components</li>
- *   <li>{@link #IGNORE_ALL} - Ignores count, durability, enchantments, and data</li>
- *   <li>{@link #STRICT} - Requires exact match of all properties</li>
+ *   <li>{@link #BASIC} - Default strict comparison ignoring durability, enchantments, and components</li>
+ *   <li>{@link #IGNORE_ALL} - Loose matching only checking item types</li>
+ *   <li>{@link #STRICT} - Exact match of all item properties</li>
  * </ul>
  *
  * <h2>Usage Examples</h2>
  * Basic configuration:
  * <pre>{@code
- * FuzzyMatcher matcher = FuzzyMatcher.create()
- *     .ignoreDurability()
- *     .whitelistDataComponents(DataComponents.LORE)
- *     .withRequiredTag(ItemTags.ARROWS);
+ * FuzzyMatcher matcher = new FuzzyMatcher(
+ *      new FuzzyConfig()
+ *          .withIgnoreDurability(true)
+ *          .withRequiredTag(ItemTags.SWORDS)
+ * );
  * }</pre>
  *
+ *
+ * @see FuzzyConfig For configuration
  * @see InventoryPredicate For single-item matching rules
- * @see #create() Entry point for configuration
+ * @see InvalidMatcherConfigurationException For configuration error details
  */
 public class FuzzyMatcher {
 
@@ -51,20 +51,24 @@ public class FuzzyMatcher {
      * Preconfigured matcher that ignores durability, enchantments, and all data components.
      * Compares item types and count strictly.
      */
-    public static final FuzzyMatcher BASIC = FuzzyMatcher.create()
-            .ignoreDurability()
-            .ignoreEnchantments()
-            .ignoreAllDataComponents();
+    public static final FuzzyMatcher BASIC = new FuzzyMatcher(
+            new FuzzyConfig()
+                    .withIgnoreDurability(true)
+                    .withIgnoreEnchantments(true)
+                    .withComponentFilter(FuzzyConfig.FilterMode.BLACKLIST, Set.of())
+    );
 
     /**
      * Preconfigured matcher that ignores count, durability, enchantments, and all data components.
      * Only compares item types.
      */
-    public static final FuzzyMatcher IGNORE_ALL = FuzzyMatcher.create()
-            .ignoreCount()
-            .ignoreDurability()
-            .ignoreEnchantments()
-            .ignoreAllDataComponents();
+    public static final FuzzyMatcher IGNORE_ALL = new FuzzyMatcher(
+            new FuzzyConfig()
+                    .withIgnoreDurability(true)
+                    .withIgnoreEnchantments(true)
+                    .withCountMode(FuzzyConfig.CountMode.IGNORE)
+                    .withComponentFilter(FuzzyConfig.FilterMode.BLACKLIST, Set.of())
+    );
 
     /**
      * Strict matcher requiring exact match of:
@@ -76,252 +80,95 @@ public class FuzzyMatcher {
      *   <li>All other data components</li>
      * </ul>
      */
-    public static final FuzzyMatcher STRICT = FuzzyMatcher.create();
+    public static final FuzzyMatcher STRICT = new FuzzyMatcher(new FuzzyConfig());
 
-    private final boolean ignoreDurability;
-    private final boolean ignoreEnchantments;
-    private final boolean ignoreDataComponent;
-    private final boolean ignoreCount;
-    private final List<InventoryPredicate> customRules;
-    private final TagKey<Item> requiredTag;
-    private final Set<DataComponentType<?>> componentWhitelist;
+    private final FuzzyConfig config;
 
-    /**
-     * Creates a new FuzzyMatcher with default strict settings.
-     *
-     * <p>Default configuration:
-     * <ul>
-     *   <li>Compare durability: enabled</li>
-     *   <li>Compare enchantments: enabled</li>
-     *   <li>Compare data components: all</li>
-     *   <li>Compare count: enabled</li>
-     *   <li>No custom rules</li>
-     * </ul>
-     */
-    public static FuzzyMatcher create() {
-        return new FuzzyMatcher(
-                false, // ignoreDurability
-                false, // ignoreEnchantments
-                false, // ignoreDataComponent
-                false, // ignoreCount
-                List.of(),
-                null,
-                Set.of()
-        );
+    private FuzzyMatcher(FuzzyConfig config) {
+        this.config = config;
     }
-
-    private FuzzyMatcher(boolean ignoreDurability,
-                         boolean ignoreEnchantments,
-                         boolean ignoreDataComponent,
-                         boolean ignoreCount,
-                         List<InventoryPredicate> customRules,
-                         TagKey<Item> requiredTag,
-                         Set<DataComponentType<?>> nbtWhitelist) {
-        this.ignoreDurability = ignoreDurability;
-        this.ignoreEnchantments = ignoreEnchantments;
-        this.ignoreDataComponent = ignoreDataComponent;
-        this.ignoreCount = ignoreCount;
-        this.customRules = List.copyOf(customRules);
-        this.requiredTag = requiredTag;
-        this.componentWhitelist = Set.copyOf(nbtWhitelist);
-    }
-
-    // ================== CONFIGURATION METHODS ================== //
-
-    /**
-     * Configures the matcher to ignore item durability values.
-     *
-     * @return New matcher instance ignoring durability
-     */
-    public FuzzyMatcher ignoreDurability() {
-        return new FuzzyMatcher(
-                true, this.ignoreEnchantments, this.ignoreDataComponent, this.ignoreCount,
-                this.customRules, this.requiredTag, this.componentWhitelist
-        );
-    }
-
-    /**
-     * Configures the matcher to ignore item enchantments.
-     *
-     * @return New matcher instance ignoring enchantments
-     */
-    public FuzzyMatcher ignoreEnchantments() {
-        return new FuzzyMatcher(
-                this.ignoreDurability, true, this.ignoreDataComponent, this.ignoreCount,
-                this.customRules, this.requiredTag, this.componentWhitelist
-        );
-    }
-
-    /**
-     * Configures the matcher to ignore all data components.
-     *
-     * @return New matcher instance ignoring data components
-     */
-    public FuzzyMatcher ignoreAllDataComponents() {
-        return new FuzzyMatcher(
-                this.ignoreDurability,
-                this.ignoreEnchantments,
-                true,
-                this.ignoreCount,
-                this.customRules,
-                this.requiredTag,
-                Set.of()
-        );
-    }
-
-    /**
-     * Whitelists specific data components to compare, ignoring all others.
-     *
-     * <p>Example:
-     * <pre>{@code
-     * .whitelistDataComponents(DataComponents.LORE, DataComponents.CUSTOM_MODEL_DATA)
-     * }</pre>
-     *
-     * @param whitelist Data components to compare
-     * @return New matcher instance with component whitelist
-     */
-    public FuzzyMatcher whitelistDataComponents(DataComponentType<?>... whitelist) {
-        return new FuzzyMatcher(
-                this.ignoreDurability,
-                this.ignoreEnchantments,
-                false, // Ensure data components are compared
-                this.ignoreCount,
-                this.customRules,
-                this.requiredTag,
-                new HashSet<>(Arrays.asList(whitelist))
-        );
-    }
-
-    /**
-     * Configures the matcher to ignore item count.
-     *
-     * @return New matcher instance ignoring count
-     */
-    public FuzzyMatcher ignoreCount() {
-        return new FuzzyMatcher(
-                this.ignoreDurability, this.ignoreEnchantments, this.ignoreDataComponent, true,
-                this.customRules, this.requiredTag, this.componentWhitelist
-        );
-    }
-
-    /**
-     * Adds a custom predicate that both items must satisfy individually.
-     * <p>
-     * The predicate is applied to each item separately. Both items must pass
-     * the predicate for the match to succeed.
-     *
-     * <p>Example - match unbreakable items:
-     * <pre>{@code
-     * .withRule(stack -> stack.getComponents().contains(DataComponents.UNBREAKABLE))
-     * }</pre>
-     *
-     * @param rule The predicate to apply to both items
-     * @return A new FuzzyMatcher instance with the added rule
-     * @see InventoryPredicate Predefined common predicates
-     */
-    public FuzzyMatcher withRule(InventoryPredicate rule) {
-        List<InventoryPredicate> newRules = new ArrayList<>(this.customRules);
-        newRules.add(rule);
-        return new FuzzyMatcher(
-                this.ignoreDurability, this.ignoreEnchantments, this.ignoreDataComponent, this.ignoreCount,
-                newRules, this.requiredTag, this.componentWhitelist
-        );
-    }
-
-    /**
-     * Requires both items to belong to the specified tag category.
-     * <p>
-     * This is a convenience method for tag-based matching. Equivalent to:
-     * <pre>{@code
-     * .withRule(InventoryPredicate.matchesTag(tag))
-     * }</pre>
-     *
-     * @param tag The item tag both items must belong to
-     * @return A new FuzzyMatcher instance with tag requirement
-     * @see InventoryPredicate#matchesTag(TagKey)
-     */
-    public FuzzyMatcher withRequiredTag(TagKey<Item> tag) {
-        return new FuzzyMatcher(
-                this.ignoreDurability, this.ignoreEnchantments, this.ignoreDataComponent, this.ignoreCount,
-                this.customRules, tag, this.componentWhitelist
-        );
-    }
-
-    // ================== CORE MATCHING LOGIC ================== //
 
     /**
      * Tests if two item stacks match according to the configured rules.
      *
      * <p>Execution order:
      * <ol>
-     *   <li>Empty check (both must be empty or both non-empty)</li>
+     *   <li>Empty item check (both must be empty or both non-empty)</li>
      *   <li>Core item type/tag verification</li>
      *   <li>Durability comparison (if enabled)</li>
      *   <li>Enchantment comparison (if enabled)</li>
-     *   <li>Data component check (whitelist or full comparison)</li>
+     *   <li>Data component filtering</li>
+     *   <li>Count comparison using configured mode</li>
      *   <li>Custom predicate validation</li>
-     *   <li>Pairwise rule evaluation</li>
      * </ol>
      *
      * @param a First item stack to compare
      * @param b Second item stack to compare
-     * @return true if items match under current configuration, false otherwise
-     * @throws InvalidMatcherConfigurationException If matcher has conflicting rules
-     * @throws NullPointerException If either stack is null
+     * @return true if items match all configured rules, false otherwise
+     * @throws InvalidMatcherConfigurationException if matcher contains conflicting rules:
+     * <ul>
+     *   <li>Custom rules combined with tag requirements</li>
+     *   <li>Custom rules used with attribute ignoring</li>
+     * </ul>
+     * @throws NullPointerException if either input stack is null
      */
     public boolean matches(ItemStack a, ItemStack b) {
         validateConfiguration();
 
-        // Handle empty items
         if (a.isEmpty() != b.isEmpty()) return false;
         if (a.isEmpty()) return true;
 
-        // Core item comparison
-        if (!compareItems(a, b)) return false;
-
-        // State-dependent comparisons
-        if (!ignoreDurability && a.getDamageValue() != b.getDamageValue()) return false;
-        if (!ignoreCount && a.getCount() != b.getCount()) return false;
-        if (!ignoreEnchantments && !compareEnchantments(a, b)) return false;
-        if (!ignoreDataComponent && !compareComponents(a, b)) return false;
-
-        return validateCustomRules(a, b);
+        return compareCore(a, b)
+                && compareDurability(a, b)
+                && compareEnchantments(a, b)
+                && compareComponents(a, b)
+                && compareCount(a, b)
+                && validateCustomRules(a, b);
     }
 
-    private boolean compareItems(ItemStack a, ItemStack b) {
-        if (requiredTag != null) {
-            return a.is(requiredTag) && b.is(requiredTag);
+    private boolean compareCore(ItemStack a, ItemStack b) {
+        if (config.requiredTag != null) {
+            return a.is(config.requiredTag) && b.is(config.requiredTag);
         }
         return a.getItem() == b.getItem();
     }
 
+    private boolean compareDurability(ItemStack a, ItemStack b) {
+        return config.ignoreDurability || a.getDamageValue() == b.getDamageValue();
+    }
+
     private boolean compareEnchantments(ItemStack a, ItemStack b) {
-        return Objects.equals(a.getEnchantments(), b.getEnchantments());
+        return config.ignoreEnchantments ||
+                Objects.equals(a.getEnchantments(), b.getEnchantments());
     }
 
     private boolean compareComponents(ItemStack a, ItemStack b) {
-        if (componentWhitelist.isEmpty()) {
-            return Objects.equals(a.getComponents(), b.getComponents());
-        }
+        return a.getComponents().stream()
+                .filter(entry -> config.componentFilter.test(entry.type()))
+                .allMatch(entry ->
+                        Objects.equals(entry.type(), b.get(entry.type()))
+                );
+    }
 
-        return componentWhitelist.stream().allMatch(componentType ->
-                Objects.equals(a.get(componentType), b.get(componentType))
-        );
+    private boolean compareCount(ItemStack a, ItemStack b) {
+        return switch (config.countMode) {
+            case IGNORE -> true;
+            case EXACT -> a.getCount() == b.getCount();
+            case AT_LEAST -> a.getCount() >= b.getCount();
+        };
     }
 
     private boolean validateCustomRules(ItemStack a, ItemStack b) {
-        return customRules.stream().allMatch(rule ->
-                rule.test(a) && rule.test(b)
-        );
+        return config.customRules.stream()
+                .allMatch(rule -> rule.test(a) && rule.test(b));
     }
 
-    // ================== VALIDATION & UTILITIES ================== //
-
     private void validateConfiguration() {
-        if (requiredTag != null && !customRules.isEmpty()) {
+        if (config.requiredTag != null && !config.customRules.isEmpty()) {
             throw new InvalidMatcherConfigurationException("Cannot combine tag requirements with custom rules");
         }
-        if ((!ignoreCount || !ignoreDurability || !ignoreEnchantments) && !customRules.isEmpty()) {
+        if ((config.ignoreDurability || config.ignoreEnchantments || config.countMode != FuzzyConfig.CountMode.IGNORE) &&
+                !config.customRules.isEmpty()) {
             throw new InvalidMatcherConfigurationException("Cannot apply custom rules while ignoring attributes");
         }
     }

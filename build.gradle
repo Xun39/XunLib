@@ -2,3 +2,37 @@ plugins {
     id 'fabric-loom' version '1.7-SNAPSHOT' apply false
     id 'net.neoforged.moddev' version '0.1.110' apply false
 }
+
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'maven-publish'
+    java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+    java.withSourcesJar()
+    java.withJavadocJar()
+
+    jar {
+        manifest {
+            attributes([
+                    "Specification-Title"     : mod_name,
+                    "Specification-Vendor"    : mod_author,
+                    'Specification-Version'   : project.jar.archiveVersion,
+                    'Implementation-Title'    : project.name,
+                    'Implementation-Version'  : project.jar.archiveVersion,
+                    'Implementation-Vendor'   : mod_author,
+                    'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
+                    'Timestampe'              : System.currentTimeMillis(),
+                    'Built-On-Java'           : "${System.getProperty('java.vm.version')} (${System.getProperty('java.vm.vendor')})",
+                    'Built-On-Minecraft'      : minecraft_version
+            ])
+        }
+    }
+
+    tasks.withType(JavaCompile).configureEach {
+        it.options.encoding = 'UTF-8'
+        it.options.release = 21
+    }
+
+    tasks.withType(GenerateModuleMetadata) {
+        enabled = false
+    }
+}
