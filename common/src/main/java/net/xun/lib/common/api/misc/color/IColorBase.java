@@ -1,6 +1,6 @@
 package net.xun.lib.common.api.misc.color;
 
-public interface ColorBase {
+public interface IColorBase {
 
     String toString();
     boolean equals(Object obj);

@@ -3,7 +3,7 @@ package net.xun.lib.common.api.misc.color;
 /**
  * Represents a color in the HSL (Hue, Saturation, Lightness) color space.
  */
-public record HSLColor(float hue, float saturation, float lightness) implements ColorBase {
+public record HSLColor(float hue, float saturation, float lightness) implements IColorBase {
 
     /**
      * Constructs an HSLColor with the specified hue, saturation, and lightness.

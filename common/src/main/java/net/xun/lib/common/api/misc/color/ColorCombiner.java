@@ -2,7 +2,7 @@ package net.xun.lib.common.api.misc.color;
 
 public class ColorCombiner {
 
-    public static RGBColor blendAdd(ColorBase color1, ColorBase color2) {
+    public static RGBColor blendAdd(IColorBase color1, IColorBase color2) {
         RGBColor rgb1 = color1.asRGB();
         RGBColor rgb2 = color2.asRGB();
 
@@ -13,7 +13,7 @@ public class ColorCombiner {
         return new RGBColor(red, green, blue);
     }
 
-    public static RGBColor blendAverage(ColorBase color1, ColorBase color2) {
+    public static RGBColor blendAverage(IColorBase color1, IColorBase color2) {
         RGBColor rgb1 = color1.asRGB();
         RGBColor rgb2 = color2.asRGB();
 
@@ -24,7 +24,7 @@ public class ColorCombiner {
         return new RGBColor(red, green, blue);
     }
 
-    public static RGBColor blendMultiply(ColorBase color1, ColorBase color2) {
+    public static RGBColor blendMultiply(IColorBase color1, IColorBase color2) {
         RGBColor rgb1 = color1.asRGB();
         RGBColor rgb2 = color2.asRGB();
 
@@ -35,7 +35,7 @@ public class ColorCombiner {
         return new RGBColor(red, green, blue);
     }
 
-    public static RGBColor blendScreen(ColorBase color1, ColorBase color2) {
+    public static RGBColor blendScreen(IColorBase color1, IColorBase color2) {
         RGBColor rgb1 = color1.asRGB();
         RGBColor rgb2 = color2.asRGB();
 
@@ -46,7 +46,7 @@ public class ColorCombiner {
         return new RGBColor(red, green, blue);
     }
 
-    public static RGBColor blendOverlay(ColorBase color1, ColorBase color2) {
+    public static RGBColor blendOverlay(IColorBase color1, IColorBase color2) {
         RGBColor rgb1 = color1.asRGB();
         RGBColor rgb2 = color2.asRGB();
 
@@ -65,7 +65,7 @@ public class ColorCombiner {
         }
     }
 
-    public static RGBColor blendLighten(ColorBase color1, ColorBase color2) {
+    public static RGBColor blendLighten(IColorBase color1, IColorBase color2) {
         RGBColor rgb1 = color1.asRGB();
         RGBColor rgb2 = color2.asRGB();
 
@@ -76,7 +76,7 @@ public class ColorCombiner {
         return new RGBColor(red, green, blue);
     }
 
-    public static RGBColor blendDarken(ColorBase color1, ColorBase color2) {
+    public static RGBColor blendDarken(IColorBase color1, IColorBase color2) {
         RGBColor rgb1 = color1.asRGB();
         RGBColor rgb2 = color2.asRGB();
 

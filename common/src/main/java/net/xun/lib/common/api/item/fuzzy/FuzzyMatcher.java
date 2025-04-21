@@ -159,16 +159,15 @@ public class FuzzyMatcher {
     }
 
     private boolean validateCustomRules(ItemStack a, ItemStack b) {
-        return config.customRules.stream()
-                .allMatch(rule -> rule.test(a) && rule.test(b));
+        return config.predicates.stream().allMatch(rule -> rule.test(a) && rule.test(b));
     }
 
     private void validateConfiguration() {
-        if (config.requiredTag != null && !config.customRules.isEmpty()) {
+        if (config.requiredTag != null && !config.predicates.isEmpty()) {
             throw new InvalidMatcherConfigurationException("Cannot combine tag requirements with custom rules");
         }
         if ((config.ignoreDurability || config.ignoreEnchantments || config.countMode != FuzzyConfig.CountMode.IGNORE) &&
-                !config.customRules.isEmpty()) {
+                !config.predicates.isEmpty()) {
             throw new InvalidMatcherConfigurationException("Cannot apply custom rules while ignoring attributes");
         }
     }

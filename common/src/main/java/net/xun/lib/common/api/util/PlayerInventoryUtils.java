@@ -141,16 +141,16 @@ public class PlayerInventoryUtils {
         }
     }
 
-    public static void removeItems(Player player, InventoryPredicate predicate, int amount, InventorySection section, InventoryCycleOrder order) {
-        InventoryUtils.removeItems(player.getInventory(), predicate, amount, section, order);
+    public static void extractItems(Player player, InventoryPredicate predicate, int amount, InventorySection section, InventoryCycleOrder order) {
+        InventoryUtils.extractItems(player.getInventory(), predicate, amount, section, order);
     }
 
-    public static void removeSingleItem(Player player, InventoryPredicate predicate,InventorySection section, InventoryCycleOrder order) {
-        InventoryUtils.removeSingleItem(player.getInventory(), predicate, section, order);
+    public static void extractSingleItem(Player player, InventoryPredicate predicate, InventorySection section, InventoryCycleOrder order) {
+        InventoryUtils.extractSingleItem(player.getInventory(), predicate, section, order);
     }
 
-    public static void addItem(Player player, ItemStack stack) {
-        InventoryUtils.addItem(player.getInventory(), stack);
+    public static void insertItem(Player player, ItemStack stack) {
+        InventoryUtils.insetItem(player.getInventory(), stack);
     }
 
     // ======================== HELPER METHODS ======================== //

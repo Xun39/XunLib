@@ -3,7 +3,7 @@ package net.xun.lib.common.api.misc.color;
 /**
  * Represents a color in the RGB (Red, Green, Blue) color space.
  */
-public record RGBColor(float red, float green, float blue) implements ColorBase {
+public record RGBColor(float red, float green, float blue) implements IColorBase {
 
     /**
      * Constructs an RGBColor with the specified red, green, and blue.

@@ -3,7 +3,6 @@ package net.xun.lib.common.api.util;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -153,8 +152,8 @@ public class InventoryUtils {
      * @param order Slot processing order strategy
      * @throws NullPointerException if container, predicate, or order is null
      */
-    public static void removeItems(Container container, InventoryPredicate predicate, int amount,
-                                   @Nullable SlotRange slots, InventoryCycleOrder order) {
+    public static void extractItems(Container container, InventoryPredicate predicate, int amount,
+                                    @Nullable SlotRange slots, InventoryCycleOrder order) {
         validateContainer(container);
         Objects.requireNonNull(predicate, "Predicate cannot be null");
         Objects.requireNonNull(order, "Removal order cannot be null");
@@ -189,9 +188,9 @@ public class InventoryUtils {
      * @param order Slot processing order
      * @throws NullPointerException if any parameter is null
      */
-    public static void removeItems(Container container, InventoryPredicate predicate, int amount, InventorySection section, InventoryCycleOrder order) {
+    public static void extractItems(Container container, InventoryPredicate predicate, int amount, InventorySection section, InventoryCycleOrder order) {
         Objects.requireNonNull(section, "Section cannot be null");
-        removeItems(container, predicate, amount, section.getSlotRange(), order);
+        extractItems(container, predicate, amount, section.getSlotRange(), order);
     }
 
     /**
@@ -203,8 +202,8 @@ public class InventoryUtils {
      * @param order Slot processing order
      * @throws NullPointerException if any parameter is null
      */
-    public static void removeSingleItem(Container container, InventoryPredicate predicate, SlotRange slots, InventoryCycleOrder order) {
-        removeItems(container, predicate, 1, slots, order);
+    public static void extractSingleItem(Container container, InventoryPredicate predicate, SlotRange slots, InventoryCycleOrder order) {
+        extractItems(container, predicate, 1, slots, order);
     }
 
     /**
@@ -216,9 +215,9 @@ public class InventoryUtils {
      * @param order Slot processing order
      * @throws NullPointerException if any parameter is null
      */
-    public static void removeSingleItem(Container container, InventoryPredicate predicate, InventorySection section, InventoryCycleOrder order) {
+    public static void extractSingleItem(Container container, InventoryPredicate predicate, InventorySection section, InventoryCycleOrder order) {
         Objects.requireNonNull(section, "Section cannot be null");
-        removeSingleItem(container, predicate, section.getSlotRange(), order);
+        extractSingleItem(container, predicate, section.getSlotRange(), order);
     }
 
     /**
@@ -228,7 +227,7 @@ public class InventoryUtils {
      * @return Remaining items that couldn't be added (empty stack if all were added)
      * @throws NullPointerException if container or stack is null
      */
-    public static ItemStack addItem(Container container, ItemStack stack) {
+    public static ItemStack insetItem(Container container, ItemStack stack) {
         validateContainer(container);
         Objects.requireNonNull(stack, "ItemStack cannot be null");
         if (stack.isEmpty()) return ItemStack.EMPTY;
@@ -249,8 +248,8 @@ public class InventoryUtils {
      * @param stack Item stack to add (will not be modified)
      * @throws NullPointerException if container or stack is null
      */
-    public static void addAndDiscardOverflow(Container container, ItemStack stack) {
-        addItem(container, stack);
+    public static void insertAndDiscardOverflow(Container container, ItemStack stack) {
+        insetItem(container, stack);
     }
 
     // ======================== UTILITY METHODS ======================== //

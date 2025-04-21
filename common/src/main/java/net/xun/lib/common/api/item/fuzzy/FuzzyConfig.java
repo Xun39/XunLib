@@ -46,18 +46,18 @@ public class FuzzyConfig {
     }
 
     /**
-     * Enum defining data component filtering modes:
+     * Enum defining filtering modes:
      * <ul>
-     *   <li>{@link #WHITELIST} - Only compare specified components</li>
-     *   <li>{@link #BLACKLIST} - Compare all components except specified</li>
+     *   <li>{@link #WHITELIST} - Only compare specified objects</li>
+     *   <li>{@link #BLACKLIST} - Compare all objects except specified</li>
      * </ul>
      */
     public enum FilterMode {
-        /** Compare all data components */
+        /** Compare all data objects */
         ALL,
-        /** Include only specified components in comparison */
+        /** Include only specified objects in comparison */
         WHITELIST,
-        /** Exclude specified components from comparison */
+        /** Exclude specified objects from comparison */
         BLACKLIST
     }
 
@@ -66,7 +66,7 @@ public class FuzzyConfig {
     CountMode countMode = CountMode.EXACT;
     Predicate<DataComponentType<?>> componentFilter = c -> true;
     TagKey<Item> requiredTag = null;
-    List<InventoryPredicate> customRules = new ArrayList<>();
+    List<InventoryPredicate> predicates = new ArrayList<>();
 
     /**
      * Sets whether durability values should be ignored in comparisons
@@ -122,15 +122,45 @@ public class FuzzyConfig {
     }
 
     /**
-     * Adds a custom validation rule to the configuration
-     *
-     * @param rule Predicate to apply during comparisons
-     * @return New configuration instance with added rule
-     * @see InventoryPredicate
+     * @deprecated
+     * This method is deprecated, see {@link #withPredicateFilter(FilterMode, List)}
+     * for new handling method
      */
+    @Deprecated(since = "1.3")
     public FuzzyConfig addCustomRule(InventoryPredicate rule) {
         FuzzyConfig copy = copy();
-        copy.customRules.add(rule);
+        copy.predicates.add(rule);
+        return copy;
+    }
+
+    /**
+     * Configures custom predicate filtering using specified mode and predicates.
+     *
+     * @param mode Filtering strategy to apply (WHITELIST or BLACKLIST)
+     * @param predicates List of predicates to include/exclude based on mode
+     * @return New configuration instance with updated predicate rules
+     * @throws IllegalArgumentException If empty predicate list is provided with WHITELIST/BLACKLIST mode
+     */
+    public FuzzyConfig withPredicateFilter(FilterMode mode, List<InventoryPredicate> predicates) {
+        if (mode == FilterMode.WHITELIST || mode == FilterMode.BLACKLIST) {
+            if (predicates == null || predicates.isEmpty()) {
+                throw new IllegalArgumentException("Predicates cannot be empty for WHITELIST or BLACKLIST modes");
+            }
+        }
+
+        FuzzyConfig copy = copy();
+
+        if (mode == FilterMode.WHITELIST) {
+            copy.predicates = new ArrayList<>(predicates);
+        } else if (mode == FilterMode.BLACKLIST) {
+            List<InventoryPredicate> negatedPredicates = new ArrayList<>(predicates.size());
+            for (InventoryPredicate p : predicates) {
+                negatedPredicates.add(item -> !p.test(item));
+            }
+            copy.predicates = negatedPredicates;
+        } else {
+            copy.predicates.clear();
+        }
         return copy;
     }
 
@@ -147,7 +177,7 @@ public class FuzzyConfig {
         copy.countMode = this.countMode;
         copy.componentFilter = this.componentFilter;
         copy.requiredTag = this.requiredTag;
-        copy.customRules = new ArrayList<>(this.customRules);
+        copy.predicates = new ArrayList<>(this.predicates);
         return copy;
     }
 }
