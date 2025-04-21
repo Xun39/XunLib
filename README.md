@@ -8,11 +8,59 @@ A **common code library mod** for Minecraft, providing reusable utilities for in
 ---
 
 ## Table of Contents
+- [Features](#features)
 - [Installation](#installation)
 - [Contributing](#contributing)
 - [License](#license)
-- [Disclaimer](#disclaimer) 
+- [Disclaimer](#disclaimer)
+  
+---
 
+## Features
+
+### **Common Utilities**
+- **General Helpers**: Simplify repetitive tasks with utility methods for logging, validation, and world interactions.
+- **Block Position Tools**: 
+  - Calculate distances, and iterate over block areas.
+- **Color Utilities**:
+  - **Conversions**: Seamlessly convert between RGB, HSV, and HSL color spaces.
+  - **Blending**: Blend colors with customizable interpolation modes.
+  - **Classes**: `HSVColor` and `HSLColor` classes for advanced color manipulation.
+
+---
+
+### **Inventory & Armor Management**
+- **Container Agnostic**:
+  - Insert/extract items from any container type (chests, hoppers, etc.) with built-in slot validation.
+  - Check item compatibility and simulate transfers without modifying inventories.
+- **Armor-Specific Tools**:
+  - Equip/unequip armor items with durability checks.
+  - Validate armor slots based on item type or custom rules.
+
+---
+
+### **Fuzzy Item Matching**
+- **Customizable Comparison**:
+  - Compare items by count, enchantments, NBT tags, or durability.
+  - Ignore specific properties (e.g., ignore count for "any amount" checks).
+- **Advanced Filters**:
+  - Whitelist/blacklist items by data components, ...*(not implemented yet)*
+  - Chain multiple conditions for complex matching logic.
+
+---
+
+### **Mob Effect Utilities**
+- **Effect Management**:
+  - Apply/remove effects with duration and amplifier control.
+
+---
+
+### **@PersistentNbt Annotation**
+- **Auto-Serialization**:
+  - Annotate fields in `BlockEntity` classes to automatically save/load them to NBT.
+  - Supports primitives, strings, lists, and compound tags.
+- **Reduce Boilerplate**:
+  - Eliminate manual `saveAdditional`/`loadAdditional` overrides for annotated fields.
 ---
 
 ## Installation
@@ -30,8 +78,7 @@ Add the jar file to your project and write this in your **`build.gradle`** file:
 ### **Notes**  
 - **Path Troubleshooting**: If Gradle fails to find the JAR, double-check:  
   - The JAR is in the correct folder (e.g., `libs`).  
-  - The filename in `build.gradle` matches the actual JAR filename **exactly** (case-sensitive).  
-- **Distribution**: If you plan to distribute your mod, ensure the library JAR is included in your build outputs (see Gradle documentation for packaging).  
+  - The filename in `build.gradle` matches the actual JAR filename **exactly** (case-sensitive). 
 
 ---
 
