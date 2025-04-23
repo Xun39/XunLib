@@ -2,6 +2,7 @@ package net.xun.lib.common.api.util;
 
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
+import net.xun.lib.common.api.exceptions.UtilityClassException;
 import net.xun.lib.common.api.world.effect.EffectStackingStrategy;
 
 import java.util.List;
@@ -10,7 +11,11 @@ import java.util.List;
  * Utility class for applying mob effects to entities with various strategies and conditions.
  * Works in conjunction with {@link EffectStackingStrategy} to determine how effects interact.
  */
-public class EffectUtils {
+public class MobEffectUtils {
+
+    private MobEffectUtils() throws UtilityClassException {
+        throw new UtilityClassException();
+    }
 
     /**
      * Applies effects to an entity using a specified {@link EffectStackingStrategy}.

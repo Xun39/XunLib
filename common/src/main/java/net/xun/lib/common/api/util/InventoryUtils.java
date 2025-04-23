@@ -6,9 +6,9 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.xun.lib.common.api.exceptions.UtilityClassException;
 import net.xun.lib.common.api.inventory.predicates.InventoryPredicate;
-import net.xun.lib.common.api.inventory.slot.InventoryCycleOrder;
-import net.xun.lib.common.api.inventory.slot.InventorySection;
+import net.xun.lib.common.api.inventory.InventoryCycleOrder;
 import net.xun.lib.common.api.inventory.slot.SlotIterator;
 import net.xun.lib.common.api.inventory.slot.SlotRange;
 import org.jetbrains.annotations.Nullable;
@@ -32,6 +32,10 @@ import java.util.Objects;
  * @see ArmorSlotsUtils Armor-specific inventory utils
  */
 public class InventoryUtils {
+
+    private InventoryUtils() throws UtilityClassException {
+        throw new UtilityClassException();
+    }
 
     // ======================== CORE CHECKS ======================== //
 
@@ -62,21 +66,6 @@ public class InventoryUtils {
     }
 
     /**
-     * Checks if a container's section contains at least {@code minCount} matching items.
-     *
-     * @param container Target inventory
-     * @param predicate Item matching logic
-     * @param minCount Minimum required items (≥1)
-     * @param section Inventory section to check
-     * @return True if section contains sufficient items, false otherwise
-     * @throws NullPointerException if any parameter is null
-     */
-    public static boolean hasItemCount(Container container, InventoryPredicate predicate, int minCount, InventorySection section) {
-        Objects.requireNonNull(section, "Section cannot be null");
-        return hasItemCount(container, predicate, minCount, section.getSlotRange());
-    }
-
-    /**
      * Checks if a container has at least one item matching the predicate.
      *
      * @param container Target inventory
@@ -87,20 +76,6 @@ public class InventoryUtils {
      */
     public static boolean hasItem(Container container, InventoryPredicate predicate, @Nullable SlotRange slots) {
         return hasItemCount(container, predicate, 1, slots);
-    }
-
-    /**
-     * Checks if a container's section contains at least one matching item.
-     *
-     * @param container Target inventory
-     * @param predicate Item matching logic
-     * @param section Inventory section to check
-     * @return True if section contains at least one matching item
-     * @throws NullPointerException if any parameter is null
-     */
-    public static boolean hasItem(Container container, InventoryPredicate predicate, InventorySection section) {
-        Objects.requireNonNull(section, "Section cannot be null");
-        return hasItem(container, predicate, section.getSlotRange());
     }
 
     // ======================== SLOT SEARCHING ======================== //
@@ -128,17 +103,15 @@ public class InventoryUtils {
     }
 
     /**
-     * Finds the first slot in a container section with a matching item.
+     * Get the item of the specific slot in the container
      *
      * @param container Target inventory
-     * @param predicate Item matching logic
-     * @param section Section to search within
-     * @return Slot index of first match, or -1 if none
-     * @throws NullPointerException if any parameter is null
+     * @param slotIndex The slot index
+     * @return ItemStack in the specific slot of the container
+     * @see net.xun.lib.common.api.inventory.slot.SlotGetter For easier slot getting
      */
-    public static int findFirstMatchingSlot(Container container, InventoryPredicate predicate, InventorySection section) {
-        Objects.requireNonNull(section, "Section cannot be null");
-        return findFirstMatchingSlot(container, predicate, section.getSlotRange());
+    public static ItemStack getItemInSlot(Container container, int slotIndex) {
+        return container.getItem(slotIndex);
     }
 
     // ======================== ITEM MANAGEMENT ======================== //
@@ -152,8 +125,7 @@ public class InventoryUtils {
      * @param order Slot processing order strategy
      * @throws NullPointerException if container, predicate, or order is null
      */
-    public static void extractItems(Container container, InventoryPredicate predicate, int amount,
-                                    @Nullable SlotRange slots, InventoryCycleOrder order) {
+    public static void extractItems(Container container, InventoryPredicate predicate, int amount, @Nullable SlotRange slots, InventoryCycleOrder order) {
         validateContainer(container);
         Objects.requireNonNull(predicate, "Predicate cannot be null");
         Objects.requireNonNull(order, "Removal order cannot be null");
@@ -179,21 +151,6 @@ public class InventoryUtils {
     }
 
     /**
-     * Removes items from a specific container section.
-     *
-     * @param container Target inventory
-     * @param predicate Item matching logic
-     * @param amount Maximum items to remove
-     * @param section Section to remove from
-     * @param order Slot processing order
-     * @throws NullPointerException if any parameter is null
-     */
-    public static void extractItems(Container container, InventoryPredicate predicate, int amount, InventorySection section, InventoryCycleOrder order) {
-        Objects.requireNonNull(section, "Section cannot be null");
-        extractItems(container, predicate, amount, section.getSlotRange(), order);
-    }
-
-    /**
      * Removes a single item from the specified slot range.
      *
      * @param container Target inventory
@@ -207,27 +164,13 @@ public class InventoryUtils {
     }
 
     /**
-     * Removes a single item from a container section.
-     *
-     * @param container Target inventory
-     * @param predicate Item matching logic
-     * @param section Section to remove from
-     * @param order Slot processing order
-     * @throws NullPointerException if any parameter is null
-     */
-    public static void extractSingleItem(Container container, InventoryPredicate predicate, InventorySection section, InventoryCycleOrder order) {
-        Objects.requireNonNull(section, "Section cannot be null");
-        extractSingleItem(container, predicate, section.getSlotRange(), order);
-    }
-
-    /**
      * Attempts to add an item stack to a container.
      * @param container Target inventory
      * @param stack Item stack to add (will not be modified)
      * @return Remaining items that couldn't be added (empty stack if all were added)
      * @throws NullPointerException if container or stack is null
      */
-    public static ItemStack insetItem(Container container, ItemStack stack) {
+    public static ItemStack insertItem(Container container, ItemStack stack) {
         validateContainer(container);
         Objects.requireNonNull(stack, "ItemStack cannot be null");
         if (stack.isEmpty()) return ItemStack.EMPTY;
@@ -249,7 +192,7 @@ public class InventoryUtils {
      * @throws NullPointerException if container or stack is null
      */
     public static void insertAndDiscardOverflow(Container container, ItemStack stack) {
-        insetItem(container, stack);
+        insertItem(container, stack);
     }
 
     // ======================== UTILITY METHODS ======================== //
@@ -278,39 +221,20 @@ public class InventoryUtils {
     }
 
     /**
-     * Collects copies of items from a container section matching the predicate.
-     *
-     * @param container Target inventory
-     * @param predicate Item matching logic
-     * @param section Section to search
-     * @return Immutable list of matching item copies
-     * @throws NullPointerException if any parameter is null
-     */
-    public static ImmutableList<ItemStack> collectMatching(Container container, InventoryPredicate predicate, InventorySection section) {
-        Objects.requireNonNull(section, "Section cannot be null");
-        return collectMatching(container, predicate, section.getSlotRange());
-    }
-
-    /**
-     * Calculates total available space for a specific item type.
+     * Calculates total available space of a container
      *
      * @param container Container to check
-     * @param stack Item type to check space for
-     * @return Total number of items that can be added
+     * @return The number of empty slots
      * @throws NullPointerException if container or stack is null
      */
-    public static int getAvailableSpace(Container container, ItemStack stack) {
+    public static int getAvailableSpace(Container container) {
         validateContainer(container);
-        Objects.requireNonNull(stack, "ItemStack cannot be null");
         int space = 0;
-        ItemStack testStack = stack.copy();
 
         for (int slot = 0; slot < container.getContainerSize(); slot++) {
             ItemStack existing = container.getItem(slot);
             if (existing.isEmpty()) {
-                space += testStack.getMaxStackSize();
-            } else if (ItemStack.isSameItem(existing, testStack)) {
-                space += testStack.getMaxStackSize() - existing.getCount();
+                space += 1;
             }
         }
         return space;

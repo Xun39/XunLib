@@ -3,6 +3,7 @@ package net.xun.lib.common.internal.nbt;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtException;
 import net.minecraft.nbt.Tag;
+import net.xun.lib.common.api.annotations.PersistentNbt;
 import net.xun.lib.common.api.nbt.INbtAdapter;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -11,7 +12,7 @@ import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 
 /**
- * Runtime field accessor for {@link net.xun.lib.common.api.nbt.PersistentNbt} annotated fields.
+ * Runtime field accessor for {@link PersistentNbt} annotated fields.
  * <p>
  * Wraps reflection operations with MethodHandles for better performance
  * and integrates with the {@link INbtAdapter} system.

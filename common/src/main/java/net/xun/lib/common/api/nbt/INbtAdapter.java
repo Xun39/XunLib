@@ -25,6 +25,14 @@ import java.util.Map;
 public interface INbtAdapter<T> {
 
     /**
+     * Returns the exact class this adapter is designed to handle.
+     * <p>
+     * Used by the adapter registry for type matching. The registry will use this adapter for all
+     * serialization tasks where {@code Class.equals()} matches the target type exactly.
+     */
+    Class<T> getTargetType();
+
+    /**
      * Converts an object instance into its NBT representation.
      *
      * @param value Non-null instance to serialize. Implementations may assume valid non-null input
@@ -47,14 +55,6 @@ public interface INbtAdapter<T> {
      * @throws IllegalArgumentException If tag contains invalid or incompatible data
      */
     T load(Tag tag);
-
-    /**
-     * Returns the exact class this adapter is designed to handle.
-     * <p>
-     * Used by the adapter registry for type matching. The registry will use this adapter for all
-     * serialization tasks where {@code Class.equals()} matches the target type exactly.
-     */
-    Class<T> getTargetType();
 
     /**
      * Retrieves the most appropriate adapter for a given type from the registry.

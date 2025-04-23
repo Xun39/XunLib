@@ -1,5 +1,7 @@
 package net.xun.lib.common.api.inventory.slot;
 
+import net.xun.lib.common.api.inventory.PlayerInventorySection;
+
 /**
  * Utility class for calculating inventory slot indices based on grid coordinates (rows/columns),
  * inventory sections, and container-to-inventory conversions.
@@ -31,7 +33,7 @@ public class SlotGetter {
      * @return the calculated inventory slot index
      * @throws IllegalArgumentException if the row or column is invalid for the given section
      */
-    public static int getInventorySlotIndex(int row, int column, InventorySection section) {
+    public static int getInventorySlotIndex(int row, int column, PlayerInventorySection section) {
         switch (section) {
             case HOTBAR:
                 if (row != 0) {

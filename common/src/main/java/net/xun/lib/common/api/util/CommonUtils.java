@@ -14,12 +14,17 @@ import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.material.Fluid;
+import net.xun.lib.common.api.exceptions.UtilityClassException;
 import net.xun.lib.common.internal.misc.ModIDManager;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class CommonUtils {
+
+    private CommonUtils() throws UtilityClassException {
+        throw new UtilityClassException();
+    }
 
     /**
      * Combines a namespace with path components into a namespaced ID string.

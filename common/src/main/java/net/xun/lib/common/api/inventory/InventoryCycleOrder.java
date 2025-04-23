@@ -1,7 +1,8 @@
-package net.xun.lib.common.api.inventory.slot;
+package net.xun.lib.common.api.inventory;
 
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
+import net.xun.lib.common.api.inventory.slot.SlotRange;
 import net.xun.lib.common.api.util.InventoryUtils;
 import org.jetbrains.annotations.Nullable;
 
@@ -28,9 +29,8 @@ public enum InventoryCycleOrder {
      * @return List of slots in processing order
      */
     public List<Integer> getSlotOrder(Container container, @Nullable SlotRange range) {
-        InventoryUtils.validateContainer(container, true); // Read-only validation
+        InventoryUtils.validateContainer(container, true);
 
-        // Determine effective slot range
         int minSlot = 0;
         int maxSlot = container.getContainerSize() - 1;
 
@@ -45,7 +45,6 @@ public enum InventoryCycleOrder {
             }
         }
 
-        // Special handling for player inventories
         boolean isPlayerInventory = container instanceof Player;
         List<Integer> slots = new ArrayList<>();
 

@@ -1,6 +1,7 @@
 package net.xun.lib.common.api.item.fuzzy;
 
 import net.minecraft.world.item.ItemStack;
+import net.xun.lib.common.api.exceptions.InvalidMatcherConfigurationException;
 import net.xun.lib.common.api.inventory.predicates.InventoryPredicate;
 
 import java.util.*;

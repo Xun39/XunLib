@@ -1,6 +1,7 @@
-package net.xun.lib.common.api.item.fuzzy;
+package net.xun.lib.common.api.exceptions;
 
 import net.minecraft.world.item.ItemStack;
+import net.xun.lib.common.api.item.fuzzy.FuzzyMatcher;
 
 /**
  * Exception thrown when invalid configuration combinations are detected in a

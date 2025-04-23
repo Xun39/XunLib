@@ -25,6 +25,15 @@ import net.xun.lib.common.internal.misc.NbtUtils;
 public class GenericNbtAdapter implements INbtAdapter<Object> {
 
     /**
+     * Specifies {@link Object} as the fallback target type, ensuring this adapter is used
+     * only when no type-specific adapters are available.
+     */
+    @Override
+    public Class<Object> getTargetType() {
+        return Object.class;
+    }
+
+    /**
      * Serializes objects using {@link NbtUtils}'s reflection-based approach.
      *
      * @param value Non-null object to serialize. Must be of a type recognized by {@link NbtUtils}
@@ -47,14 +56,5 @@ public class GenericNbtAdapter implements INbtAdapter<Object> {
     @Override
     public Object load(Tag tag) {
         return NbtUtils.readField(tag);
-    }
-
-    /**
-     * Specifies {@link Object} as the fallback target type, ensuring this adapter is used
-     * only when no type-specific adapters are available.
-     */
-    @Override
-    public Class<Object> getTargetType() {
-        return Object.class;
     }
 }

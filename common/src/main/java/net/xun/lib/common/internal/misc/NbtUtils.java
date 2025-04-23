@@ -1,7 +1,7 @@
 package net.xun.lib.common.internal.misc;
 
 import net.minecraft.nbt.*;
-import net.xun.lib.common.api.nbt.PersistentNbt;
+import net.xun.lib.common.api.annotations.PersistentNbt;
 import net.xun.lib.common.internal.nbt.NbtFieldAccessor;
 import net.xun.lib.common.internal.block.entity.BlockEntityDataManager;
 import org.jetbrains.annotations.ApiStatus;

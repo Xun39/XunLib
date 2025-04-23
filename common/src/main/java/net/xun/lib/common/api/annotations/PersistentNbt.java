@@ -1,5 +1,6 @@
-package net.xun.lib.common.api.nbt;
+package net.xun.lib.common.api.annotations;
 
+import net.xun.lib.common.api.nbt.INbtAdapter;
 import net.xun.lib.common.api.nbt.adapters.GenericNbtAdapter;
 import net.xun.lib.common.internal.misc.NbtUtils;
 

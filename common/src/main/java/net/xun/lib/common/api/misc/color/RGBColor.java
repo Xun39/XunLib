@@ -1,5 +1,7 @@
 package net.xun.lib.common.api.misc.color;
 
+import net.xun.lib.common.api.exceptions.InvalidColorFormatException;
+
 /**
  * Represents a color in the RGB (Red, Green, Blue) color space.
  */

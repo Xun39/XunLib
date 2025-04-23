@@ -2,13 +2,12 @@ package net.xun.lib.common.internal.block.entity;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.xun.lib.common.api.nbt.PersistentNbt;
+import net.xun.lib.common.api.annotations.PersistentNbt;
 import net.xun.lib.common.internal.nbt.NbtFieldAccessor;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

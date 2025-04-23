@@ -2,11 +2,16 @@ package net.xun.lib.common.api.util;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.xun.lib.common.api.exceptions.UtilityClassException;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class BlockPosUtils {
+
+    private BlockPosUtils() throws UtilityClassException {
+        throw new UtilityClassException();
+    }
 
     public static List<BlockPos> getDisc(BlockPos center, int radius) {
         List<BlockPos> disc = new ArrayList<>();

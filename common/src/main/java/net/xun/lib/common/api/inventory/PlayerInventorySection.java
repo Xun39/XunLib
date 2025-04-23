@@ -1,4 +1,6 @@
-package net.xun.lib.common.api.inventory.slot;
+package net.xun.lib.common.api.inventory;
+
+import net.xun.lib.common.api.inventory.slot.SlotRange;
 
 import java.util.function.IntPredicate;
 
@@ -17,7 +19,7 @@ import java.util.function.IntPredicate;
  *   <li>{@code ALL} (0-40 inclusive)</li>
  * </ul>
  */
-public enum InventorySection {
+public enum PlayerInventorySection {
 
     HOTBAR(0, 9),
     MAIN_INVENTORY(9, 36),
@@ -29,7 +31,7 @@ public enum InventorySection {
     private final int end;
     private final IntPredicate checker;
 
-    InventorySection(int start, int end) {
+    PlayerInventorySection(int start, int end) {
         this.start = start;
         this.end = end;
         this.checker = slot -> slot >= start && slot < end;
