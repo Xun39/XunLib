@@ -53,8 +53,6 @@ public class FuzzyConfig {
      * </ul>
      */
     public enum FilterMode {
-        /** Compare all data objects */
-        ALL,
         /** Include only specified objects in comparison */
         WHITELIST,
         /** Exclude specified objects from comparison */
@@ -115,7 +113,8 @@ public class FuzzyConfig {
      */
     public FuzzyConfig withComponentFilter(FilterMode mode, Set<DataComponentType<?>> components) {
         FuzzyConfig copy = copy();
-        copy.componentFilter = mode == FilterMode.WHITELIST
+        copy.componentFilter =
+                mode == FilterMode.WHITELIST
                 ? components::contains
                 : c -> !components.contains(c);
         return copy;

@@ -9,7 +9,7 @@ public class ModSetup {
      * <p>
      *     used in {@link net.xun.lib.common.api.util.CommonUtils} for all mod ID
      *     related methods
-     * @param modId your mod ID
+     * @param modId Your mod ID
      */
     public static void setModId(String modId) {
         ModIDManager.setModId(modId);

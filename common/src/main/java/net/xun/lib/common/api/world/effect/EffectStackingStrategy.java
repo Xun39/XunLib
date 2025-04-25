@@ -44,6 +44,19 @@ public enum EffectStackingStrategy {
         }
     }),
 
+    PREVENT_STACKING((entity, effect) -> {
+        MobEffectInstance current = entity.getEffect(effect.getEffect());
+        if (current == null) {
+            entity.addEffect(new MobEffectInstance(
+                    effect.getEffect(),
+                    effect.getDuration(),
+                    effect.getAmplifier(),
+                    effect.isAmbient(),
+                    effect.isVisible()
+            ));
+        }
+    }),
+
     /**
      * Always applies the new effect, overwriting any existing version.
      * <p>
