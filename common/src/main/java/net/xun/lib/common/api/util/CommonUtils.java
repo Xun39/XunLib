@@ -7,18 +7,28 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.alchemy.Potion;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.chunk.status.ChunkStatus;
+import net.minecraft.world.level.gameevent.GameEvent;
+import net.minecraft.world.level.levelgen.structure.templatesystem.PosRuleTestType;
+import net.minecraft.world.level.levelgen.structure.templatesystem.RuleTestType;
+import net.minecraft.world.level.levelgen.structure.templatesystem.rule.blockentity.RuleBlockEntityModifierType;
 import net.minecraft.world.level.material.Fluid;
 import net.xun.lib.common.api.exceptions.UtilityClassException;
 import net.xun.lib.common.internal.misc.ModIDManager;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.jar.Attributes;
 
 public class CommonUtils {
 
@@ -50,7 +60,7 @@ public class CommonUtils {
      * @return Namespaced ResourceLocation
      * @throws IllegalStateException If the mod ID has not been set or detected
      */
-    public static ResourceLocation modResourceLocation(String path) {
+    public static ResourceLocation modLoc(String path) {
         return ResourceLocation.fromNamespaceAndPath(ModIDManager.getModId(), path);
     }
 
@@ -65,21 +75,6 @@ public class CommonUtils {
         return combineAsNamespacedID(ModIDManager.getModId(), pathParts);
     }
 
-    private static final Map<Class<?>, Registry<?>> REGISTRIES = new HashMap<>();
-
-    static {
-        REGISTRIES.put(SoundEvent.class, BuiltInRegistries.SOUND_EVENT);
-        REGISTRIES.put(Fluid.class, BuiltInRegistries.FLUID);
-        REGISTRIES.put(MobEffect.class, BuiltInRegistries.MOB_EFFECT);
-        REGISTRIES.put(Block.class, BuiltInRegistries.BLOCK);
-        REGISTRIES.put(EntityType.class, BuiltInRegistries.ENTITY_TYPE);
-        REGISTRIES.put(Item.class, BuiltInRegistries.ITEM);
-        REGISTRIES.put(Potion.class, BuiltInRegistries.POTION);
-        REGISTRIES.put(ParticleType.class, BuiltInRegistries.PARTICLE_TYPE);
-        REGISTRIES.put(BlockEntityType.class, BuiltInRegistries.BLOCK_ENTITY_TYPE);
-        REGISTRIES.put(ArmorMaterial.class, BuiltInRegistries.ARMOR_MATERIAL);
-    }
-
     /**
      * Retrieves the registry key for a given object by checking known registries.
      * <p>
@@ -91,14 +86,18 @@ public class CommonUtils {
      * @return The resource location key of the object
      * @throws IllegalArgumentException If the object's type isn't in the supported registries
      */
+    @SuppressWarnings("unchecked")
     public static ResourceLocation getKey(Object obj) {
-        for (Map.Entry<Class<?>, Registry<?>> entry : REGISTRIES.entrySet()) {
-            if (entry.getKey().isInstance(obj)) {
-                Registry<Object> registry = (Registry<Object>) entry.getValue();
-                return registry.getKey(obj);
-            }
+        for (Registry<?> registry : BuiltInRegistries.REGISTRY) {
+            try {
+                Registry<Object> objRegistry = (Registry<Object>) registry;
+                ResourceLocation key = objRegistry.getKey(obj);
+                if (key != null) {
+                    return key;
+                }
+            } catch (ClassCastException ignored) {}
         }
-        throw new IllegalArgumentException("Unsupported type: " + obj.getClass());
+        throw new IllegalArgumentException("Object not registered in any known registry: " + obj);
     }
 
     /**

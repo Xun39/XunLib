@@ -10,18 +10,18 @@ public enum ArmorType {
     LEGGINGS("_leggings", ArmorItem.Type.LEGGINGS, EquipmentSlot.LEGS),
     BOOTS("_boots", ArmorItem.Type.BOOTS, EquipmentSlot.FEET);
 
-    private final String suffix;
+    private final String nameSuffix;
     private final ArmorItem.Type type;
     private final EquipmentSlot slot;
 
     ArmorType(String suffix, ArmorItem.Type type, EquipmentSlot slot) {
-        this.suffix = suffix;
+        this.nameSuffix = suffix;
         this.type = type;
         this.slot = slot;
     }
 
-    public String getSuffix() {
-        return suffix;
+    public String getNameSuffix() {
+        return nameSuffix;
     }
 
     public ArmorItem.Type getType() {

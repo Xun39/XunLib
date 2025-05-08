@@ -19,7 +19,7 @@ public enum ToolType {
     SHOVEL("_shovel", ShovelItem::new);
 
     /** Suffix appended to base name for registration */
-    public final String nameSuffix;
+    private final String nameSuffix;
     private final ToolFactory factory;
 
     /**
@@ -40,6 +40,10 @@ public enum ToolType {
      */
     Item create(Tier tier, Item.Properties properties) {
         return factory.create(tier, properties);
+    }
+
+    public String getNameSuffix() {
+        return nameSuffix;
     }
 
     /**

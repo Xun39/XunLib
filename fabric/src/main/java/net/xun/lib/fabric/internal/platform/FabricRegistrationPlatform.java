@@ -1,12 +1,16 @@
 package net.xun.lib.fabric.internal.platform;
 
-import net.xun.lib.common.internal.item.ItemRegistrar;
-import net.xun.lib.common.internal.platform.services.IRegistrationPlatform;
-import net.xun.lib.fabric.internal.item.tools.FabricItemRegistrar;
+import net.minecraft.core.Registry;
+import net.xun.lib.common.internal.platform.IRegistrationPlatform;
+import net.xun.lib.common.api.registries.Registrar;
+import net.xun.lib.fabric.api.registries.FabricRegistrar;
+import org.jetbrains.annotations.ApiStatus;
 
+@ApiStatus.Internal
 public class FabricRegistrationPlatform implements IRegistrationPlatform {
+
     @Override
-    public ItemRegistrar getItemRegistrar() {
-        return new FabricItemRegistrar();
+    public <T> Registrar<T> createRegistrar(Registry<T> registry, String modId) {
+        return new FabricRegistrar<>(registry, modId);
     }
 }

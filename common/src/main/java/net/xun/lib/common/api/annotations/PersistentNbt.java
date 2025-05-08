@@ -26,7 +26,7 @@ import java.lang.annotation.Target;
  * <p><b>Example:</b>
  * <pre>{@code
  * @PersistentNbt
- * private int fuelLevel;  // Auto-serialized using GenericNbtAdapter
+ * private int smeltingTime;  // Auto-serialized using GenericNbtAdapter
  *
  * @PersistentNbt(adapter = BlockPosAdapter.class)
  * private BlockPos cachedPosition;  // Custom serialization
@@ -57,8 +57,8 @@ public @interface PersistentNbt {
      * <p><b>Example:</b>
      * <pre>{@code
      * // Custom adapter for inventory serialization
-     * @PersistentNbt(adapter = CompactInventoryAdapter.class)
-     * private InventorySection warehouseInventory;
+     * @PersistentNbt(adapter = ItemStackAdapter.class)
+     * private NonNullList<ItemStack> items;
      * }</pre>
      */
     Class<? extends INbtAdapter> adapter() default GenericNbtAdapter.class;

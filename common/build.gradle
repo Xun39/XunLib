@@ -18,7 +18,7 @@ neoForge {
 
 dependencies {
     compileOnly group: 'org.spongepowered', name: 'mixin', version: '0.8.5'
-    // fabric and neoforge both bundle mixinextras, so it is safe to use it in common
+
     compileOnly group: 'io.github.llamalad7', name: 'mixinextras-common', version: '0.3.5'
     annotationProcessor group: 'io.github.llamalad7', name: 'mixinextras-common', version: '0.3.5'
 }
@@ -37,5 +37,40 @@ configurations {
 artifacts {
     commonJava sourceSets.main.java.sourceDirectories.singleFile
     commonResources sourceSets.main.resources.sourceDirectories.singleFile
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId = rootProject.mod_id + "-" + project.name
+
+            pom {
+                name = "XunLib"
+                description = "A common code library"
+                url = 'https://github.com/Xun39/XunLib'
+                scm {
+                    url = 'https://github.com/Xun39/XunLib'
+                    connection = 'scm:git:git://github.com/Xun39/XunLib.git'
+                    developerConnection = 'scm:git:ssh://git@github.com:Xun39/XunLib.git'
+                }
+                licenses {
+                    license {
+                        name = 'MIT'
+                        url = 'https://github.com/Xun39/XunLib/blob/main/LICENSE'
+                        distribution = 'repo'
+                    }
+                }
+                developers {
+                    developer {
+                        name = 'Xun'
+                        email = 'kaixunsu@outlook.com'
+                    }
+                }
+            }
+        }
+    }
+    repositories {
+        mavenLocal()
+    }
 }
 

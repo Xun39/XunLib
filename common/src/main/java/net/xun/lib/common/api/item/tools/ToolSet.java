@@ -1,14 +1,16 @@
 package net.xun.lib.common.api.item.tools;
 
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.*;
-import net.xun.lib.common.internal.item.ItemRegistrar;
-import net.xun.lib.common.internal.platform.RegistrationServices;
+import net.xun.lib.common.api.registries.LazyItemReference;
+import net.xun.lib.common.api.registries.LazyRegistryReference;
+import net.xun.lib.common.api.registries.Registrar;
+import net.xun.lib.common.internal.misc.ModIDManager;
 
 import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Supplier;
 
 /**
  * Represents a complete set of tools (sword, axe, pickaxe, shovel, hoe) with configurable attributes.
@@ -22,11 +24,11 @@ public class ToolSet {
     private final EnumMap<ToolType, Float> attackSpeed;
     private final Item.Properties properties;
     private final ToolConfigurator configuration;
-    private final Map<ToolType, Supplier<? extends Item>> tools = new EnumMap<>(ToolType.class);
-    private final ItemRegistrar registrar;
+    private final Map<ToolType, LazyRegistryReference<? extends Item>> tools = new EnumMap<>(ToolType.class);
+    private final Registrar<Item> registrar;
     private final AttributeHelper attributeHelper;
 
-    public ToolSet(String name, Tier tier, EnumMap<ToolType, Float> attackDamage, EnumMap<ToolType, Float> attackSpeed, Item.Properties properties, ToolConfigurator configuration, ItemRegistrar registrar, AttributeHelper attributeHelper) {
+    public ToolSet(String name, Tier tier, EnumMap<ToolType, Float> attackDamage, EnumMap<ToolType, Float> attackSpeed, Item.Properties properties, ToolConfigurator configuration, Registrar<Item> registrar, AttributeHelper attributeHelper) {
         this.name = name;
         this.tier = tier;
         this.attackDamage = attackDamage;
@@ -35,6 +37,71 @@ public class ToolSet {
         this.configuration = configuration;
         this.registrar = registrar;
         this.attributeHelper = attributeHelper;
+    }
+
+    /**
+     * Registers all tools in the set with the game registry.
+     */
+    public void registerAll() {
+        for (ToolType type : ToolType.values()) {
+
+            final String fullName = name + type.getNameSuffix();
+            Item.Properties finalProperties = attributeHelper.applyAttributes(
+                    properties, tier.getAttackDamageBonus() + attackDamage.get(type), attackSpeed.get(type)
+            );
+
+            LazyItemReference<Item> reference = new LazyItemReference<>(fullName, () -> configuration.createTool(type, tier, finalProperties));
+
+            registrar.register(fullName, reference::get);
+            tools.put(type, reference);
+        }
+    }
+
+    /**
+     * @return Supplier for the registered sword item
+     */
+    public LazyItemReference<SwordItem> getSword() {
+        return getTool(ToolType.SWORD);
+    }
+
+    /**
+     * @return Supplier for the registered axe item
+     */
+    public LazyItemReference<AxeItem> getAxe() {
+        return getTool(ToolType.AXE);
+    }
+
+    /**
+     * @return Supplier for the registered pickaxe item
+     */
+    public LazyItemReference<PickaxeItem> getPickaxe() {
+        return getTool(ToolType.PICKAXE);
+    }
+
+    /**
+     * @return Supplier for the registered hoe item
+     */
+    public LazyItemReference<HoeItem> getHoe() {
+        return getTool(ToolType.HOE);
+    }
+
+    /**
+     * @return Supplier for the registered shovel item
+     */
+    public LazyItemReference<ShovelItem> getShovel() {
+        return getTool(ToolType.SHOVEL);
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T extends Item> LazyItemReference<T> getTool(ToolType type) {
+        return (LazyItemReference<T>) tools.get(type);
+    }
+
+    /**
+     * @return List of all registered tool items in this set
+     */
+    public List<Item> getAll() {
+        return tools.values().stream().map(supplier -> (Item) supplier.get()).toList();
     }
 
     /**
@@ -48,7 +115,7 @@ public class ToolSet {
         private final EnumMap<ToolType, Float> attackSpeed = new EnumMap<>(ToolType.class);
         private Item.Properties properties = new Item.Properties();
         private ToolConfigurator configuration = ToolConfigurator.DEFAULT;
-        private final ItemRegistrar registrar;
+        private final Registrar<Item> registrar;
         private final AttributeHelper attributeHelper;
 
         /**
@@ -61,7 +128,7 @@ public class ToolSet {
         public Builder(String name, Tier tier, AttributeHelper attributeHelper) {
             this.name = name;
             this.tier = tier;
-            this.registrar = RegistrationServices.getItemRegistrar();
+            this.registrar = Registrar.create(BuiltInRegistries.ITEM, ModIDManager.getModId());
             this.attributeHelper = attributeHelper;
             initializeDefaultStats();
         }
@@ -155,73 +222,5 @@ public class ToolSet {
                 throw new IllegalArgumentException("Invalid stats array lengths. Expected " + expected + " elements. Tool order: " + Arrays.toString(ToolType.values()));
             }
         }
-    }
-
-    /**
-     * Registers all tools in the set with the game registry.
-     *
-     * @return This ToolSet for chaining
-     */
-    public ToolSet registerAll() {
-        for (ToolType type : ToolType.values()) {
-            final float damage = attackDamage.get(type);
-            final float speed = attackSpeed.get(type);
-
-            Item.Properties finalProperties = attributeHelper.applyAttributes(
-                    properties, tier.getAttackDamageBonus() + damage, speed
-            );
-
-            tools.put(type, registrar.registerItem(
-                    name + type.nameSuffix, () -> configuration.createTool(type, tier, properties))
-            );
-        }
-        return this;
-    }
-
-    /**
-     * @return Supplier for the registered sword item
-     */
-    @SuppressWarnings("unchecked")
-    public Supplier<SwordItem> getSword() {
-        return (Supplier<SwordItem>) tools.get(ToolType.SWORD);
-    }
-
-    /**
-     * @return Supplier for the registered axe item
-     */
-    @SuppressWarnings("unchecked")
-    public Supplier<AxeItem> getAxe() {
-        return (Supplier<AxeItem>) tools.get(ToolType.AXE);
-    }
-
-    /**
-     * @return Supplier for the registered pickaxe item
-     */
-    @SuppressWarnings("unchecked")
-    public Supplier<PickaxeItem> getPickaxe() {
-        return (Supplier<PickaxeItem>) tools.get(ToolType.PICKAXE);
-    }
-
-    /**
-     * @return Supplier for the registered hoe item
-     */
-    @SuppressWarnings("unchecked")
-    public Supplier<HoeItem> getHoe() {
-        return (Supplier<HoeItem>) tools.get(ToolType.HOE);
-    }
-
-    /**
-     * @return Supplier for the registered shovel item
-     */
-    @SuppressWarnings("unchecked")
-    public Supplier<ShovelItem> getShovel() {
-        return (Supplier<ShovelItem>) tools.get(ToolType.SHOVEL);
-    }
-
-    /**
-     * @return List of all registered tool items in this set
-     */
-    public List<Item> getAll() {
-        return tools.values().stream().map(supplier -> (Item) supplier.get()).toList();
     }
 }
