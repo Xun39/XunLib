@@ -1,33 +1,32 @@
 package net.xun.lib.fabric.api.registries;
 
 import net.minecraft.core.Registry;
-import net.minecraft.resources.ResourceLocation;
-import net.xun.lib.common.api.registries.LazyRegistryReference;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceKey;
 import net.xun.lib.common.api.registries.Registrar;
+import net.xun.lib.common.api.registries.RegistryHolder;
+import net.xun.lib.common.api.util.CommonUtils;
 
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Supplier;
+public class FabricRegistrar<T> extends Registrar<T> {
 
-public class FabricRegistrar<T> implements Registrar<T> {
-    private final Registry<T> registry;
-    private final String modId;
-    private final Set<String> registeredNames = ConcurrentHashMap.newKeySet();
-
-    public FabricRegistrar(Registry<T> registry, String modId) {
-        this.registry = registry;
-        this.modId = modId;
+    public FabricRegistrar(ResourceKey<Registry<T>> registry) {
+        super(registry);
     }
 
     @Override
-    public <U extends T> LazyRegistryReference<U> register(String name, Supplier<U> supplier) {
-        if (!registeredNames.add(name)) {
-            throw new IllegalArgumentException("Duplicate registration: " + name);
-        }
+    protected <R extends T> void bind(RegistryHolder<T, R> holder) {
+        holder.bind(
+                Registry.registerForHolder(
+                        getRegistry(getRegistry()),
+                        CommonUtils.createKey(
+                                getRegistry(),
+                                holder.unwrapKey().orElseThrow().location().getPath()),
+                        holder.getSupplier().get())
+        );
+    }
 
-        LazyRegistryReference<U> ref = new LazyRegistryReference<>(name, supplier);
-
-        Registry.register(registry, ResourceLocation.fromNamespaceAndPath(modId, name), supplier.get());
-        return ref;
+    @SuppressWarnings("unchecked")
+    private static <R> Registry<R> getRegistry(ResourceKey<Registry<R>> key) {
+        return (Registry<R>) BuiltInRegistries.REGISTRY.get(key.location());
     }
 }

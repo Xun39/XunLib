@@ -1,16 +1,12 @@
 package net.xun.lib.common.api.item.tools;
 
-import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.*;
-import net.xun.lib.common.api.registries.LazyItemReference;
-import net.xun.lib.common.api.registries.LazyRegistryReference;
-import net.xun.lib.common.api.registries.Registrar;
-import net.xun.lib.common.internal.misc.ModIDManager;
+import net.xun.lib.common.api.util.CommonUtils;
+import net.xun.lib.common.api.util.LazyReference;
 
-import java.util.Arrays;
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.function.Supplier;
 
 /**
  * Represents a complete set of tools (sword, axe, pickaxe, shovel, hoe) with configurable attributes.
@@ -18,90 +14,82 @@ import java.util.Map;
  */
 public class ToolSet {
 
-    private final String name;
-    private final Tier tier;
-    private final EnumMap<ToolType, Float> attackDamage;
-    private final EnumMap<ToolType, Float> attackSpeed;
-    private final Item.Properties properties;
-    private final ToolConfigurator configuration;
-    private final Map<ToolType, LazyRegistryReference<? extends Item>> tools = new EnumMap<>(ToolType.class);
-    private final Registrar<Item> registrar;
-    private final AttributeHelper attributeHelper;
+    private final Map<ToolType, LazyReference<? extends Item>> tools = new EnumMap<>(ToolType.class);
 
-    public ToolSet(String name, Tier tier, EnumMap<ToolType, Float> attackDamage, EnumMap<ToolType, Float> attackSpeed, Item.Properties properties, ToolConfigurator configuration, Registrar<Item> registrar, AttributeHelper attributeHelper) {
-        this.name = name;
-        this.tier = tier;
-        this.attackDamage = attackDamage;
-        this.attackSpeed = attackSpeed;
-        this.properties = properties;
-        this.configuration = configuration;
-        this.registrar = registrar;
-        this.attributeHelper = attributeHelper;
-    }
+    protected ToolSet(String name, Tier tier, EnumMap<ToolType, Float> attackDamage, EnumMap<ToolType, Float> attackSpeed, Item.Properties properties, ToolConfigurator configuration, AttributeHelper attributeHelper) {
 
-    /**
-     * Registers all tools in the set with the game registry.
-     */
-    public void registerAll() {
         for (ToolType type : ToolType.values()) {
+            String fullName = name + type.getNameSuffix();
 
-            final String fullName = name + type.getNameSuffix();
             Item.Properties finalProperties = attributeHelper.applyAttributes(
                     properties, tier.getAttackDamageBonus() + attackDamage.get(type), attackSpeed.get(type)
             );
 
-            LazyItemReference<Item> reference = new LazyItemReference<>(fullName, () -> configuration.createTool(type, tier, finalProperties));
-
-            registrar.register(fullName, reference::get);
-            tools.put(type, reference);
+            tools.put(type, new LazyReference<>(
+                    fullName,
+                    () -> configuration.createTool(type, tier, finalProperties))
+            );
         }
     }
 
+    public Map<ResourceLocation, Supplier<? extends Item>> getItemsForRegistration() {
+        Map<ResourceLocation, Supplier<? extends Item>> items = new LinkedHashMap<>();
+
+        for (Map.Entry<ToolType, LazyReference<? extends Item>> entry : tools.entrySet()) {
+            ResourceLocation id = CommonUtils.modLoc(entry.getValue().getName());
+            items.put(id, entry.getValue());
+        }
+
+        return items;
+    }
+
     /**
-     * @return Supplier for the registered sword item
+     * @return Supplier of the registered sword item
      */
-    public LazyItemReference<SwordItem> getSword() {
+    public Supplier<SwordItem> getSword() {
         return getTool(ToolType.SWORD);
     }
 
     /**
-     * @return Supplier for the registered axe item
+     * @return Supplier of the registered axe item
      */
-    public LazyItemReference<AxeItem> getAxe() {
+    public Supplier<AxeItem> getAxe() {
         return getTool(ToolType.AXE);
     }
 
     /**
-     * @return Supplier for the registered pickaxe item
+     * @return Supplier of the registered pickaxe item
      */
-    public LazyItemReference<PickaxeItem> getPickaxe() {
+    public Supplier<PickaxeItem> getPickaxe() {
         return getTool(ToolType.PICKAXE);
     }
 
     /**
-     * @return Supplier for the registered hoe item
+     * @return Supplier of the registered hoe item
      */
-    public LazyItemReference<HoeItem> getHoe() {
+    public Supplier<HoeItem> getHoe() {
         return getTool(ToolType.HOE);
     }
 
     /**
-     * @return Supplier for the registered shovel item
+     * @return Supplier of the registered shovel item
      */
-    public LazyItemReference<ShovelItem> getShovel() {
+    public Supplier<ShovelItem> getShovel() {
         return getTool(ToolType.SHOVEL);
     }
 
     @SuppressWarnings("unchecked")
-    private <T extends Item> LazyItemReference<T> getTool(ToolType type) {
-        return (LazyItemReference<T>) tools.get(type);
+    private <T extends Item> Supplier<T> getTool(ToolType type) {
+        return (Supplier<T>) tools.get(type);
     }
 
     /**
      * @return List of all registered tool items in this set
      */
     public List<Item> getAll() {
-        return tools.values().stream().map(supplier -> (Item) supplier.get()).toList();
+        return tools.values().stream()
+                .map(supplier -> (Item) supplier.get())
+                .toList();
     }
 
     /**
@@ -115,7 +103,6 @@ public class ToolSet {
         private final EnumMap<ToolType, Float> attackSpeed = new EnumMap<>(ToolType.class);
         private Item.Properties properties = new Item.Properties();
         private ToolConfigurator configuration = ToolConfigurator.DEFAULT;
-        private final Registrar<Item> registrar;
         private final AttributeHelper attributeHelper;
 
         /**
@@ -128,7 +115,6 @@ public class ToolSet {
         public Builder(String name, Tier tier, AttributeHelper attributeHelper) {
             this.name = name;
             this.tier = tier;
-            this.registrar = Registrar.create(BuiltInRegistries.ITEM, ModIDManager.getModId());
             this.attributeHelper = attributeHelper;
             initializeDefaultStats();
         }
@@ -213,7 +199,7 @@ public class ToolSet {
          * @return New ToolSet with specified configuration
          */
         public ToolSet build() {
-            return new ToolSet(this.name, this.tier, this.attackDamage, this.attackSpeed, this.properties, this.configuration, this.registrar, this.attributeHelper);
+            return new ToolSet(this.name, this.tier, this.attackDamage, this.attackSpeed, this.properties, this.configuration, this.attributeHelper);
         }
 
         private void validateArrayStats(float[] damages, float[] speeds) {

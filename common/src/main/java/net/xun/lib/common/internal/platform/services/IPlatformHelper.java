@@ -1,5 +1,9 @@
 package net.xun.lib.common.internal.platform.services;
 
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceKey;
+import net.xun.lib.common.api.registries.Registrar;
+
 public interface IPlatformHelper {
 
     /**
@@ -30,7 +34,8 @@ public interface IPlatformHelper {
      * @return The name of the environment type.
      */
     default String getEnvironmentName() {
-
         return isDevelopmentEnvironment() ? "development" : "production";
     }
+
+    <T> Registrar<T> createRegistrar(ResourceKey<Registry<T>> registry, String namespace);
 }

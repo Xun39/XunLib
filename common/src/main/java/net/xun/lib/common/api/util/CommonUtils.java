@@ -3,6 +3,7 @@ package net.xun.lib.common.api.util;
 import net.minecraft.core.Registry;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.effect.MobEffect;
@@ -128,5 +129,16 @@ public class CommonUtils {
      */
     public static String getRegistryID(ItemLike itemLike) {
         return getKey(itemLike).getPath();
+    }
+
+    /**
+     * Creates a resource key from a registry and a path
+     * @param registry Resource key of the registry
+     * @param path The key path
+     * @return A resource key from the registry and the path
+     * @param <T> The type of the resource key
+     */
+    public static <T> ResourceKey<T> createKey(ResourceKey<? extends Registry<T>> registry, String path) {
+        return ResourceKey.create(registry, CommonUtils.modLoc(path));
     }
 }
