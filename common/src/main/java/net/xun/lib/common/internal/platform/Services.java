@@ -2,9 +2,11 @@ package net.xun.lib.common.internal.platform;
 
 import net.xun.lib.common.internal.XunLibConstants;
 import net.xun.lib.common.internal.platform.services.IPlatformHelper;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.ServiceLoader;
 
+@ApiStatus.Internal
 public class Services {
 
     public static final IPlatformHelper PLATFORM = load(IPlatformHelper.class);

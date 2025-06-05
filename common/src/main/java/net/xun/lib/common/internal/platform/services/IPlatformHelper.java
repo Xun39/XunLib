@@ -2,7 +2,10 @@ package net.xun.lib.common.internal.platform.services;
 
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
-import net.xun.lib.common.api.registries.Registrar;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
+import net.xun.lib.common.api.registries.Register;
+import net.xun.lib.common.api.registries.RegistryHolder;
 
 public interface IPlatformHelper {
 
@@ -37,5 +40,9 @@ public interface IPlatformHelper {
         return isDevelopmentEnvironment() ? "development" : "production";
     }
 
-    <T> Registrar<T> createRegistrar(ResourceKey<Registry<T>> registry, String namespace);
+    <T> Register<T> createRegistrar(ResourceKey<? extends Registry<T>> registry, String namespace);
+
+    <T extends Item> void bindItem(RegistryHolder<Item, T> holder, String namespace);
+
+    <T extends Block> void bindBlock(RegistryHolder<Block, T> holder, String namespace);
 }

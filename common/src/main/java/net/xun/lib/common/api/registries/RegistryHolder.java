@@ -1,7 +1,7 @@
 package net.xun.lib.common.api.registries;
 
 /*
-    This is a class from the Artifacts mod
+    This class is from the Artifacts mod
 
     MIT License
 
@@ -21,114 +21,186 @@ package net.xun.lib.common.api.registries;
 import com.mojang.datafixers.util.Either;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderOwner;
+import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-public class RegistryHolder<T, R extends T> implements Holder<T>, Supplier<R> {
+/**
+ * A registry-backed holder implementation that wraps a registry entry and its supplier.
+ * <p>
+ * This class acts as a bridge between {@link Holder} and {@link Supplier}, allowing lazy initialization
+ * and late binding to actual registry entries.
+ * </p>
+ *
+ * @param <R> The base registry type (e.g. {@code Item})
+ * @param <T> The concrete type of the held object (must extend {@code R})
+ */
+public class RegistryHolder<R, T extends R> implements Holder<R>, Supplier<T> {
 
-    protected final ResourceKey<T> key;
-    private final Supplier<R> supplier;
-    private Holder<T> holder;
+    /** Resource key identifying the held object in the registry */
+    protected final ResourceKey<R> key;
 
-    protected RegistryHolder(ResourceKey<T> key, Supplier<R> supplier) {
+    /** Supplier for the concrete instance of the held object */
+    private final Supplier<T> supplier;
+
+    /** The actual holder instance after binding */
+    private Holder<R> holder;
+
+    /**
+     * Creates a new RegistryHolder instance.
+     *
+     * @param key      Resource key identifying the object in the registry
+     * @param supplier Supplier providing the concrete instance of the object
+     */
+    protected RegistryHolder(ResourceKey<R> key, Supplier<T> supplier) {
         this.key = key;
         this.supplier = supplier;
     }
 
-    public Supplier<R> getSupplier() {
+    /**
+     * Gets the underlying supplier for the held object.
+     *
+     * @return The supplier providing the concrete instance
+     */
+    public Supplier<T> getSupplier() {
         return supplier;
     }
 
-    public void bind(Holder<T> holder) {
+    /**
+     * Binds this holder to a concrete registry holder.
+     * <p>
+     * This should be called during registry initialization to link the holder
+     * to the actual registry entry.
+     *
+     * @param holder The concrete holder from the registry
+     * @throws IllegalStateException If already bound
+     */
+    public void bind(Holder<R> holder) {
         if (this.holder != null) {
-            throw new IllegalStateException();
+            throw new IllegalStateException("Try to bind already existing value!");
         }
+
         this.holder = holder;
     }
 
-    public Holder<T> holder() {
+    /**
+     * Gets the underlying registry holder.
+     *
+     * @return The bound holder instance
+     */
+    public Holder<R> holder() {
         return holder;
     }
 
+    /**
+     * {@inheritDoc}
+     * @throws NullPointerException If accessed before binding
+     */
+    @NotNull
     @Override
-    @SuppressWarnings("unchecked")
-    public R get() {
-        return (R) value();
-    }
+    public R value() {
+        if (this.holder == null) {
+            throw new NullPointerException("Trying to access unbound value: " + this.key);
+        }
 
-    @Override
-    public T value() {
         return holder.value();
     }
 
+    /**
+     * {@inheritDoc}
+     * @throws NullPointerException If accessed before binding
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    public T get() {
+        return (T) value();
+    }
+
+    /** {@inheritDoc} */
     @Override
     public boolean isBound() {
         return holder != null && holder.isBound();
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean is(ResourceLocation resourceLocation) {
         return resourceLocation.equals(key.location());
     }
 
+    /** {@inheritDoc} */
     @Override
-    public boolean is(ResourceKey<T> resourceKey) {
+    public boolean is(ResourceKey<R> resourceKey) {
         return resourceKey.equals(key);
     }
 
+    /** {@inheritDoc} */
     @Override
-    public boolean is(Predicate<ResourceKey<T>> predicate) {
+    public boolean is(Predicate<ResourceKey<R>> predicate) {
         return predicate.test(key);
     }
 
+    /** {@inheritDoc} */
     @Override
-    public boolean is(TagKey<T> tagKey) {
+    public boolean is(TagKey<R> tagKey) {
         return isBound() && holder.is(tagKey);
     }
 
+    /** {@inheritDoc} */
     @Override
     @SuppressWarnings("deprecation")
-    public boolean is(Holder<T> holder) {
+    public boolean is(Holder<R> holder) {
         return isBound() && holder.is(holder);
     }
 
+    /** {@inheritDoc} */
     @Override
-    public Stream<TagKey<T>> tags() {
+    public Stream<TagKey<R>> tags() {
         return isBound() ? holder.tags() : Stream.empty();
     }
 
+    /** {@inheritDoc} */
     @Override
-    public Either<ResourceKey<T>, T> unwrap() {
+    public Either<ResourceKey<R>, R> unwrap() {
         return Either.left(key);
     }
 
+    /** {@inheritDoc} */
     @Override
-    public Optional<ResourceKey<T>> unwrapKey() {
+    public Optional<ResourceKey<R>> unwrapKey() {
         return Optional.of(key);
     }
 
+    /** {@inheritDoc} */
     @Override
     public Kind kind() {
         return Kind.REFERENCE;
     }
 
+    /** {@inheritDoc} */
     @Override
-    public boolean canSerializeIn(HolderOwner<T> holderOwner) {
+    public boolean canSerializeIn(HolderOwner<R> holderOwner) {
         return isBound() && holder.canSerializeIn(holderOwner);
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
-        return obj instanceof Holder<?> h && h.kind() == Kind.REFERENCE && h.unwrapKey().isPresent() && h.unwrapKey().get() == this.key;
+        return obj instanceof Holder<?> h &&
+                h.kind() == Kind.REFERENCE &&
+                h.unwrapKey().isPresent() &&
+                h.unwrapKey().get() == this.key;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int hashCode() {
         return this.key.hashCode();

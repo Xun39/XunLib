@@ -1,15 +1,12 @@
 package net.xun.lib.common.api.item.armor;
 
 import net.minecraft.core.Holder;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.Item;
 import net.xun.lib.common.api.util.LazyReference;
-import net.xun.lib.common.api.registries.Registrar;
 import net.xun.lib.common.api.util.CommonUtils;
-import net.xun.lib.common.internal.misc.ModIDManager;
 
 import java.util.EnumMap;
 import java.util.LinkedHashMap;
