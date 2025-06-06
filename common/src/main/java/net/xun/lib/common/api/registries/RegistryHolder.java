@@ -1,7 +1,7 @@
 package net.xun.lib.common.api.registries;
 
 /*
-    This class is from the Artifacts mod
+    This class is a modified version of the RegistryHolder from the Artifacts mod
 
     MIT License
 
@@ -43,6 +43,10 @@ import java.util.stream.Stream;
  * @param <T> The concrete type of the held object (must extend {@code R})
  */
 public class RegistryHolder<R, T extends R> implements Holder<R>, Supplier<T> {
+
+    public static <R, T extends R> RegistryHolder<R, T> create(ResourceKey<R> key, Supplier<T> supplier) {
+        return new RegistryHolder<>(key, supplier);
+    }
 
     /** Resource key identifying the held object in the registry */
     protected final ResourceKey<R> key;
@@ -106,11 +110,11 @@ public class RegistryHolder<R, T extends R> implements Holder<R>, Supplier<T> {
     @NotNull
     @Override
     public R value() {
-        if (this.holder == null) {
-            throw new NullPointerException("Trying to access unbound value: " + this.key);
+        if (this.holder != null) {
+            return holder.value();
         }
 
-        return holder.value();
+        return supplier.get();
     }
 
     /**
@@ -155,7 +159,7 @@ public class RegistryHolder<R, T extends R> implements Holder<R>, Supplier<T> {
 
     /** {@inheritDoc} */
     @Override
-    @SuppressWarnings("deprecation")
+    @Deprecated
     public boolean is(Holder<R> holder) {
         return isBound() && holder.is(holder);
     }

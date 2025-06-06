@@ -1,14 +1,8 @@
 package net.xun.lib.fabric.internal.platform;
 
-import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.level.block.Block;
 import net.xun.lib.common.api.registries.Register;
-import net.xun.lib.common.api.registries.RegistryHolder;
 import net.xun.lib.common.internal.platform.services.IPlatformHelper;
 import net.fabricmc.loader.api.FabricLoader;
 import net.xun.lib.fabric.api.registries.FabricRegister;
@@ -33,11 +27,21 @@ public class FabricPlatformHelper implements IPlatformHelper {
     }
 
     @Override
-    public <T> Register<T> createRegistrar(ResourceKey<? extends Registry<T>> registry, String namespace) {
+    public <T> Register<T> createRegister(ResourceKey<? extends Registry<T>> registry, String namespace) {
         return new FabricRegister<>(registry, namespace);
     }
 
     @Override
+    public Register.Blocks createBlockRegister(String namespace) {
+        return new FabricRegister.FabricBlocks(namespace);
+    }
+
+    @Override
+    public Register.Items createItemRegister(String namespace) {
+        return new FabricRegister.FabricItems(namespace);
+    }
+
+    /* @Override
     public <T extends Item> void bindItem(RegistryHolder<Item, T> holder, String namespace) {
         ResourceLocation id = holder.unwrapKey().orElseThrow().location();
         Item item = holder.getSupplier().get();
@@ -63,5 +67,5 @@ public class FabricPlatformHelper implements IPlatformHelper {
         );
 
         holder.bind(registeredHolder);
-    }
+    } */
 }

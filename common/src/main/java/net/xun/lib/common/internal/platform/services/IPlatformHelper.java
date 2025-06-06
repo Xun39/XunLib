@@ -40,9 +40,13 @@ public interface IPlatformHelper {
         return isDevelopmentEnvironment() ? "development" : "production";
     }
 
-    <T> Register<T> createRegistrar(ResourceKey<? extends Registry<T>> registry, String namespace);
+    <T> Register<T> createRegister(ResourceKey<? extends Registry<T>> registry, String namespace);
 
-    <T extends Item> void bindItem(RegistryHolder<Item, T> holder, String namespace);
+    Register.Blocks createBlockRegister(String namespace);
 
-    <T extends Block> void bindBlock(RegistryHolder<Block, T> holder, String namespace);
+    Register.Items createItemRegister(String namespace);
+
+    /* <T extends Item> void bindItem(RegistryHolder<Item, T> holder, String namespace);
+
+    <T extends Block> void bindBlock(RegistryHolder<Block, T> holder, String namespace); */
 }

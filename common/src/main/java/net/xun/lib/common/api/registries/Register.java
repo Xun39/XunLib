@@ -1,7 +1,7 @@
 package net.xun.lib.common.api.registries;
 
 /*
-    This class is from the Artifacts mod
+    This class is a modified version of the Register from the Artifacts mod
 
     MIT License
 
@@ -41,42 +41,32 @@ import java.util.function.Supplier;
  * registration through specialized inner classes.
  * </p>
  *
- * @param <T> The base type of objects being registered (e.g. Block, Item)
+ * @param <R> The base type of objects being registered (e.g. Block, Item)
  */
-public abstract class Register<T> implements Iterable<T> {
+public abstract class Register<R> implements Iterable<R> {
 
     /**
      * Creates a register for the specified registry and namespace.
      *
-     * @param <R>       The registry object type
+     * @param <T>       The registry object type
      * @param registry  The target registry
      * @param namespace The namespace for registered objects
      * @return A new register instance
      */
-    public static <R> Register<R> create(Registry<R> registry, String namespace) {
-        return Services.PLATFORM.createRegistrar(registry.key(), namespace);
+    public static <T> Register<T> create(Registry<T> registry, String namespace) {
+        return Services.PLATFORM.createRegister(registry.key(), namespace);
     }
 
     /**
      * Creates a register for the specified registry key and namespace.
      *
-     * @param <R>       The registry object type
+     * @param <T>       The registry object type
      * @param registry  The resource key of the target registry
      * @param namespace The namespace for registered objects
      * @return A new register instance
      */
-    public static <R> Register<R> create(ResourceKey<Registry<R>> registry, String namespace) {
-        return Services.PLATFORM.createRegistrar(registry, namespace);
-    }
-
-    /**
-     * Creates a specialized item register for the given namespace.
-     *
-     * @param namespace The namespace for registered items
-     * @return A new item register
-     */
-    public static Items createItems(String namespace) {
-        return new Items(namespace);
+    public static <T> Register<T> create(ResourceKey<Registry<T>> registry, String namespace) {
+        return Services.PLATFORM.createRegister(registry, namespace);
     }
 
     /**
@@ -86,17 +76,27 @@ public abstract class Register<T> implements Iterable<T> {
      * @return A new block register
      */
     public static Blocks createBlocks(String namespace) {
-        return new Blocks(namespace);
+        return Services.PLATFORM.createBlockRegister(namespace);
+    }
+
+    /**
+     * Creates a specialized item register for the given namespace.
+     *
+     * @param namespace The namespace for registered items
+     * @return A new item register
+     */
+    public static Items createItems(String namespace) {
+        return Services.PLATFORM.createItemRegister(namespace);
     }
 
     /** The resource key of the target registry */
-    private final ResourceKey<? extends Registry<T>> registryKey;
+    private final ResourceKey<? extends Registry<R>> registryKey;
 
     /** The namespace for registered objects */
     private final String namespace;
 
     /** List of registry holders for objects to be registered */
-    private final List<RegistryHolder<T, ?>> entries = new ArrayList<>();
+    private final List<RegistryHolder<R, ?>> entries = new ArrayList<>();
 
     /**
      * Constructs a new register instance.
@@ -104,7 +104,7 @@ public abstract class Register<T> implements Iterable<T> {
      * @param registry  The resource key of the target registry
      * @param namespace The namespace for registered objects
      */
-    protected Register(ResourceKey<? extends Registry<T>> registry, String namespace) {
+    protected Register(ResourceKey<? extends Registry<R>> registry, String namespace) {
         this.registryKey = registry;
         this.namespace = namespace;
     }
@@ -114,7 +114,7 @@ public abstract class Register<T> implements Iterable<T> {
      *
      * @return The registry resource key
      */
-    public ResourceKey<? extends Registry<T>> getRegistryKey() {
+    public ResourceKey<? extends Registry<R>> getRegistryKey() {
         return this.registryKey;
     }
 
@@ -123,7 +123,7 @@ public abstract class Register<T> implements Iterable<T> {
      *
      * @return Collection of registry holders
      */
-    public Collection<RegistryHolder<T, ?>> getEntries() {
+    public Collection<RegistryHolder<R, ?>> getEntries() {
         return this.entries;
     }
 
@@ -142,24 +142,20 @@ public abstract class Register<T> implements Iterable<T> {
      * For certain registries (attributes, mob effects, data component types),
      * binding happens immediately during registration.
      *
-     * @param <R>      The concrete type of the object to register
+     * @param <T>      The concrete type of the object to register
      * @param name     The name of the object (without namespace)
      * @param supplier Supplier providing the object instance
      * @return The created registry holder
      */
-    public <R extends T> RegistryHolder<T, R> register(String name, Supplier<R> supplier) {
-        RegistryHolder<T, R> holder = new RegistryHolder<>(CommonUtils.createKey(registryKey, name), supplier);
+    public <T extends R> RegistryHolder<R, T> register(String name, Supplier<T> supplier) {
+        RegistryHolder<R, T> holder = createHolder(CommonUtils.createKey(registryKey, name), supplier);
         entries.add(holder);
 
-        // Immediately bind for specific registry types
-        if (getRegistryKey().equals(Registries.ATTRIBUTE)
-                || getRegistryKey().equals(Registries.MOB_EFFECT)
-                || getRegistryKey().equals(Registries.DATA_COMPONENT_TYPE)
-        ) {
-            bind(holder);
-        }
-
         return holder;
+    }
+
+    protected <T extends R> RegistryHolder<R, T> createHolder(ResourceKey<R> key, Supplier<T> supplier) {
+        return RegistryHolder.create(key, supplier);
     }
 
     /**
@@ -168,7 +164,7 @@ public abstract class Register<T> implements Iterable<T> {
      */
     @NotNull
     @Override
-    public Iterator<T> iterator() {
+    public Iterator<R> iterator() {
         return entries.stream().map(RegistryHolder::value).iterator();
     }
 
@@ -179,12 +175,8 @@ public abstract class Register<T> implements Iterable<T> {
      * Note: Certain registry types are bound immediately and skip this step.
      */
     public void register() {
-        // Bind all entries except those already bound during registration
-        if (!getRegistryKey().equals(Registries.ATTRIBUTE)
-                && !getRegistryKey().equals(Registries.MOB_EFFECT)
-                && !getRegistryKey().equals(Registries.DATA_COMPONENT_TYPE)
-        ) {
-            for (RegistryHolder<T, ?> holder : getEntries()) {
+        for (RegistryHolder<R, ?> holder : getEntries()) {
+            if (!holder.isBound()) {
                 bind(holder);
             }
         }
@@ -193,10 +185,10 @@ public abstract class Register<T> implements Iterable<T> {
     /**
      * Binds a registry holder to the actual registry entry.
      *
-     * @param <R>    The concrete type of the registered object
+     * @param <T>    The concrete type of the registered object
      * @param holder The registry holder to bind
      */
-    protected abstract <R extends T> void bind(RegistryHolder<T, R> holder);
+    protected abstract <T extends R> void bind(RegistryHolder<R, T> holder);
 
     /**
      * Specialized register implementation for blocks.
@@ -230,8 +222,13 @@ public abstract class Register<T> implements Iterable<T> {
          * {@inheritDoc}
          */
         @Override
-        protected <R extends Block> void bind(RegistryHolder<Block, R> holder) {
-            Services.PLATFORM.bindBlock(holder, getNamespace());
+        protected <B extends Block> void bind(RegistryHolder<Block, B> holder) {
+
+        }
+
+        @Override
+        protected <T extends Block> RegistryHolder<Block, T> createHolder(ResourceKey<Block> key, Supplier<T> supplier) {
+            return RegistryBlock.createBlock(key, supplier);
         }
     }
 
@@ -267,8 +264,13 @@ public abstract class Register<T> implements Iterable<T> {
          * {@inheritDoc}
          */
         @Override
-        protected <R extends Item> void bind(RegistryHolder<Item, R> holder) {
-            Services.PLATFORM.bindItem(holder, getNamespace());
+        protected <I extends Item> void bind(RegistryHolder<Item, I> holder) {
+
+        }
+
+        @Override
+        protected <T extends Item> RegistryHolder<Item, T> createHolder(ResourceKey<Item> key, Supplier<T> supplier) {
+            return RegistryItem.createItem(key, supplier);
         }
     }
 }
