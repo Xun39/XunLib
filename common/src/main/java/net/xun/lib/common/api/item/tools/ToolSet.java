@@ -186,15 +186,15 @@ public class ToolSet {
         }
 
         /**
-         * Applies vanilla Minecraft balance values to all tools.
+         * Applies vanilla Minecraft balance values to all tools. (iron tools stats)
          * Uses standard damage bonuses and attack speeds from vanilla.
          *
          * @return This builder for chaining
          */
         public Builder withVanillaBalance() {
             return withToolStats(
-                    new float[] { 3, 5, 1, 1.5F, 1 },
-                    new float[] { 1.6F, 0.9F, 1.2F, 1.0F, 1.0F }
+                    new float[] { 3, 6, 1, -2.0F, 1.5F },
+                    new float[] { 1.6F, 0.9F, 1.2F, 3.0F, 1.0F }
             );
         }
 
