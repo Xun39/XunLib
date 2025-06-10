@@ -8,28 +8,18 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.ai.attributes.Attribute;
-import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.alchemy.Potion;
-import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.level.chunk.status.ChunkStatus;
-import net.minecraft.world.level.gameevent.GameEvent;
-import net.minecraft.world.level.levelgen.structure.templatesystem.PosRuleTestType;
-import net.minecraft.world.level.levelgen.structure.templatesystem.RuleTestType;
-import net.minecraft.world.level.levelgen.structure.templatesystem.rule.blockentity.RuleBlockEntityModifierType;
 import net.minecraft.world.level.material.Fluid;
 import net.xun.lib.common.api.exceptions.UtilityClassException;
 import net.xun.lib.common.internal.misc.ModIDManager;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.jar.Attributes;
 
 public class CommonUtils {
 
@@ -76,6 +66,21 @@ public class CommonUtils {
         return combineAsNamespacedID(ModIDManager.getModId(), pathParts);
     }
 
+    private static final Map<Class<?>, Registry<?>> KNOWN_REGISTRIES = new HashMap<>();
+
+    static {
+        KNOWN_REGISTRIES.put(SoundEvent.class, BuiltInRegistries.SOUND_EVENT);
+        KNOWN_REGISTRIES.put(Fluid.class, BuiltInRegistries.FLUID);
+        KNOWN_REGISTRIES.put(MobEffect.class, BuiltInRegistries.MOB_EFFECT);
+        KNOWN_REGISTRIES.put(Block.class, BuiltInRegistries.BLOCK);
+        KNOWN_REGISTRIES.put(EntityType.class, BuiltInRegistries.ENTITY_TYPE);
+        KNOWN_REGISTRIES.put(Item.class, BuiltInRegistries.ITEM);
+        KNOWN_REGISTRIES.put(Potion.class, BuiltInRegistries.POTION);
+        KNOWN_REGISTRIES.put(ParticleType.class, BuiltInRegistries.PARTICLE_TYPE);
+        KNOWN_REGISTRIES.put(BlockEntityType.class, BuiltInRegistries.BLOCK_ENTITY_TYPE);
+        KNOWN_REGISTRIES.put(ArmorMaterial.class, BuiltInRegistries.ARMOR_MATERIAL);
+    }
+
     /**
      * Retrieves the registry key for a given object by checking known registries.
      * <p>
@@ -89,16 +94,13 @@ public class CommonUtils {
      */
     @SuppressWarnings("unchecked")
     public static ResourceLocation getKey(Object obj) {
-        for (Registry<?> registry : BuiltInRegistries.REGISTRY) {
-            try {
-                Registry<Object> objRegistry = (Registry<Object>) registry;
-                ResourceLocation key = objRegistry.getKey(obj);
-                if (key != null) {
-                    return key;
-                }
-            } catch (ClassCastException ignored) {}
+        for (Map.Entry<Class<?>, Registry<?>> entry : KNOWN_REGISTRIES.entrySet()) {
+            if (entry.getKey().isInstance(obj)) {
+                Registry<Object> registry = (Registry<Object>) entry.getValue();
+                return registry.getKey(obj);
+            }
         }
-        throw new IllegalArgumentException("Object not registered in any known registry: " + obj);
+        throw new IllegalArgumentException("Unsupported type: " + obj.getClass());
     }
 
     /**
