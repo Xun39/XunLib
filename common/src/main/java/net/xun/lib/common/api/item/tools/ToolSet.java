@@ -10,28 +10,42 @@ import java.util.function.Supplier;
 
 /**
  * Represents a complete set of tools (sword, axe, pickaxe, shovel, hoe) with configurable attributes.
- * Use the nested Builder class to configure and create tool sets with consistent properties.
+ * Use the nested {@link Builder} to configure and create tool sets with consistent properties.
  */
 public class ToolSet {
 
     private final Map<ToolType, LazyReference<? extends Item>> tools = new EnumMap<>(ToolType.class);
 
-    protected ToolSet(String name, Tier tier, EnumMap<ToolType, Float> attackDamage, EnumMap<ToolType, Float> attackSpeed, Item.Properties properties, ToolConfigurator configuration, AttributeHelper attributeHelper) {
+    protected ToolSet(String name,
+                      Tier tier,
+                      EnumMap<ToolType, Float> attackDamage,
+                      EnumMap<ToolType, Float> attackSpeed,
+                      Supplier<Item.Properties> propertiesSupplier,
+                      ToolConfigurator configuration,
+                      AttributeHelper attributeHelper) {
 
         for (ToolType type : ToolType.values()) {
             String fullName = name + type.getNameSuffix();
 
+            Item.Properties toolProperties = propertiesSupplier.get();
+
             Item.Properties finalProperties = attributeHelper.applyAttributes(
-                    properties, tier.getAttackDamageBonus() + attackDamage.get(type), attackSpeed.get(type)
+                    toolProperties,
+                    tier.getAttackDamageBonus() + attackDamage.get(type),
+                    attackSpeed.get(type)
             );
 
-            tools.put(type, new LazyReference<>(
-                    fullName,
+            tools.put(type, new LazyReference<>(fullName,
                     () -> configuration.createTool(type, tier, finalProperties))
             );
         }
     }
 
+    /**
+     * Retrieves all tool items in this set for registration purposes.
+     *
+     * @return Map of {@link ResourceLocation} keys to {@link Supplier} providers for tool items
+     */
     public Map<ResourceLocation, Supplier<? extends Item>> getItemsForRegistration() {
         Map<ResourceLocation, Supplier<? extends Item>> items = new LinkedHashMap<>();
 
@@ -44,35 +58,45 @@ public class ToolSet {
     }
 
     /**
-     * @return Supplier of the registered sword item
+     * Gets the sword item from this tool set.
+     *
+     * @return Supplier providing the registered {@link SwordItem}
      */
     public Supplier<SwordItem> getSword() {
         return getTool(ToolType.SWORD);
     }
 
     /**
-     * @return Supplier of the registered axe item
+     * Gets the axe item from this tool set.
+     *
+     * @return Supplier providing the registered {@link AxeItem}
      */
     public Supplier<AxeItem> getAxe() {
         return getTool(ToolType.AXE);
     }
 
     /**
-     * @return Supplier of the registered pickaxe item
+     * Gets the pickaxe item from this tool set.
+     *
+     * @return Supplier providing the registered {@link PickaxeItem}
      */
     public Supplier<PickaxeItem> getPickaxe() {
         return getTool(ToolType.PICKAXE);
     }
 
     /**
-     * @return Supplier of the registered hoe item
+     * Gets the hoe item from this tool set.
+     *
+     * @return Supplier providing the registered {@link HoeItem}
      */
     public Supplier<HoeItem> getHoe() {
         return getTool(ToolType.HOE);
     }
 
     /**
-     * @return Supplier of the registered shovel item
+     * Gets the shovel item from this tool set.
+     *
+     * @return Supplier providing the registered {@link ShovelItem}
      */
     public Supplier<ShovelItem> getShovel() {
         return getTool(ToolType.SHOVEL);
@@ -84,7 +108,9 @@ public class ToolSet {
     }
 
     /**
-     * @return List of all registered tool items in this set
+     * Retrieves all registered tool items in this set.
+     *
+     * @return List containing all tool items
      */
     public List<Item> getAll() {
         return tools.values().stream()
@@ -93,24 +119,24 @@ public class ToolSet {
     }
 
     /**
-     * Builder for constructing ToolSet instances with flexible configuration.
-     * Allows setting per-tool attributes, item properties, and registration behavior.
+     * Builder for constructing {@link ToolSet} instances with flexible configuration.
+     * Allows setting per-tool attributes, item properties, and creation behavior.
      */
     public static class Builder {
         private final String name;
         private final Tier tier;
         private final EnumMap<ToolType, Float> attackDamage = new EnumMap<>(ToolType.class);
         private final EnumMap<ToolType, Float> attackSpeed = new EnumMap<>(ToolType.class);
-        private Item.Properties properties = new Item.Properties();
+        private Supplier<Item.Properties> propertiesSupplier = Item.Properties::new;
         private ToolConfigurator configuration = ToolConfigurator.DEFAULT;
         private final AttributeHelper attributeHelper;
 
         /**
-         * Constructs a new ToolSet builder.
+         * Constructs a new builder for a tool set.
          *
-         * @param name Base name for tools (will be combined with tool-specific suffixes)
-         * @param tier Material tier for all tools in the set
-         * @param attributeHelper Helper for applying item attributes to tool properties
+         * @param name Base name for tools (appended with tool-specific suffixes)
+         * @param tier Material tier for all tools
+         * @param attributeHelper Helper for applying item attributes to properties
          */
         public Builder(String name, Tier tier, AttributeHelper attributeHelper) {
             this.name = name;
@@ -127,12 +153,13 @@ public class ToolSet {
         }
 
         /**
-         * Sets attack stats for all tools using arrays. Array order must match ToolType.values().
+         * Configures attack stats for all tools using arrays.
+         * Array order must match {@link ToolType#values()}.
          *
-         * @param damages Attack damage values (added to tier's base damage)
-         * @param speeds  Attack speed values
+         * @param damages Attack damage bonuses (added to tier's base damage)
+         * @param speeds  Attack speed modifiers
          * @return This builder for chaining
-         * @throws IllegalArgumentException If array lengths don't match ToolType count
+         * @throws IllegalArgumentException If array lengths don't match tool types
          */
         public Builder withToolStats(float[] damages, float[] speeds) {
             validateArrayStats(damages, speeds);
@@ -145,11 +172,11 @@ public class ToolSet {
         }
 
         /**
-         * Sets attack stats for a specific tool type.
+         * Configures attack stats for a specific tool type.
          *
-         * @param type   Tool type to configure
-         * @param damage Attack damage (added to tier's base damage)
-         * @param speed  Attack speed
+         * @param type   Target tool type
+         * @param damage Attack damage bonus (added to tier's base damage)
+         * @param speed  Attack speed modifier
          * @return This builder for chaining
          */
         public Builder withToolStats(ToolType type, float damage, float speed) {
@@ -159,8 +186,8 @@ public class ToolSet {
         }
 
         /**
-         * Configures tools with vanilla Minecraft balance values.
-         * Uses standard damage bonuses and speeds from vanilla tool behavior.
+         * Applies vanilla Minecraft balance values to all tools.
+         * Uses standard damage bonuses and attack speeds from vanilla.
          *
          * @return This builder for chaining
          */
@@ -172,18 +199,32 @@ public class ToolSet {
         }
 
         /**
-         * Sets base item properties for all tools in the set.
+         * <b>Caution:</b> Sets shared item properties for all tools.
+         * May cause attribute conflicts if properties are mutated internally.
+         * Prefer {@link #withItemPropertiesSupplier} for multi-tool sets.
          *
-         * @param properties Item properties (durability, rarity, etc.)
+         * @param properties Base properties for all tools
          * @return This builder for chaining
          */
         public Builder withItemProperties(Item.Properties properties) {
-            this.properties = properties;
+            this.propertiesSupplier = () -> properties;
             return this;
         }
 
         /**
-         * Sets custom tool creation configuration.
+         * Sets item properties using a supplier (called per-tool during construction).
+         * Safer than {@link #withItemProperties} for tool sets.
+         *
+         * @param propertiesSupplier Supplier providing base properties
+         * @return This builder for chaining
+         */
+        public Builder withItemPropertiesSupplier(Supplier<Item.Properties> propertiesSupplier) {
+            this.propertiesSupplier = propertiesSupplier;
+            return this;
+        }
+
+        /**
+         * Sets custom tool creation logic.
          *
          * @param configurator Tool creation strategy implementation
          * @return This builder for chaining
@@ -194,12 +235,12 @@ public class ToolSet {
         }
 
         /**
-         * Builds the configured ToolSet instance.
+         * Constructs the configured {@link ToolSet}.
          *
-         * @return New ToolSet with specified configuration
+         * @return New tool set instance
          */
         public ToolSet build() {
-            return new ToolSet(this.name, this.tier, this.attackDamage, this.attackSpeed, this.properties, this.configuration, this.attributeHelper);
+            return new ToolSet(this.name, this.tier, this.attackDamage, this.attackSpeed, this.propertiesSupplier, this.configuration, this.attributeHelper);
         }
 
         private void validateArrayStats(float[] damages, float[] speeds) {
