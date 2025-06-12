@@ -84,7 +84,6 @@ public class MobEffectUtils {
         MobEffectInstance current = entity.getEffect(effect.getEffect());
         if (current == null) return false;
         return !current.endsWithin(expiryThreshold) ||
-                (current.getAmplifier() >= effect.getAmplifier() &&
-                current.getDuration() >= effect.getDuration());
+                (current.getAmplifier() >= effect.getAmplifier() && current.getDuration() >= effect.getDuration());
     }
 }

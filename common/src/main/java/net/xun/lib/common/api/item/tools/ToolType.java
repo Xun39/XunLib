@@ -38,7 +38,7 @@ public enum ToolType {
      * @param properties Base item properties
      * @return Configured tool item
      */
-    Item create(Tier tier, Item.Properties properties) {
+    public Item create(Tier tier, Item.Properties properties) {
         return factory.create(tier, properties);
     }
 
