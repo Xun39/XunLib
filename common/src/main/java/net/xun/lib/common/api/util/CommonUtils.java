@@ -66,19 +66,19 @@ public class CommonUtils {
         return combineAsNamespacedID(ModIDManager.getModId(), pathParts);
     }
 
-    private static final Map<Class<?>, Registry<?>> KNOWN_REGISTRIES = new HashMap<>();
+    private static final Map<Class<?>, Registry<?>> REGISTRIES = new HashMap<>();
 
     static {
-        KNOWN_REGISTRIES.put(SoundEvent.class, BuiltInRegistries.SOUND_EVENT);
-        KNOWN_REGISTRIES.put(Fluid.class, BuiltInRegistries.FLUID);
-        KNOWN_REGISTRIES.put(MobEffect.class, BuiltInRegistries.MOB_EFFECT);
-        KNOWN_REGISTRIES.put(Block.class, BuiltInRegistries.BLOCK);
-        KNOWN_REGISTRIES.put(EntityType.class, BuiltInRegistries.ENTITY_TYPE);
-        KNOWN_REGISTRIES.put(Item.class, BuiltInRegistries.ITEM);
-        KNOWN_REGISTRIES.put(Potion.class, BuiltInRegistries.POTION);
-        KNOWN_REGISTRIES.put(ParticleType.class, BuiltInRegistries.PARTICLE_TYPE);
-        KNOWN_REGISTRIES.put(BlockEntityType.class, BuiltInRegistries.BLOCK_ENTITY_TYPE);
-        KNOWN_REGISTRIES.put(ArmorMaterial.class, BuiltInRegistries.ARMOR_MATERIAL);
+        REGISTRIES.put(SoundEvent.class, BuiltInRegistries.SOUND_EVENT);
+        REGISTRIES.put(Fluid.class, BuiltInRegistries.FLUID);
+        REGISTRIES.put(MobEffect.class, BuiltInRegistries.MOB_EFFECT);
+        REGISTRIES.put(Block.class, BuiltInRegistries.BLOCK);
+        REGISTRIES.put(EntityType.class, BuiltInRegistries.ENTITY_TYPE);
+        REGISTRIES.put(Item.class, BuiltInRegistries.ITEM);
+        REGISTRIES.put(Potion.class, BuiltInRegistries.POTION);
+        REGISTRIES.put(ParticleType.class, BuiltInRegistries.PARTICLE_TYPE);
+        REGISTRIES.put(BlockEntityType.class, BuiltInRegistries.BLOCK_ENTITY_TYPE);
+        REGISTRIES.put(ArmorMaterial.class, BuiltInRegistries.ARMOR_MATERIAL);
     }
 
     /**
@@ -94,7 +94,7 @@ public class CommonUtils {
      */
     @SuppressWarnings("unchecked")
     public static ResourceLocation getKey(Object obj) {
-        for (Map.Entry<Class<?>, Registry<?>> entry : KNOWN_REGISTRIES.entrySet()) {
+        for (Map.Entry<Class<?>, Registry<?>> entry : REGISTRIES.entrySet()) {
             if (entry.getKey().isInstance(obj)) {
                 Registry<Object> registry = (Registry<Object>) entry.getValue();
                 return registry.getKey(obj);
