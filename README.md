@@ -1,5 +1,5 @@
 # Xun Lib 
-*1.21.x | NeoForge/Forge/Fabric | MIT*
+*1.21.x | NeoForge/Fabric | MIT*
 
 A **common code library mod** for Minecraft, providing reusable utilities for inventory/armor management, fuzzy item matching, effect handling, and other common utilities. Designed to simplify mod development by abstracting repetitive tasks.
 
