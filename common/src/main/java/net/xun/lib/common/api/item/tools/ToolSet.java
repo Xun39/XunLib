@@ -14,6 +14,7 @@ import java.util.function.Supplier;
  */
 public class ToolSet {
 
+    private final String name;
     private final Map<ToolType, LazyReference<? extends Item>> tools = new EnumMap<>(ToolType.class);
 
     protected ToolSet(String name,
@@ -39,6 +40,7 @@ public class ToolSet {
                     () -> configuration.createTool(type, tier, finalProperties))
             );
         }
+        this.name = name;
     }
 
     /**
@@ -55,6 +57,15 @@ public class ToolSet {
         }
 
         return items;
+    }
+
+    /**
+     * Gets the base name of this tool set.
+     *
+     * @return The base name of this tool set
+     */
+    public String getName() {
+        return name;
     }
 
     /**

@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
  */
 public class ArmorSet {
 
+    private final String name;
     private final Map<ArmorType, LazyReference<ArmorItem>> armors = new EnumMap<>(ArmorType.class);
 
     protected ArmorSet(String name,
@@ -39,6 +40,7 @@ public class ArmorSet {
                     () -> configuration.createArmor(type, material, durabilityFactor, armorProperties))
             );
         }
+        this.name = name;
     }
 
     /**
@@ -55,6 +57,15 @@ public class ArmorSet {
         }
 
         return items;
+    }
+
+    /**
+     * Gets the base name of this armor set.
+     *
+     * @return The base name of this armor set
+     */
+    public String getName() {
+        return name;
     }
 
     /**
