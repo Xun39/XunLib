@@ -41,7 +41,7 @@ public class CommonUtils {
      * @return The combined namespaced ID in standard "namespace:path" format
      */
     public static String combineAsNamespacedID(String namespace, String... pathParts) {
-        return "%s%s".formatted(namespace, String.join("_", pathParts));
+        return "%s:%s".formatted(namespace, String.join("_", pathParts));
     }
 
     /**
