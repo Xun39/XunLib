@@ -85,7 +85,7 @@ public class FuzzyMatcher {
 
     private final FuzzyConfig config;
 
-    private FuzzyMatcher(FuzzyConfig config) {
+    public FuzzyMatcher(FuzzyConfig config) {
         this.config = config;
     }
 
