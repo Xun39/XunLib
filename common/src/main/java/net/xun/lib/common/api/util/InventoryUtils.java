@@ -7,7 +7,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.xun.lib.common.api.exceptions.UtilityClassException;
-import net.xun.lib.common.api.inventory.predicates.InventoryPredicate;
+import net.xun.lib.common.api.inventory.predicates.ItemStackPredicate;
 import net.xun.lib.common.api.inventory.InventoryCycleOrder;
 import net.xun.lib.common.api.inventory.slot.SlotIterator;
 import net.xun.lib.common.api.inventory.slot.SlotRange;
@@ -28,8 +28,8 @@ import java.util.Objects;
  *   <li>Item collection with custom predicates</li>
  * </ul>
  *
- * @see InventoryPredicate Inventory predicates
- * @see ArmorSlotsUtils Armor-specific inventory utils
+ * @see ItemStackPredicate Inventory predicates
+ * @see PlayerArmorSlotsUtils Armor-specific inventory utils
  */
 public class InventoryUtils {
 
@@ -49,7 +49,7 @@ public class InventoryUtils {
      * @return True if container contains sufficient matching items, false otherwise
      * @throws NullPointerException if container or predicate is null
      */
-    public static boolean hasItemCount(Container container, InventoryPredicate predicate, int minCount, @Nullable SlotRange slots) {
+    public static boolean hasItemCount(Container container, ItemStackPredicate predicate, int minCount, @Nullable SlotRange slots) {
         validateContainer(container);
         Objects.requireNonNull(predicate, "Predicate cannot be null");
         if (minCount < 1) throw new IllegalArgumentException("minCount must be ≥1");
@@ -74,7 +74,7 @@ public class InventoryUtils {
      * @return True if at least one matching item exists
      * @throws NullPointerException if container or predicate is null
      */
-    public static boolean hasItem(Container container, InventoryPredicate predicate, @Nullable SlotRange slots) {
+    public static boolean hasItem(Container container, ItemStackPredicate predicate, @Nullable SlotRange slots) {
         return hasItemCount(container, predicate, 1, slots);
     }
 
@@ -89,7 +89,7 @@ public class InventoryUtils {
      * @return Slot index of first match, or -1 if none
      * @throws NullPointerException if container or predicate is null
      */
-    public static int findFirstMatchingSlot(Container container, InventoryPredicate predicate, @Nullable SlotRange slots) {
+    public static int findFirstMatchingSlot(Container container, ItemStackPredicate predicate, @Nullable SlotRange slots) {
         validateContainer(container);
         Objects.requireNonNull(predicate, "Predicate cannot be null");
 
@@ -125,7 +125,7 @@ public class InventoryUtils {
      * @param order Slot processing order strategy
      * @throws NullPointerException if container, predicate, or order is null
      */
-    public static void extractItems(Container container, InventoryPredicate predicate, int amount, @Nullable SlotRange slots, InventoryCycleOrder order) {
+    public static void extractItems(Container container, ItemStackPredicate predicate, int amount, @Nullable SlotRange slots, InventoryCycleOrder order) {
         validateContainer(container);
         Objects.requireNonNull(predicate, "Predicate cannot be null");
         Objects.requireNonNull(order, "Removal order cannot be null");
@@ -159,7 +159,7 @@ public class InventoryUtils {
      * @param order Slot processing order
      * @throws NullPointerException if any parameter is null
      */
-    public static void extractSingleItem(Container container, InventoryPredicate predicate, SlotRange slots, InventoryCycleOrder order) {
+    public static void extractSingleItem(Container container, ItemStackPredicate predicate, SlotRange slots, InventoryCycleOrder order) {
         extractItems(container, predicate, 1, slots, order);
     }
 
@@ -206,7 +206,7 @@ public class InventoryUtils {
      * @return Immutable list of matching item copies
      * @throws NullPointerException if container or predicate is null
      */
-    public static ImmutableList<ItemStack> collectMatching(Container container, InventoryPredicate predicate, @Nullable SlotRange slots) {
+    public static ImmutableList<ItemStack> collectMatching(Container container, ItemStackPredicate predicate, @Nullable SlotRange slots) {
         validateContainer(container);
         Objects.requireNonNull(predicate, "Predicate cannot be null");
         List<ItemStack> matches = new ArrayList<>();

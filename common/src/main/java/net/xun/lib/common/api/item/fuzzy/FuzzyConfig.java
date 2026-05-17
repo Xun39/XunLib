@@ -3,7 +3,7 @@ package net.xun.lib.common.api.item.fuzzy;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
-import net.xun.lib.common.api.inventory.predicates.InventoryPredicate;
+import net.xun.lib.common.api.inventory.predicates.ItemStackPredicate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,7 +64,7 @@ public class FuzzyConfig {
     CountMode countMode = CountMode.EXACT;
     Predicate<DataComponentType<?>> componentFilter = c -> true;
     TagKey<Item> requiredTag = null;
-    List<InventoryPredicate> predicates = new ArrayList<>();
+    List<ItemStackPredicate> predicates = new ArrayList<>();
 
     /**
      * Sets whether durability values should be ignored in comparisons
@@ -126,7 +126,7 @@ public class FuzzyConfig {
      * for new handling method
      */
     @Deprecated(since = "1.3")
-    public FuzzyConfig addCustomRule(InventoryPredicate rule) {
+    public FuzzyConfig addCustomRule(ItemStackPredicate rule) {
         FuzzyConfig copy = copy();
         copy.predicates.add(rule);
         return copy;
@@ -140,7 +140,7 @@ public class FuzzyConfig {
      * @return New configuration instance with updated predicate rules
      * @throws IllegalArgumentException If empty predicate list is provided with WHITELIST/BLACKLIST mode
      */
-    public FuzzyConfig withPredicateFilter(FilterMode mode, List<InventoryPredicate> predicates) {
+    public FuzzyConfig withPredicateFilter(FilterMode mode, List<ItemStackPredicate> predicates) {
         if (mode == FilterMode.WHITELIST || mode == FilterMode.BLACKLIST) {
             if (predicates == null || predicates.isEmpty()) {
                 throw new IllegalArgumentException("Predicates cannot be empty for WHITELIST or BLACKLIST modes");
@@ -152,8 +152,8 @@ public class FuzzyConfig {
         if (mode == FilterMode.WHITELIST) {
             copy.predicates = new ArrayList<>(predicates);
         } else if (mode == FilterMode.BLACKLIST) {
-            List<InventoryPredicate> negatedPredicates = new ArrayList<>(predicates.size());
-            for (InventoryPredicate p : predicates) {
+            List<ItemStackPredicate> negatedPredicates = new ArrayList<>(predicates.size());
+            for (ItemStackPredicate p : predicates) {
                 negatedPredicates.add(item -> !p.test(item));
             }
             copy.predicates = negatedPredicates;

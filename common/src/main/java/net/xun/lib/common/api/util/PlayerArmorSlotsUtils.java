@@ -6,9 +6,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.enchantment.Enchantment;
 import net.xun.lib.common.api.exceptions.UtilityClassException;
-import net.xun.lib.common.api.inventory.predicates.InventoryPredicate;
+import net.xun.lib.common.api.inventory.predicates.ItemStackPredicate;
 import net.xun.lib.common.api.inventory.slot.SlotGetter;
 
 import java.util.Arrays;
@@ -31,7 +30,7 @@ import java.util.Collection;
  * @see SlotGetter Armor Slot Indices
  * @see ArmorItem Armor item handling
  */
-public class ArmorSlotsUtils {
+public class PlayerArmorSlotsUtils {
 
     private static final int[] ALL_ARMOR_SLOTS = {
             EquipmentSlot.HEAD.getIndex(),
@@ -40,7 +39,7 @@ public class ArmorSlotsUtils {
             EquipmentSlot.FEET.getIndex()
     };
 
-    private ArmorSlotsUtils() throws UtilityClassException {
+    private PlayerArmorSlotsUtils() throws UtilityClassException {
         throw new UtilityClassException();
     }
 
@@ -127,7 +126,7 @@ public class ArmorSlotsUtils {
      * @param condition The condition
      * @return {@code True} if the armor in the specific slot matches the condition
      */
-    public static boolean matchesInSlot(Player player, int slotIndex, InventoryPredicate condition) {
+    public static boolean matchesInSlot(Player player, int slotIndex, ItemStackPredicate condition) {
         return condition.test(getArmorInSlot(player, slotIndex));
     }
 
@@ -138,7 +137,7 @@ public class ArmorSlotsUtils {
      * @param condition The condition
      * @return {@code True} if the item in the specific slot matches the condition
      */
-    public static boolean matchesAllArmor(Player player, InventoryPredicate condition) {
+    public static boolean matchesAllArmor(Player player, ItemStackPredicate condition) {
         return Arrays.stream(ALL_ARMOR_SLOTS).allMatch(slot -> matchesInSlot(player, slot, condition));
     }
 
@@ -177,7 +176,7 @@ public class ArmorSlotsUtils {
 
     public static int countDamagedPieces(Player player) {
         return (int) Arrays.stream(ALL_ARMOR_SLOTS)
-                .filter(slot -> matchesInSlot(player, slot, InventoryPredicate.IS_DAMAGED))
+                .filter(slot -> matchesInSlot(player, slot, ItemStackPredicate.IS_DAMAGED))
                 .count();
     }
 }

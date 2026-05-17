@@ -1,4 +1,4 @@
-package net.xun.lib.common.api.inventory.slot;
+package net.xun.lib.common.api.block.entity.container.slot;
 
 import net.minecraft.world.Container;
 import net.minecraft.world.inventory.Slot;

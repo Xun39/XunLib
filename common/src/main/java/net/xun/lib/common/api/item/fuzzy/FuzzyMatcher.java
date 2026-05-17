@@ -2,7 +2,7 @@ package net.xun.lib.common.api.item.fuzzy;
 
 import net.minecraft.world.item.ItemStack;
 import net.xun.lib.common.api.exceptions.InvalidMatcherConfigurationException;
-import net.xun.lib.common.api.inventory.predicates.InventoryPredicate;
+import net.xun.lib.common.api.inventory.predicates.ItemStackPredicate;
 
 import java.util.*;
 
@@ -20,7 +20,7 @@ import java.util.*;
  *   <li>Data component filtering (whitelist/blacklist)</li>
  *   <li>Tag-based category matching</li>
  *   <li>Count comparison modes (exact, at-least, ignore)</li>
- *   <li>Custom validation rules via {@link InventoryPredicate}</li>
+ *   <li>Custom validation rules via {@link ItemStackPredicate}</li>
  *   <li>Empty item handling</li>
  * </ul>
  *
@@ -43,7 +43,7 @@ import java.util.*;
  *
  *
  * @see FuzzyConfig For configuration
- * @see InventoryPredicate For single-item matching rules
+ * @see ItemStackPredicate For single-item matching rules
  * @see InvalidMatcherConfigurationException For configuration error details
  */
 public class FuzzyMatcher {

@@ -8,7 +8,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.xun.lib.common.api.exceptions.UtilityClassException;
-import net.xun.lib.common.api.inventory.predicates.InventoryPredicate;
+import net.xun.lib.common.api.inventory.predicates.ItemStackPredicate;
 import net.xun.lib.common.api.inventory.InventoryCycleOrder;
 import net.xun.lib.common.api.inventory.PlayerInventorySection;
 import org.jetbrains.annotations.NotNull;
@@ -71,7 +71,7 @@ public class PlayerInventoryUtils {
      * @return True if container contains sufficient matching items, false otherwise
      * @throws NullPointerException if container or predicate is null
      */
-    public static boolean hasItemCount(Player player, InventoryPredicate predicate, int minCount, PlayerInventorySection section) {
+    public static boolean hasItemCount(Player player, ItemStackPredicate predicate, int minCount, PlayerInventorySection section) {
         return InventoryUtils.hasItemCount(player.getInventory(), predicate, minCount, section.getSlotRange());
     }
 
@@ -84,7 +84,7 @@ public class PlayerInventoryUtils {
      * @return True if section contains at least one matching item
      * @throws NullPointerException if any parameter is null
      */
-    public static boolean hasItem(Player player, InventoryPredicate predicate, PlayerInventorySection section) {
+    public static boolean hasItem(Player player, ItemStackPredicate predicate, PlayerInventorySection section) {
         return InventoryUtils.hasItem(player.getInventory(), predicate, section.getSlotRange());
     }
 
@@ -99,7 +99,7 @@ public class PlayerInventoryUtils {
      * @return Slot index of first match, or -1 if none
      * @throws NullPointerException if any parameter is null
      */
-    public static int findFirstMatchingSlot(Player player, InventoryPredicate predicate, PlayerInventorySection section) {
+    public static int findFirstMatchingSlot(Player player, ItemStackPredicate predicate, PlayerInventorySection section) {
         return InventoryUtils.findFirstMatchingSlot(player.getInventory(), predicate, section.getSlotRange());
     }
 
@@ -206,7 +206,7 @@ public class PlayerInventoryUtils {
      * @param order Slot processing order
      * @throws NullPointerException if any parameter is null
      */
-    public static void extractItems(Player player, InventoryPredicate predicate, int amount, PlayerInventorySection section, InventoryCycleOrder order) {
+    public static void extractItems(Player player, ItemStackPredicate predicate, int amount, PlayerInventorySection section, InventoryCycleOrder order) {
         InventoryUtils.extractItems(player.getInventory(), predicate, amount, section.getSlotRange(), order);
     }
 
@@ -219,7 +219,7 @@ public class PlayerInventoryUtils {
      * @param order Slot processing order
      * @throws NullPointerException if any parameter is null
      */
-    public static void extractSingleItem(Player player, InventoryPredicate predicate, PlayerInventorySection section, InventoryCycleOrder order) {
+    public static void extractSingleItem(Player player, ItemStackPredicate predicate, PlayerInventorySection section, InventoryCycleOrder order) {
         InventoryUtils.extractSingleItem(player.getInventory(), predicate, section.getSlotRange(), order);
     }
 
@@ -255,7 +255,7 @@ public class PlayerInventoryUtils {
      * @return Immutable list of matching item copies
      * @throws NullPointerException if any parameter is null
      */
-    public static ImmutableList<ItemStack> collectMatching(Container container, InventoryPredicate predicate, PlayerInventorySection section) {
+    public static ImmutableList<ItemStack> collectMatching(Container container, ItemStackPredicate predicate, PlayerInventorySection section) {
         Objects.requireNonNull(section, "Section cannot be null");
         return InventoryUtils.collectMatching(container, predicate, section.getSlotRange());
     }
