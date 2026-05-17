@@ -1,14 +1,12 @@
 package net.xun.lib.common.api.util;
 
-import com.google.common.collect.ImmutableList;
-import net.minecraft.world.Container;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.xun.lib.common.api.exceptions.UtilityClassException;
-import net.xun.lib.common.api.inventory.predicates.ItemStackPredicate;
+import net.xun.lib.common.api.inventory.ItemStackPredicate;
 import net.xun.lib.common.api.inventory.InventoryCycleOrder;
 import net.xun.lib.common.api.inventory.PlayerInventorySection;
 import org.jetbrains.annotations.NotNull;
@@ -28,13 +26,10 @@ import java.util.Objects;
  *
  * @see InventoryUtils General inventory utilities
  */
-public class PlayerInventoryUtils {
-
+public final class PlayerInventoryUtils {
     private PlayerInventoryUtils() throws UtilityClassException {
         throw new UtilityClassException();
     }
-
-    // ======================== CORE CHECKS ======================== //
 
     /**
      * Checks if either of the player's hands is empty.
@@ -76,21 +71,6 @@ public class PlayerInventoryUtils {
     }
 
     /**
-     * Checks if a container's section contains at least one matching item.
-     *
-     * @param player Target player
-     * @param predicate Item matching logic
-     * @param section Inventory section to check
-     * @return True if section contains at least one matching item
-     * @throws NullPointerException if any parameter is null
-     */
-    public static boolean hasItem(Player player, ItemStackPredicate predicate, PlayerInventorySection section) {
-        return InventoryUtils.hasItem(player.getInventory(), predicate, section.getSlotRange());
-    }
-
-    // ======================== SLOT SEARCHING ======================== //
-
-    /**
      * Finds the first slot in an inventory section with a matching item.
      *
      * @param player Target player
@@ -102,20 +82,6 @@ public class PlayerInventoryUtils {
     public static int findFirstMatchingSlot(Player player, ItemStackPredicate predicate, PlayerInventorySection section) {
         return InventoryUtils.findFirstMatchingSlot(player.getInventory(), predicate, section.getSlotRange());
     }
-
-    /**
-     * Get the item of the specific slot in the inventory
-     *
-     * @param player Target player
-     * @param slotIndex The slot index
-     * @return ItemStack in the specific slot of the inventory
-     * @see net.xun.lib.common.api.inventory.slot.SlotGetter For easier slot getting
-     */
-    public static ItemStack getItemInSlot(Player player, int slotIndex) {
-        return InventoryUtils.getItemInSlot(player.getInventory(), slotIndex);
-    }
-
-    // ======================== ITEM MANAGEMENT ======================== //
 
     /**
      * Swaps items between the player's main hand and offhand.
@@ -189,9 +155,9 @@ public class PlayerInventoryUtils {
         validatePlayer(player);
         Objects.requireNonNull(item, "Item cannot be null");
 
-        if (hasEmptyHand(player, InteractionHand.MAIN_HAND)) {
+        if (player.getMainHandItem().isEmpty()) {
             setItemInMainHand(player, item);
-        } else if (hasEmptyHand(player, InteractionHand.OFF_HAND)) {
+        } else if (player.getOffhandItem().isEmpty()) {
             setItemInOffHand(player, item);
         }
     }
@@ -211,19 +177,6 @@ public class PlayerInventoryUtils {
     }
 
     /**
-     * Removes a single item from an inventory section.
-     *
-     * @param player Target player
-     * @param predicate Item matching logic
-     * @param section Section to remove from
-     * @param order Slot processing order
-     * @throws NullPointerException if any parameter is null
-     */
-    public static void extractSingleItem(Player player, ItemStackPredicate predicate, PlayerInventorySection section, InventoryCycleOrder order) {
-        InventoryUtils.extractSingleItem(player.getInventory(), predicate, section.getSlotRange(), order);
-    }
-
-    /**
      * Attempts to add an item stack to an inventory.
      * @param player Target player
      * @param stack Item stack to add (will not be modified)
@@ -233,45 +186,6 @@ public class PlayerInventoryUtils {
     public static ItemStack insertItem(Player player, ItemStack stack) {
         return InventoryUtils.insertItem(player.getInventory(), stack);
     }
-
-    /**
-     * Adds items to a player's inventory and permanently discards any overflow
-     * @param player Target player
-     * @param stack Item stack to add (will not be modified)
-     * @throws NullPointerException if container or stack is null
-     */
-    public static void insertAndDiscardOverflow(Player player, ItemStack stack) {
-        InventoryUtils.insertAndDiscardOverflow(player.getInventory(), stack);
-    }
-
-    // ======================== UTILITY METHODS ======================== //
-
-    /**
-     * Collects copies of items from an inventory section matching the predicate.
-     *
-     * @param container Target inventory
-     * @param predicate Item matching logic
-     * @param section Section to search
-     * @return Immutable list of matching item copies
-     * @throws NullPointerException if any parameter is null
-     */
-    public static ImmutableList<ItemStack> collectMatching(Container container, ItemStackPredicate predicate, PlayerInventorySection section) {
-        Objects.requireNonNull(section, "Section cannot be null");
-        return InventoryUtils.collectMatching(container, predicate, section.getSlotRange());
-    }
-
-    /**
-     * Calculates total available space for a specific item type.
-     *
-     * @param player Target player
-     * @return Total number of items that can be added
-     * @throws NullPointerException if container or stack is null
-     */
-    public static int getAvailableSpace(Player player) {
-        return InventoryUtils.getAvailableSpace(player.getInventory());
-    }
-
-    // ======================== HELPER METHODS ======================== //
 
     private static void validatePlayer(@Nullable Player player) {
         Objects.requireNonNull(player, "Player cannot be null");

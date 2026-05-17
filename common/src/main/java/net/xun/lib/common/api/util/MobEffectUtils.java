@@ -1,134 +1,91 @@
 package net.xun.lib.common.api.util;
 
-import net.minecraft.core.Holder;
-import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.xun.lib.common.api.exceptions.UtilityClassException;
 import net.xun.lib.common.api.world.effect.EffectStackingStrategy;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
- * Utility class for applying mob effects to entities with various strategies and conditions.
- * Works in conjunction with {@link EffectStackingStrategy} to determine how effects interact.
+ * Utility methods for working with {@link MobEffectInstance}s.
  */
-public class MobEffectUtils {
-
+public final class MobEffectUtils {
     private MobEffectUtils() throws UtilityClassException {
         throw new UtilityClassException();
     }
 
     /**
-     * Checks if the specified entity currently has the given effect.
-     *
-     * @param entity The entity to check. May be null.
-     * @param effect The effect to check for. May be null.
-     * @return true if the entity has the effect, false otherwise or if either parameter is null.
-     */
-    public static boolean hasEffect(LivingEntity entity, MobEffectInstance effect) {
-        if (entity == null || effect == null)
-            return false;
-
-        return entity.getEffect(effect.getEffect()) != null;
-    }
-
-    /**
-     * Checks if the entity has a sufficient version of the given effect.
-     * The existing effect is considered sufficient if it meets either condition:
+     * Returns whether the entity has an effect equivalent to or better than the provided one.
+     * An effect is considered sufficient if:
      * <ul>
-     *   <li>The remaining duration is greater than {@code expiryThreshold}, OR</li>
-     *   <li>The amplifier is equal to or higher than the new effect AND
-     *       the remaining duration is equal to or longer than the new effect's duration</li>
+     *     <li>It will not expire within the threshold, OR</li>
+     *     <li>Its amplifier and duration are both greater than or equal to the incoming effect</li>
      * </ul>
      *
-     * @param entity           The entity to check. Must not be null.
-     * @param effect           The effect to check for. Must not be null.
-     * @param expiryThreshold The threshold for remaining duration (in ticks).
-     * @return true if the entity has a sufficient effect, false otherwise.
-     * @throws NullPointerException if entity or effect is null.
+     * @param entity          Target entity
+     * @param effect          Incoming effect
+     * @param expiryThreshold Refresh threshold in ticks
+     * @return true if the current effect is sufficient
      */
     public static boolean hasSufficientEffect(LivingEntity entity, MobEffectInstance effect, int expiryThreshold) {
-        Holder<MobEffect> effectHolder = effect.getEffect();
-        MobEffectInstance current = entity.getEffect(effectHolder);
+        Objects.requireNonNull(entity, "entity");
+        Objects.requireNonNull(effect, "effect");
+
+        MobEffectInstance current = entity.getEffect(effect.getEffect());
 
         if (current == null) {
             return false;
         }
 
-        return !current.endsWithin(expiryThreshold) ||
-                (current.getAmplifier() >= effect.getAmplifier() &&
-                        current.getDuration() >= effect.getDuration());
+        boolean durationSafe = !current.endsWithin(expiryThreshold);
+        boolean strongerOrEqual = current.getAmplifier() >= effect.getAmplifier() && current.getDuration() >= effect.getDuration();
+
+        return durationSafe || strongerOrEqual;
     }
 
     /**
-     * Applies effects to an entity using a specified {@link EffectStackingStrategy}.
+     * Applies effects only if they are not already sufficiently active.
      *
-     * @param entity   Target entity (must not be null)
-     * @param effects  List of effects to apply (must not contain null elements)
-     * @param strategy Application strategy from {@link EffectStackingStrategy}
-     * @throws NullPointerException if entity, effects, or any element in effects is null
-     */
-    public static void applyEffectsWithStrategy(LivingEntity entity, List<MobEffectInstance> effects, EffectStackingStrategy strategy) {
-        effects.forEach(e -> strategy.apply(entity, e));
-    }
-
-    /**
-     * Applies effects to an entity only if they are not sufficiently present or if forced.
-     * Each effect is checked individually: if {@code forceAdd} is true, the effect is always applied.
-     * Otherwise, it is applied only if the entity does not already have a sufficient version.
-     *
-     * @param entity           The target entity. Must not be null.
-     * @param effects          The list of effects to apply. Must not be null and must not contain null elements.
-     * @param expiryThreshold The minimum remaining duration (in ticks) an existing effect must have
-     *                        to be considered sufficient.
-     * @param forceAdd         If true, applies effects regardless of existing ones.
-     * @throws NullPointerException if entity, effects, or any effect in the list is null.
+     * @param entity Target entity
+     * @param effects Effects to apply
+     * @param expiryThreshold Refresh threshold in ticks
+     * @param forceAdd Whether to bypass sufficiency checks
      */
     public static void applySmartEffects(LivingEntity entity, List<MobEffectInstance> effects, int expiryThreshold, boolean forceAdd) {
-        if (entity == null || effects == null || effects.isEmpty()) return;
+        Objects.requireNonNull(entity, "entity");
+        Objects.requireNonNull(effects, "effects");
 
         for (MobEffectInstance effect : effects) {
-            applySingleEffect(entity, effect, expiryThreshold, forceAdd);
+            applyEffect(entity, effect, expiryThreshold, forceAdd);
         }
     }
 
     /**
-     * Applies a single effect to the entity if conditions are met or if forced.
+     * Applies an effect if forced or not already sufficiently present.
      *
-     * @param entity           The target entity. Must not be null.
-     * @param effect           The effect to apply. Must not be null.
-     * @param expiryThreshold The minimum remaining duration (in ticks) for an existing effect to be
-     *                        considered sufficient.
-     * @param forceAdd         If true, applies the effect regardless of existing ones.
-     * @throws NullPointerException if entity or effect is null.
+     * @param entity Target entity
+     * @param effect Effect to apply
+     * @param expiryThreshold Refresh threshold in ticks
+     * @param forceAdd Whether to bypass sufficiency checks
      */
-    public static void applySingleEffect(LivingEntity entity, MobEffectInstance effect, int expiryThreshold, boolean forceAdd) {
+    public static void applyEffect(LivingEntity entity, MobEffectInstance effect, int expiryThreshold, boolean forceAdd) {
+        Objects.requireNonNull(entity, "entity");
+        Objects.requireNonNull(effect, "effect");
+
         if (forceAdd || !hasSufficientEffect(entity, effect, expiryThreshold)) {
             entity.addEffect(new MobEffectInstance(effect));
         }
     }
 
-    /**
-     * Removes the specified effect type from the entity. The effect to remove is identified by the
-     * effect type of the given effect instance. If the entity doesn't have this effect type,
-     * this method does nothing.
-     *
-     * @param entity The target entity. Must not be null.
-     * @param effect The effect instance containing the effect type to remove. Must not be null.
-     * @throws NullPointerException if entity or effect is null.
-     */
-    public static void clearEffect(LivingEntity entity, MobEffectInstance effect) {
-        entity.removeEffect(effect.getEffect());
-    }
+    public static void applyEffectWithStrategy(LivingEntity entity, MobEffectInstance effect, EffectStackingStrategy strategy) {
+        Objects.requireNonNull(entity);
+        Objects.requireNonNull(effect);
+        Objects.requireNonNull(strategy);
 
-    /**
-     * Removes all active effects from the entity.
-     *
-     * @param entity The target entity. Must not be null.
-     * @throws NullPointerException if entity is null.
-     */
-    public static void clearEffects(LivingEntity entity) {
-        entity.removeAllEffects();
+        MobEffectInstance current = entity.getEffect(effect.getEffect());
+
+        strategy.apply(entity, current, effect);
     }
 }

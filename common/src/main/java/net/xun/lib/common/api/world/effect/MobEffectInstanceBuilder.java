@@ -7,61 +7,57 @@ import net.minecraft.world.entity.LivingEntity;
 import net.xun.lib.common.api.util.MobEffectUtils;
 
 import java.util.List;
+import java.util.Objects;
 
 public class MobEffectInstanceBuilder {
 
     private final Holder<MobEffect> effect;
+
     private int duration = 0;
     private int amplifier = 0;
-    private boolean isAmbient = true;
-    private boolean isVisible = true;
+
+    private boolean ambient;
+    private boolean visible = true;
     private boolean showIcon = true;
-    private EffectStackingStrategy strategy = EffectStackingStrategy.FORCE_OVERRIDE;
 
     public MobEffectInstanceBuilder(Holder<MobEffect> effect) {
-        this.effect = effect;
+        this.effect = Objects.requireNonNull(effect);
     }
 
     public static MobEffectInstanceBuilder of(Holder<MobEffect> effect) {
         return new MobEffectInstanceBuilder(effect);
     }
 
-    public MobEffectInstanceBuilder withDuration(int ticks) {
+    public MobEffectInstanceBuilder duration(int ticks) {
         this.duration = Math.max(0, ticks);
         return this;
     }
 
-    public MobEffectInstanceBuilder withAmplifier(int amplifier) {
-        this.amplifier = Math.max(0, Math.min(amplifier, 127));
+    public MobEffectInstanceBuilder durationSeconds(int seconds) {
+        return duration(seconds * 20);
+    }
+
+    public MobEffectInstanceBuilder amplifier(int amplifier) {
+        this.amplifier = Math.max(0, amplifier);
         return this;
     }
 
-    public MobEffectInstanceBuilder ambient() {
-        this.isAmbient = true;
+    public MobEffectInstanceBuilder ambient(boolean ambient) {
+        this.ambient = ambient;
         return this;
     }
 
-    public MobEffectInstanceBuilder hidden() {
-        this.isVisible = false;
+    public MobEffectInstanceBuilder visible(boolean visible) {
+        this.visible = visible;
         return this;
     }
 
-    public MobEffectInstanceBuilder hideIcon() {
-        this.showIcon = false;
-        return this;
-    }
-
-    public MobEffectInstanceBuilder withApplyStrategy(EffectStackingStrategy strategy) {
-        this.strategy = strategy;
+    public MobEffectInstanceBuilder showIcon(boolean showIcon) {
+        this.showIcon = showIcon;
         return this;
     }
 
     public MobEffectInstance build() {
-        return new MobEffectInstance(effect, duration, amplifier, isAmbient, isVisible, showIcon);
-    }
-
-    public void applyTo(LivingEntity living) {
-        if (living == null || living.level().isClientSide) return;
-        MobEffectUtils.applyEffectsWithStrategy(living, List.of(build()), this.strategy);
+        return new MobEffectInstance(effect, duration, amplifier, ambient, visible, showIcon);
     }
 }

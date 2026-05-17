@@ -1,4 +1,4 @@
-package net.xun.lib.common.api.inventory.predicates;
+package net.xun.lib.common.api.inventory;
 
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
@@ -11,9 +11,9 @@ import java.util.function.Predicate;
 
 public interface ItemStackPredicate extends Predicate<ItemStack> {
 
-    ItemStackPredicate IS_DAMAGED = stack -> stack != null && stack.isDamaged() && stack.isDamageableItem();
-    ItemStackPredicate IS_FULL_STACK = stack -> stack != null && !stack.isEmpty() && stack.getCount() >= stack.getMaxStackSize();
-    ItemStackPredicate IS_EMPTY = stack -> stack == null || stack.isEmpty();
+    ItemStackPredicate IS_DAMAGED = stack -> !stack.isEmpty() && stack.isDamaged() && stack.isDamageableItem();
+    ItemStackPredicate IS_FULL_STACK = stack -> !stack.isEmpty() && stack.getCount() >= stack.getMaxStackSize();
+    ItemStackPredicate IS_EMPTY = ItemStack::isEmpty;
 
     /**
      * Creates a predicate matching items of specific class hierarchy

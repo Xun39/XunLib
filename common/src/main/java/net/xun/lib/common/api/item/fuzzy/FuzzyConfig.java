@@ -3,7 +3,7 @@ package net.xun.lib.common.api.item.fuzzy;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
-import net.xun.lib.common.api.inventory.predicates.ItemStackPredicate;
+import net.xun.lib.common.api.inventory.ItemStackPredicate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -94,12 +94,25 @@ public class FuzzyConfig {
      * Configures stack count comparison strategy
      *
      * @param countMode The count matching strategy to use
-     * @return New configuration instance with updated strategy
+     * @return New configuration instance with updated setting
      * @see CountMode
      */
     public FuzzyConfig withCountMode(CountMode countMode) {
         FuzzyConfig copy = copy();
         copy.countMode = countMode;
+        return copy;
+    }
+
+    /**
+     * Sets whether a specific tag is required in comparisons
+     *
+     * @param tag the required tag
+     * @return New configuration instance with updated setting
+     * @see CountMode
+     */
+    public FuzzyConfig withRequiredTag(TagKey<Item> tag) {
+        FuzzyConfig copy = copy();
+        copy.requiredTag = tag;
         return copy;
     }
 

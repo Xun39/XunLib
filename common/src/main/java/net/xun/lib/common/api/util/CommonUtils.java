@@ -21,8 +21,7 @@ import net.xun.lib.common.internal.misc.ModIDManager;
 import java.util.HashMap;
 import java.util.Map;
 
-public class CommonUtils {
-
+public final class CommonUtils {
     private CommonUtils() throws UtilityClassException {
         throw new UtilityClassException();
     }
@@ -64,73 +63,6 @@ public class CommonUtils {
      */
     public static String namespacedID(String... pathParts) {
         return combineAsNamespacedID(ModIDManager.getModId(), pathParts);
-    }
-
-    private static final Map<Class<?>, Registry<?>> REGISTRIES = new HashMap<>();
-
-    static {
-        REGISTRIES.put(SoundEvent.class, BuiltInRegistries.SOUND_EVENT);
-        REGISTRIES.put(Fluid.class, BuiltInRegistries.FLUID);
-        REGISTRIES.put(MobEffect.class, BuiltInRegistries.MOB_EFFECT);
-        REGISTRIES.put(Block.class, BuiltInRegistries.BLOCK);
-        REGISTRIES.put(EntityType.class, BuiltInRegistries.ENTITY_TYPE);
-        REGISTRIES.put(Item.class, BuiltInRegistries.ITEM);
-        REGISTRIES.put(Potion.class, BuiltInRegistries.POTION);
-        REGISTRIES.put(ParticleType.class, BuiltInRegistries.PARTICLE_TYPE);
-        REGISTRIES.put(BlockEntityType.class, BuiltInRegistries.BLOCK_ENTITY_TYPE);
-        REGISTRIES.put(ArmorMaterial.class, BuiltInRegistries.ARMOR_MATERIAL);
-    }
-
-    /**
-     * Retrieves the registry key for a given object by checking known registries.
-     * <p>
-     * Supports objects registered in common registries such as blocks, items, entities,
-     * effects, and more. If the object's type isn't recognized, throws an exception.
-     * </p>
-     *
-     * @param obj The registered object to get the key for
-     * @return The resource location key of the object
-     * @throws IllegalArgumentException If the object's type isn't in the supported registries
-     */
-    @SuppressWarnings("unchecked")
-    public static ResourceLocation getKey(Object obj) {
-        for (Map.Entry<Class<?>, Registry<?>> entry : REGISTRIES.entrySet()) {
-            if (entry.getKey().isInstance(obj)) {
-                Registry<Object> registry = (Registry<Object>) entry.getValue();
-                return registry.getKey(obj);
-            }
-        }
-        throw new IllegalArgumentException("Unsupported type: " + obj.getClass());
-    }
-
-    /**
-     * Gets the path component of the registry key for the given object.
-     * <p>
-     * Equivalent to calling {@code getKey(obj).getPath()}.
-     * </p>
-     *
-     * @param obj The registered object to get the ID for
-     * @return The path portion of the object's registry key
-     * @throws IllegalArgumentException If the object's type isn't supported
-     * @see #getKey(Object)
-     */
-    public static String getRegistryID(Object obj) {
-        return getKey(obj).getPath();
-    }
-
-    /**
-     * Gets the path component of the registry key for an {@link ItemLike} object.
-     * <p>
-     * Specifically handles items and blocks through the {@link ItemLike} interface.
-     * </p>
-     *
-     * @param itemLike The item or block to get the registry ID for
-     * @return The path portion of the object's registry key
-     * @throws IllegalArgumentException If the object's type isn't supported
-     * @see #getKey(Object)
-     */
-    public static String getRegistryID(ItemLike itemLike) {
-        return getKey(itemLike).getPath();
     }
 
     /**

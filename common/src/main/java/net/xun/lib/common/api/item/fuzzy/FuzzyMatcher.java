@@ -1,17 +1,15 @@
 package net.xun.lib.common.api.item.fuzzy;
 
+import net.minecraft.core.component.DataComponentType;
 import net.minecraft.world.item.ItemStack;
 import net.xun.lib.common.api.exceptions.InvalidMatcherConfigurationException;
-import net.xun.lib.common.api.inventory.predicates.ItemStackPredicate;
+import net.xun.lib.common.api.inventory.ItemStackPredicate;
 
 import java.util.*;
 
 /**
  * Advanced item comparison system with configurable matching rules, supporting both
  * individual item checks and pairwise item comparisons.
- * <p>
- * Instances are immutable and thread-safe. Configure using the fluent methods that
- * return new instances with updated settings.
  *
  * <h2>Features</h2>
  * <ul>
@@ -139,16 +137,38 @@ public class FuzzyMatcher {
     }
 
     private boolean compareEnchantments(ItemStack a, ItemStack b) {
-        return config.ignoreEnchantments ||
-                Objects.equals(a.getEnchantments(), b.getEnchantments());
+        return config.ignoreEnchantments || Objects.equals(a.getEnchantments(), b.getEnchantments());
     }
 
     private boolean compareComponents(ItemStack a, ItemStack b) {
-        return a.getComponents().stream()
-                .filter(entry -> config.componentFilter.test(entry.type()))
-                .allMatch(entry ->
-                        Objects.equals(entry.type(), b.get(entry.type()))
-                );
+        Set<DataComponentType<?>> checked = new HashSet<>();
+
+        for (var entry : a.getComponents()) {
+            DataComponentType<?> type = entry.type();
+
+            if (!config.componentFilter.test(type))
+                continue;
+
+            checked.add(type);
+
+            if (!Objects.equals(a.get(type), b.get(type)))
+                return false;
+        }
+
+        for (var entry : b.getComponents()) {
+            DataComponentType<?> type = entry.type();
+
+            if (!config.componentFilter.test(type))
+                continue;
+
+            if (checked.contains(type))
+                continue;
+
+            if (!Objects.equals(a.get(type), b.get(type)))
+                return false;
+        }
+
+        return true;
     }
 
     private boolean compareCount(ItemStack a, ItemStack b) {
@@ -165,11 +185,16 @@ public class FuzzyMatcher {
 
     private void validateConfiguration() {
         if (config.requiredTag != null && !config.predicates.isEmpty()) {
-            throw new InvalidMatcherConfigurationException("Cannot combine tag requirements with custom rules");
+            throw new InvalidMatcherConfigurationException(
+                    "Cannot combine tag requirements with custom rules"
+            );
         }
-        if ((config.ignoreDurability || config.ignoreEnchantments || config.countMode != FuzzyConfig.CountMode.IGNORE) &&
-                !config.predicates.isEmpty()) {
-            throw new InvalidMatcherConfigurationException("Cannot apply custom rules while ignoring attributes");
+
+        if ((config.ignoreDurability || config.ignoreEnchantments)
+                && !config.predicates.isEmpty()) {
+            throw new InvalidMatcherConfigurationException(
+                    "Cannot apply custom rules while ignoring attributes"
+            );
         }
     }
 }

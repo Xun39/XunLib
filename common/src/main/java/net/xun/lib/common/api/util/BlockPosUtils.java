@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class BlockPosUtils {
+public final class BlockPosUtils {
 
     private BlockPosUtils() throws UtilityClassException {
         throw new UtilityClassException();

@@ -15,7 +15,7 @@
     "environment": "*",
     "entrypoints": {
         "main": [
-            "net.xun.lib.fabric.internal.XunLibFabric"
+            "net.xun.lib.fabric.XunLibFabric"
         ]
     },
     "mixins": [

@@ -7,7 +7,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.xun.lib.common.api.exceptions.UtilityClassException;
-import net.xun.lib.common.api.inventory.predicates.ItemStackPredicate;
+import net.xun.lib.common.api.inventory.ItemStackPredicate;
 import net.xun.lib.common.api.inventory.InventoryCycleOrder;
 import net.xun.lib.common.api.inventory.slot.SlotIterator;
 import net.xun.lib.common.api.inventory.slot.SlotRange;
@@ -28,10 +28,10 @@ import java.util.Objects;
  *   <li>Item collection with custom predicates</li>
  * </ul>
  *
- * @see ItemStackPredicate Inventory predicates
- * @see PlayerArmorSlotsUtils Armor-specific inventory utils
+ * @see ItemStackPredicate ItemStack predicates
+ * @see EquipmentSlotsUtils Equipment slots-specific inventory utils
  */
-public class InventoryUtils {
+public final class InventoryUtils {
 
     private InventoryUtils() throws UtilityClassException {
         throw new UtilityClassException();
@@ -52,30 +52,23 @@ public class InventoryUtils {
     public static boolean hasItemCount(Container container, ItemStackPredicate predicate, int minCount, @Nullable SlotRange slots) {
         validateContainer(container);
         Objects.requireNonNull(predicate, "Predicate cannot be null");
-        if (minCount < 1) throw new IllegalArgumentException("minCount must be ≥1");
+
+        if (minCount < 1)
+            throw new IllegalArgumentException("minCount must be ≥1");
 
         int count = 0;
         for (int slot : getSlotIterator(container, slots)) {
             ItemStack stack = container.getItem(slot);
+
             if (!stack.isEmpty() && predicate.test(stack)) {
                 count += stack.getCount();
-                if (count >= minCount) return true;
+
+                if (count >= minCount)
+                    return true;
             }
         }
-        return false;
-    }
 
-    /**
-     * Checks if a container has at least one item matching the predicate.
-     *
-     * @param container Target inventory
-     * @param predicate Item matching logic
-     * @param slots Slot range to check (null for entire inventory)
-     * @return True if at least one matching item exists
-     * @throws NullPointerException if container or predicate is null
-     */
-    public static boolean hasItem(Container container, ItemStackPredicate predicate, @Nullable SlotRange slots) {
-        return hasItemCount(container, predicate, 1, slots);
+        return false;
     }
 
     // ======================== SLOT SEARCHING ======================== //
@@ -95,23 +88,13 @@ public class InventoryUtils {
 
         for (int slot : getSlotIterator(container, slots)) {
             ItemStack stack = container.getItem(slot);
+
             if (!stack.isEmpty() && predicate.test(stack)) {
                 return slot;
             }
         }
-        return -1;
-    }
 
-    /**
-     * Get the item of the specific slot in the container
-     *
-     * @param container Target inventory
-     * @param slotIndex The slot index
-     * @return ItemStack in the specific slot of the container
-     * @see net.xun.lib.common.api.inventory.slot.SlotGetter For easier slot getting
-     */
-    public static ItemStack getItemInSlot(Container container, int slotIndex) {
-        return container.getItem(slotIndex);
+        return -1;
     }
 
     // ======================== ITEM MANAGEMENT ======================== //
@@ -125,42 +108,45 @@ public class InventoryUtils {
      * @param order Slot processing order strategy
      * @throws NullPointerException if container, predicate, or order is null
      */
-    public static void extractItems(Container container, ItemStackPredicate predicate, int amount, @Nullable SlotRange slots, InventoryCycleOrder order) {
+    public static int extractItems(Container container, ItemStackPredicate predicate, int amount, @Nullable SlotRange slots, InventoryCycleOrder order) {
         validateContainer(container);
         Objects.requireNonNull(predicate, "Predicate cannot be null");
         Objects.requireNonNull(order, "Removal order cannot be null");
         if (amount < 1) throw new IllegalArgumentException("Amount must be ≥1");
 
         List<Integer> slotOrder = order.getSlotOrder(container, slots);
+
         int remaining = amount;
+        int removed = 0;
+        boolean changed = false;
 
         for (int slot : slotOrder) {
             ItemStack stack = container.getItem(slot);
-            if (stack.isEmpty() || !predicate.test(stack)) continue;
+
+            if (stack.isEmpty() || !predicate.test(stack))
+                continue;
 
             int remove = Math.min(stack.getCount(), remaining);
             stack.shrink(remove);
+
+            removed += remove;
             remaining -= remove;
+            changed = true;
 
             if (stack.isEmpty()) {
                 container.setItem(slot, ItemStack.EMPTY);
+            } else {
+                container.setItem(slot, stack);
             }
 
-            if (remaining <= 0) break;
+            if (remaining <= 0)
+                break;
         }
-    }
 
-    /**
-     * Removes a single item from the specified slot range.
-     *
-     * @param container Target inventory
-     * @param predicate Item matching logic
-     * @param slots Slot range to search
-     * @param order Slot processing order
-     * @throws NullPointerException if any parameter is null
-     */
-    public static void extractSingleItem(Container container, ItemStackPredicate predicate, SlotRange slots, InventoryCycleOrder order) {
-        extractItems(container, predicate, 1, slots, order);
+        if (changed)
+            container.setChanged();
+
+        return removed;
     }
 
     /**
@@ -173,26 +159,22 @@ public class InventoryUtils {
     public static ItemStack insertItem(Container container, ItemStack stack) {
         validateContainer(container);
         Objects.requireNonNull(stack, "ItemStack cannot be null");
+
         if (stack.isEmpty()) return ItemStack.EMPTY;
 
         ItemStack remaining = stack.copy();
 
         remaining = tryMergeWithExisting(container, remaining);
-        if (remaining.isEmpty()) return ItemStack.EMPTY;
+
+        if (remaining.isEmpty()) {
+            container.setChanged();
+            return ItemStack.EMPTY;
+        }
 
         remaining = tryFillEmptySlots(container, remaining);
+        container.setChanged();
 
         return remaining;
-    }
-
-    /**
-     * Adds items to a container and permanently discards any overflow
-     * @param container Target inventory
-     * @param stack Item stack to add (will not be modified)
-     * @throws NullPointerException if container or stack is null
-     */
-    public static void insertAndDiscardOverflow(Container container, ItemStack stack) {
-        insertItem(container, stack);
     }
 
     // ======================== UTILITY METHODS ======================== //
@@ -209,14 +191,17 @@ public class InventoryUtils {
     public static ImmutableList<ItemStack> collectMatching(Container container, ItemStackPredicate predicate, @Nullable SlotRange slots) {
         validateContainer(container);
         Objects.requireNonNull(predicate, "Predicate cannot be null");
+
         List<ItemStack> matches = new ArrayList<>();
 
         for (int slot : getSlotIterator(container, slots)) {
             ItemStack stack = container.getItem(slot);
+
             if (!stack.isEmpty() && predicate.test(stack)) {
                 matches.add(stack.copy());
             }
         }
+
         return ImmutableList.copyOf(matches);
     }
 
@@ -227,24 +212,26 @@ public class InventoryUtils {
      * @return The number of empty slots
      * @throws NullPointerException if container or stack is null
      */
-    public static int getAvailableSpace(Container container) {
+    public static int getEmptySlotCount(Container container) {
         validateContainer(container);
-        int space = 0;
+
+        int count = 0;
 
         for (int slot = 0; slot < container.getContainerSize(); slot++) {
-            ItemStack existing = container.getItem(slot);
-            if (existing.isEmpty()) {
-                space += 1;
+            if (container.getItem(slot).isEmpty()) {
+                count += 1;
             }
         }
-        return space;
+
+        return count;
     }
 
     // ======================== HELPER METHODS ======================== //
 
     private static Iterable<Integer> getSlotIterator(Container container, @Nullable SlotRange range) {
-        return range != null ? range.getSlots(container) :
-                () -> new SlotIterator(0, container.getContainerSize());
+        return range != null
+                ? range.getSlots(container)
+                : () -> new SlotIterator(0, container.getContainerSize());
     }
 
     private static ItemStack tryMergeWithExisting(Container container, ItemStack stack) {
@@ -253,19 +240,40 @@ public class InventoryUtils {
         for (int slot = 0; slot < container.getContainerSize(); slot++) {
             ItemStack existing = container.getItem(slot);
 
-            if (ItemStack.isSameItem(existing, remaining)) {
-                int transfer = Math.min(remaining.getCount(), existing.getMaxStackSize() - existing.getCount());
-
-                if (transfer > 0) {
-                    existing.grow(transfer);
-                    remaining.shrink(transfer);
-                    container.setItem(slot, existing);
-
-                    if (remaining.isEmpty()) {
-                        return ItemStack.EMPTY;
-                    }
-                }
+            if (existing.isEmpty()) {
+                continue;
             }
+
+            if (!container.canPlaceItem(slot, remaining)) {
+                continue;
+            }
+
+            if (!ItemStack.isSameItemSameComponents(existing, remaining)) {
+                continue;
+            }
+
+            int maxStackSize = Math.min(
+                    existing.getMaxStackSize(),
+                    container.getMaxStackSize()
+            );
+
+            int availableSpace = maxStackSize - existing.getCount();
+
+            if (availableSpace <= 0) {
+                continue;
+            }
+
+            int transfer = Math.min(remaining.getCount(), availableSpace);
+
+            ItemStack updated = existing.copy();
+            updated.grow(transfer);
+
+            container.setItem(slot, updated);
+
+            remaining.shrink(transfer);
+
+            if (remaining.isEmpty())
+                return ItemStack.EMPTY;
         }
 
         return remaining;
@@ -277,17 +285,30 @@ public class InventoryUtils {
         for (int slot = 0; slot < container.getContainerSize(); slot++) {
             ItemStack existing = container.getItem(slot);
 
-            if (existing.isEmpty()) {
-                int transfer = Math.min(remaining.getCount(), remaining.getMaxStackSize());
-                ItemStack newStack = remaining.copy();
-                newStack.setCount(transfer);
+            if (!existing.isEmpty()) {
+                continue;
+            }
 
-                container.setItem(slot, newStack);
-                remaining.shrink(transfer);
+            if (!container.canPlaceItem(slot, remaining)) {
+                continue;
+            }
 
-                if (remaining.isEmpty()) {
-                    return ItemStack.EMPTY;
-                }
+            int maxInsert = Math.min(
+                    remaining.getMaxStackSize(),
+                    container.getMaxStackSize()
+            );
+
+            int transfer = Math.min(remaining.getCount(), maxInsert);
+
+            ItemStack newStack = remaining.copy();
+            newStack.setCount(transfer);
+
+            container.setItem(slot, newStack);
+
+            remaining.shrink(transfer);
+
+            if (remaining.isEmpty()) {
+                return ItemStack.EMPTY;
             }
         }
 
@@ -307,31 +328,23 @@ public class InventoryUtils {
         Objects.requireNonNull(container, "Container cannot be null");
 
         Level level = null;
-        if (container instanceof Entity e) {
-            level = e.level();
-        } else if (container instanceof BlockEntity be) {
-            level = be.getLevel();
+
+        if (container instanceof Entity entity) {
+            level = entity.level();
+        } else if (container instanceof BlockEntity blockEntity) {
+            level = blockEntity.getLevel();
         }
 
         if (!allowClientSide && level != null && level.isClientSide) {
             throw new IllegalStateException("Client-side inventory modifications are not allowed");
         }
-
-        int size = container.getContainerSize();
-        if (size <= 0) {
-            throw new IllegalArgumentException("Container has invalid size: " + size);
-        }
-
-        // Validate slot access
-        try {
-            container.getItem(0);
-            if (size > 1) container.getItem(size - 1);
-        } catch (IndexOutOfBoundsException e) {
-            throw new IllegalArgumentException("Container slot access violation", e);
-        }
     }
 
-    // Disable Client-side by default
+    /**
+     * Validates a container while disallowing client-side access.
+     *
+     * @param container Container to validate
+     */
     public static void validateContainer(Container container) {
         validateContainer(container, false);
     }

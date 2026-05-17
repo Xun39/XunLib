@@ -7,8 +7,7 @@ import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.ItemStack;
 import net.xun.lib.common.api.exceptions.UtilityClassException;
-import net.xun.lib.common.api.inventory.predicates.ItemStackPredicate;
-import net.xun.lib.common.api.inventory.slot.SlotGetter;
+import net.xun.lib.common.api.inventory.ItemStackPredicate;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -25,11 +24,15 @@ import java.util.Collection;
  *   <li>Slot-specific operations and armor retrieval</li>
  * </ul>
  *
+ * @deprecated Since version 3.0.0, use {@link EquipmentSlotsUtils} instead, which works with any
+ *             {@link net.minecraft.world.entity.LivingEntity} (including players, mobs, armor stands).
+ *             This class will be removed in a future release.
  *
  * @see InventoryUtils General inventory utilities
- * @see SlotGetter Armor Slot Indices
  * @see ArmorItem Armor item handling
+ * @see EquipmentSlotsUtils Replacement utility
  */
+@Deprecated(forRemoval = true)
 public class PlayerArmorSlotsUtils {
 
     private static final int[] ALL_ARMOR_SLOTS = {
@@ -47,7 +50,7 @@ public class PlayerArmorSlotsUtils {
      * Checks if a specific armor slot contains any armor item.
      *
      * @param player Target player
-     * @param slotIndex Armor slot to check (see {@link SlotGetter})
+     * @param slotIndex Armor slot to check
      * @return {@code True} if the slot contains non-air armor, false otherwise
      * @throws NullPointerException if player is null
      */
@@ -70,7 +73,7 @@ public class PlayerArmorSlotsUtils {
      * Checks if armor in a specific slot matches given material.
      *
      * @param player Target player
-     * @param slotIndex Armor slot to check (see {@link SlotGetter})
+     * @param slotIndex Armor slot to check
      * @param material Required armor material
      * @return {@code True} if slot contains armor of specified material, false otherwise
      * @throws NullPointerException if any parameter is null

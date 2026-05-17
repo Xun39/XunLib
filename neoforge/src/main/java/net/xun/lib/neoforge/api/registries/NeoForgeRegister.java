@@ -13,7 +13,7 @@ import net.xun.lib.common.api.registries.Register;
 import net.xun.lib.common.api.registries.RegistryBlock;
 import net.xun.lib.common.api.registries.RegistryHolder;
 import net.xun.lib.common.api.registries.RegistryItem;
-import net.xun.lib.neoforge.internal.XunLibNeoForge;
+import net.xun.lib.neoforge.XunLibNeoForge;
 
 import java.util.HashMap;
 import java.util.Map;

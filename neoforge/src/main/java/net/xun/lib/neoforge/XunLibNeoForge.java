@@ -1,10 +1,10 @@
-package net.xun.lib.neoforge.internal;
+package net.xun.lib.neoforge;
 
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.registries.DeferredRegister;
-import net.xun.lib.common.internal.XunLibCommon;
-import net.xun.lib.common.internal.XunLibConstants;
+import net.xun.lib.common.XunLibCommon;
+import net.xun.lib.common.XunLibConstants;
 
 import java.util.HashMap;
 import java.util.Map;

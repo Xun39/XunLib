@@ -1,7 +1,7 @@
 package net.xun.lib.common.internal.mixin;
 
 import net.minecraft.client.Minecraft;
-import net.xun.lib.common.internal.XunLibConstants;
+import net.xun.lib.common.XunLibConstants;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
