@@ -1,9 +1,9 @@
-package net.xun.lib.neoforge.internal.platform;
+package net.xun.lib.neoforge.platform;
 
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.xun.lib.common.api.registries.Register;
-import net.xun.lib.common.internal.platform.services.IPlatformHelper;
+import net.xun.lib.common.platform.services.IPlatformHelper;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.loading.FMLLoader;
 import net.xun.lib.neoforge.api.registries.NeoForgeRegister;

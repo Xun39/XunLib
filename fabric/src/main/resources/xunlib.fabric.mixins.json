@@ -1,7 +1,7 @@
 {
   "required": true,
   "minVersion": "0.8",
-  "package": "net.xun.lib.fabric.internal.mixin",
+  "package": "net.xun.lib.fabric.mixin",
   "refmap": "${mod_id}.refmap.json",
   "compatibilityLevel": "JAVA_21",
   "mixins": [],
@@ -13,4 +13,3 @@
     "defaultRequire": 1
   }
 }
-  

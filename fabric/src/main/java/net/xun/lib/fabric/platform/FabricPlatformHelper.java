@@ -1,9 +1,9 @@
-package net.xun.lib.fabric.internal.platform;
+package net.xun.lib.fabric.platform;
 
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.xun.lib.common.api.registries.Register;
-import net.xun.lib.common.internal.platform.services.IPlatformHelper;
+import net.xun.lib.common.platform.services.IPlatformHelper;
 import net.fabricmc.loader.api.FabricLoader;
 import net.xun.lib.fabric.api.registries.FabricRegister;
 import org.jetbrains.annotations.ApiStatus;

@@ -3,8 +3,8 @@ package net.xun.lib.neoforge;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.registries.DeferredRegister;
-import net.xun.lib.common.XunLibCommon;
-import net.xun.lib.common.XunLibConstants;
+import net.xun.lib.common.impl.XunLibCommon;
+import net.xun.lib.common.impl.XunLibConstants;
 
 import java.util.HashMap;
 import java.util.Map;

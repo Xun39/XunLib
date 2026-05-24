@@ -1,4 +1,4 @@
-package net.xun.lib.common;
+package net.xun.lib.common.impl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

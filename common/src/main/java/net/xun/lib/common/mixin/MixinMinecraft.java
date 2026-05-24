@@ -1,20 +1,19 @@
-package net.xun.lib.neoforge.internal.mixin;
+package net.xun.lib.common.mixin;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.TitleScreen;
-import net.xun.lib.common.XunLibConstants;
+import net.xun.lib.common.impl.XunLibConstants;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(TitleScreen.class)
-public class MixinTitleScreen {
+@Mixin(Minecraft.class)
+public class MixinMinecraft {
 
-    @Inject(at = @At("HEAD"), method = "init()V")
+    @Inject(at = @At("TAIL"), method = "<init>")
     private void init(CallbackInfo info) {
 
-        XunLibConstants.LOGGER.info("This line is printed by an example mod mixin from NeoForge!");
+        XunLibConstants.LOGGER.info("This line is printed by an example mod common mixin!");
         XunLibConstants.LOGGER.info("MC Version: {}", Minecraft.getInstance().getVersionType());
     }
 }

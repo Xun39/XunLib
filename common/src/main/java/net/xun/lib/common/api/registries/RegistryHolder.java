@@ -1,22 +1,5 @@
 package net.xun.lib.common.api.registries;
 
-/*
-    This class is a modified version of the RegistryHolder from the Artifacts mod
-
-    MIT License
-
-    Copyright (c) 2019-2021
-
-    Permission is hereby granted, free of charge, to any person obtaining a copy
-    of this software and associated documentation files (the "Software"), to deal
-    in the Software without restriction, including without limitation the rights
-    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-    copies of the Software, and to permit persons to whom the Software is
-    furnished to do so, subject to the following conditions:
-
-    The above copyright notice and this permission notice shall be included in all
-    copies or substantial portions of the Software.
-*/
 
 import com.mojang.datafixers.util.Either;
 import net.minecraft.core.Holder;
@@ -31,6 +14,8 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
+
+/* This class is a modified version of the RegistryHolder from the Artifacts mod */
 
 /**
  * A registry-backed holder implementation that wraps a registry entry and its supplier.

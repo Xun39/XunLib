@@ -1,4 +1,4 @@
-package net.xun.lib.common.internal.misc;
+package net.xun.lib.common.impl;
 
 import org.jetbrains.annotations.ApiStatus;
 

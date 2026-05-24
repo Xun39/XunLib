@@ -1,7 +1,7 @@
 package net.xun.lib.fabric;
 
 import net.fabricmc.api.ModInitializer;
-import net.xun.lib.common.XunLibCommon;
+import net.xun.lib.common.impl.XunLibCommon;
 
 public class XunLibFabric implements ModInitializer {
     

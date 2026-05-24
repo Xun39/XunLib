@@ -1,4 +1,4 @@
-package net.xun.lib.common.internal.platform.services;
+package net.xun.lib.common.platform.services;
 
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;

@@ -1,4 +1,4 @@
-package net.xun.lib.common.internal.block.entity;
+package net.xun.lib.common.impl.block.entity;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;

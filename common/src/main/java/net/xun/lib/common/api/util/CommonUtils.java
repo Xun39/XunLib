@@ -1,25 +1,10 @@
 package net.xun.lib.common.api.util;
 
 import net.minecraft.core.Registry;
-import net.minecraft.core.particles.ParticleType;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.sounds.SoundEvent;
-import net.minecraft.world.effect.MobEffect;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.item.ArmorMaterial;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.alchemy.Potion;
-import net.minecraft.world.level.ItemLike;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.level.material.Fluid;
 import net.xun.lib.common.api.exceptions.UtilityClassException;
-import net.xun.lib.common.internal.misc.ModIDManager;
-
-import java.util.HashMap;
-import java.util.Map;
+import net.xun.lib.common.impl.ModIDManager;
 
 public final class CommonUtils {
     private CommonUtils() throws UtilityClassException {

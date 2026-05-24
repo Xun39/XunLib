@@ -22,10 +22,6 @@ public record Area(int x, int y, int width, int height) {
      * screenX = leftPos + x
      * screenY = topPos + y
      * </pre>
-     * The point {@code (mouseX, mouseY)} is considered inside if:
-     * <pre>
-     * screenX <= mouseX < screenX + width  and  screenY <= mouseY < screenY + height
-     * </pre>
      *
      * @param mouseX the X coordinate of the point to test (usually in screen space)
      * @param mouseY the Y coordinate of the point to test

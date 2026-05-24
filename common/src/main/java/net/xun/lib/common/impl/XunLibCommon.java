@@ -1,6 +1,6 @@
-package net.xun.lib.common;
+package net.xun.lib.common.impl;
 
-import net.xun.lib.common.internal.platform.Services;
+import net.xun.lib.common.platform.Services;
 
 public class XunLibCommon {
 

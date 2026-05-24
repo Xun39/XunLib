@@ -6,8 +6,8 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.xun.lib.common.internal.block.entity.ClientTickable;
-import net.xun.lib.common.internal.block.entity.ServerTickable;
+import net.xun.lib.common.impl.block.entity.ClientTickable;
+import net.xun.lib.common.impl.block.entity.ServerTickable;
 
 public interface ITickableBlockEntity extends ClientTickable, ServerTickable {
 
