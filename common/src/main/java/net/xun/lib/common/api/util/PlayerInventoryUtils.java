@@ -5,7 +5,6 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.xun.lib.common.api.exceptions.UtilityClassException;
 import net.xun.lib.common.api.inventory.ItemStackPredicate;
 import net.xun.lib.common.api.inventory.InventoryCycleOrder;
 import net.xun.lib.common.api.inventory.PlayerInventorySection;
@@ -27,8 +26,7 @@ import java.util.Objects;
  * @see InventoryUtils General inventory utilities
  */
 public final class PlayerInventoryUtils {
-    private PlayerInventoryUtils() throws UtilityClassException {
-        throw new UtilityClassException();
+    private PlayerInventoryUtils() {
     }
 
     /**

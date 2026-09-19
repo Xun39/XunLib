@@ -2,7 +2,6 @@ package net.xun.lib.common.api.util;
 
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
-import net.xun.lib.common.api.exceptions.UtilityClassException;
 import net.xun.lib.common.api.world.effect.EffectStackingStrategy;
 
 import java.util.List;
@@ -12,8 +11,7 @@ import java.util.Objects;
  * Utility methods for working with {@link MobEffectInstance}s.
  */
 public final class MobEffectUtils {
-    private MobEffectUtils() throws UtilityClassException {
-        throw new UtilityClassException();
+    private MobEffectUtils() {
     }
 
     /**

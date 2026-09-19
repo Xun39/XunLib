@@ -6,7 +6,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.ItemStack;
-import net.xun.lib.common.api.exceptions.UtilityClassException;
 import net.xun.lib.common.api.inventory.ItemStackPredicate;
 
 import java.util.Arrays;
@@ -35,8 +34,7 @@ import java.util.stream.StreamSupport;
  * @see ItemStackPredicate
  */
 public final class EquipmentSlotsUtils {
-    private EquipmentSlotsUtils() throws UtilityClassException {
-        throw new UtilityClassException();
+    private EquipmentSlotsUtils() {
     }
 
     /**

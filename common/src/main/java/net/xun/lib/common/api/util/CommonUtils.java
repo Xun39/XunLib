@@ -3,12 +3,10 @@ package net.xun.lib.common.api.util;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.xun.lib.common.api.exceptions.UtilityClassException;
 import net.xun.lib.common.impl.ModIDManager;
 
 public final class CommonUtils {
-    private CommonUtils() throws UtilityClassException {
-        throw new UtilityClassException();
+    private CommonUtils() {
     }
 
     /**

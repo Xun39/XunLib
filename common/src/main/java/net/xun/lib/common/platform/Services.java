@@ -1,6 +1,6 @@
 package net.xun.lib.common.platform;
 
-import net.xun.lib.common.impl.XunLibConstants;
+import net.xun.lib.common.XunLibConstants;
 import net.xun.lib.common.platform.services.IPlatformHelper;
 import org.jetbrains.annotations.ApiStatus;
 

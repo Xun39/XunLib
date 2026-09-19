@@ -4,7 +4,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.AABB;
-import net.xun.lib.common.api.exceptions.UtilityClassException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,8 +11,7 @@ import java.util.Optional;
 
 public final class BlockPosUtils {
 
-    private BlockPosUtils() throws UtilityClassException {
-        throw new UtilityClassException();
+    private BlockPosUtils() {
     }
 
     /**

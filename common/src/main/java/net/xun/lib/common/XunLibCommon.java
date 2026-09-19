@@ -1,4 +1,4 @@
-package net.xun.lib.common.impl;
+package net.xun.lib.common;
 
 import net.xun.lib.common.platform.Services;
 

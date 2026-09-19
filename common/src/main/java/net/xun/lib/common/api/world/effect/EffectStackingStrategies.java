@@ -1,11 +1,9 @@
 package net.xun.lib.common.api.world.effect;
 
 import net.minecraft.world.effect.MobEffectInstance;
-import net.xun.lib.common.api.exceptions.UtilityClassException;
 
 public final class EffectStackingStrategies {
-    private EffectStackingStrategies() throws UtilityClassException {
-        throw new UtilityClassException();
+    private EffectStackingStrategies() {
     }
 
     /**

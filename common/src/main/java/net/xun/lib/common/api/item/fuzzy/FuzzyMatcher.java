@@ -2,7 +2,6 @@ package net.xun.lib.common.api.item.fuzzy;
 
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.world.item.ItemStack;
-import net.xun.lib.common.api.exceptions.InvalidMatcherConfigurationException;
 import net.xun.lib.common.api.inventory.ItemStackPredicate;
 
 import java.util.*;
@@ -42,7 +41,6 @@ import java.util.*;
  *
  * @see FuzzyConfig For configuration
  * @see ItemStackPredicate For single-item matching rules
- * @see InvalidMatcherConfigurationException For configuration error details
  */
 public class FuzzyMatcher {
 
@@ -104,7 +102,6 @@ public class FuzzyMatcher {
      * @param a First item stack to compare
      * @param b Second item stack to compare
      * @return true if items match all configured rules, false otherwise
-     * @throws InvalidMatcherConfigurationException if matcher contains conflicting rules:
      * <ul>
      *   <li>Custom rules combined with tag requirements</li>
      *   <li>Custom rules used with attribute ignoring</li>
@@ -185,14 +182,14 @@ public class FuzzyMatcher {
 
     private void validateConfiguration() {
         if (config.requiredTag != null && !config.predicates.isEmpty()) {
-            throw new InvalidMatcherConfigurationException(
+            throw new RuntimeException(
                     "Cannot combine tag requirements with custom rules"
             );
         }
 
         if ((config.ignoreDurability || config.ignoreEnchantments)
                 && !config.predicates.isEmpty()) {
-            throw new InvalidMatcherConfigurationException(
+            throw new RuntimeException(
                     "Cannot apply custom rules while ignoring attributes"
             );
         }

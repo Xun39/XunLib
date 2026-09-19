@@ -6,7 +6,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.ItemStack;
-import net.xun.lib.common.api.exceptions.UtilityClassException;
 import net.xun.lib.common.api.inventory.ItemStackPredicate;
 
 import java.util.Arrays;
@@ -42,8 +41,7 @@ public class PlayerArmorSlotsUtils {
             EquipmentSlot.FEET.getIndex()
     };
 
-    private PlayerArmorSlotsUtils() throws UtilityClassException {
-        throw new UtilityClassException();
+    private PlayerArmorSlotsUtils() {
     }
 
     /**
