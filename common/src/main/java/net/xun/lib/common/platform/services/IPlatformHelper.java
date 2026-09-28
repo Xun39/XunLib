@@ -2,10 +2,7 @@ package net.xun.lib.common.platform.services;
 
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.level.block.Block;
-import net.xun.lib.common.api.registries.Register;
-import net.xun.lib.common.api.registries.RegistryHolder;
+import net.xun.lib.common.api.registration.Register;
 
 public interface IPlatformHelper {
 
@@ -45,8 +42,4 @@ public interface IPlatformHelper {
     Register.Blocks createBlockRegister(String namespace);
 
     Register.Items createItemRegister(String namespace);
-
-    /* <T extends Item> void bindItem(RegistryHolder<Item, T> holder, String namespace);
-
-    <T extends Block> void bindBlock(RegistryHolder<Block, T> holder, String namespace); */
 }

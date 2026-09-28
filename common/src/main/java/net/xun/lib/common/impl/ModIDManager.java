@@ -6,7 +6,6 @@ import java.util.Locale;
 
 @ApiStatus.Internal
 public class ModIDManager {
-
     private static String modId = null;
 
     public static String getModId() {

@@ -28,11 +28,10 @@ import java.util.Objects;
  * </ul>
  *
  * @see ItemStackPredicate ItemStack predicates
- * @see EquipmentSlotsUtils Equipment slots-specific inventory utils
+ * @see EquipmentSlotsOps Equipment slots-specific inventory utils
  */
-public final class InventoryUtils {
-
-    private InventoryUtils() {
+public final class InventoryOps {
+    private InventoryOps() {
     }
 
     // ======================== CORE CHECKS ======================== //

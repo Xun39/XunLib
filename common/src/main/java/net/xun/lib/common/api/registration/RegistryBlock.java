@@ -1,4 +1,4 @@
-package net.xun.lib.common.api.registries;
+package net.xun.lib.common.api.registration;
 
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
@@ -67,7 +67,7 @@ public class RegistryBlock<T extends Block> extends RegistryHolder<Block, T> imp
      * @return The created registry holder
      */
     public static <T extends Block> RegistryBlock<T> createBlock(ResourceKey<Block> key, Supplier<T> supplier) {
-        return new RegistryBlock<T>(key, supplier);
+        return new RegistryBlock<>(key, supplier);
     }
 
     /**

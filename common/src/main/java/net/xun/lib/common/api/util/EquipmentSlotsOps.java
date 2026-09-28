@@ -33,8 +33,8 @@ import java.util.stream.StreamSupport;
  * @see ArmorItem
  * @see ItemStackPredicate
  */
-public final class EquipmentSlotsUtils {
-    private EquipmentSlotsUtils() {
+public final class EquipmentSlotsOps {
+    private EquipmentSlotsOps() {
     }
 
     /**

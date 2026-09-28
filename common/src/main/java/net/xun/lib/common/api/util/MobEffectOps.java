@@ -10,8 +10,8 @@ import java.util.Objects;
 /**
  * Utility methods for working with {@link MobEffectInstance}s.
  */
-public final class MobEffectUtils {
-    private MobEffectUtils() {
+public final class MobEffectOps {
+    private MobEffectOps() {
     }
 
     /**

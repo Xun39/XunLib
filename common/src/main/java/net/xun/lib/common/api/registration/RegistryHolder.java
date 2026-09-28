@@ -1,10 +1,9 @@
-package net.xun.lib.common.api.registries;
+package net.xun.lib.common.api.registration;
 
 
 import com.mojang.datafixers.util.Either;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderOwner;
-import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
@@ -95,11 +94,13 @@ public class RegistryHolder<R, T extends R> implements Holder<R>, Supplier<T> {
     @NotNull
     @Override
     public R value() {
-        if (this.holder != null) {
-            return holder.value();
+        if (holder == null) {
+            throw new IllegalStateException(
+                    "Registry object has not been registered yet: " + key
+            );
         }
 
-        return supplier.get();
+        return holder.value();
     }
 
     /**
@@ -186,7 +187,7 @@ public class RegistryHolder<R, T extends R> implements Holder<R>, Supplier<T> {
         return obj instanceof Holder<?> h &&
                 h.kind() == Kind.REFERENCE &&
                 h.unwrapKey().isPresent() &&
-                h.unwrapKey().get() == this.key;
+                h.unwrapKey().get().equals(this.key);
     }
 
     /** {@inheritDoc} */

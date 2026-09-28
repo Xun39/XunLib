@@ -1,10 +1,14 @@
 package net.xun.lib.common.api.util;
 
+import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.xun.lib.common.impl.ModIDManager;
 
+import java.util.Optional;
+
+@Deprecated
 public final class CommonUtils {
     private CommonUtils() {
     }
@@ -22,6 +26,7 @@ public final class CommonUtils {
      * @param pathParts The components of the path to join with underscores
      * @return The combined namespaced ID in standard "namespace:path" format
      */
+    @Deprecated
     public static String combineAsNamespacedID(String namespace, String... pathParts) {
         return "%s:%s".formatted(namespace, String.join("_", pathParts));
     }
@@ -33,6 +38,7 @@ public final class CommonUtils {
      * @return Namespaced ResourceLocation
      * @throws IllegalStateException If the mod ID has not been set or detected
      */
+    @Deprecated
     public static ResourceLocation modLoc(String path) {
         return ResourceLocation.fromNamespaceAndPath(ModIDManager.getModId(), path);
     }
@@ -50,12 +56,19 @@ public final class CommonUtils {
 
     /**
      * Creates a resource key from a registry and a path
+     *
      * @param registry Resource key of the registry
-     * @param path The key path
+     * @param path     The key path
+     * @param <T>      The type of the resource key
      * @return A resource key from the registry and the path
-     * @param <T> The type of the resource key
      */
+    @Deprecated
     public static <T> ResourceKey<T> createKey(ResourceKey<? extends Registry<T>> registry, String path) {
         return ResourceKey.create(registry, CommonUtils.modLoc(path));
+    }
+
+    @Deprecated
+    public static String translationKey(String... parts) {
+        return String.join(".", parts);
     }
 }

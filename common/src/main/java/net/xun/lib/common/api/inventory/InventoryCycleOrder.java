@@ -3,7 +3,7 @@ package net.xun.lib.common.api.inventory;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
 import net.xun.lib.common.api.inventory.slot.SlotRange;
-import net.xun.lib.common.api.util.InventoryUtils;
+import net.xun.lib.common.api.util.InventoryOps;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -29,7 +29,7 @@ public enum InventoryCycleOrder {
      * @return List of slots in processing order
      */
     public List<Integer> getSlotOrder(Container container, @Nullable SlotRange range) {
-        InventoryUtils.validateContainer(container, true);
+        InventoryOps.validateContainer(container, true);
 
         int minSlot = 0;
         int maxSlot = container.getContainerSize() - 1;

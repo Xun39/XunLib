@@ -3,10 +3,7 @@ package net.xun.lib.common.api.world.effect;
 import net.minecraft.core.Holder;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.entity.LivingEntity;
-import net.xun.lib.common.api.util.MobEffectUtils;
 
-import java.util.List;
 import java.util.Objects;
 
 public class MobEffectInstanceBuilder {

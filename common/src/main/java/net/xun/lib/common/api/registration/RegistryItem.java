@@ -1,4 +1,4 @@
-package net.xun.lib.common.api.registries;
+package net.xun.lib.common.api.registration;
 
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;

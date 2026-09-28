@@ -1,4 +1,4 @@
-package net.xun.lib.fabric.api.registries;
+package net.xun.lib.fabric.api.registration;
 
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
@@ -8,17 +8,10 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
-import net.xun.lib.common.api.registries.Register;
-import net.xun.lib.common.api.registries.RegistryBlock;
-import net.xun.lib.common.api.registries.RegistryHolder;
-import net.xun.lib.common.api.registries.RegistryItem;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.Supplier;
+import net.xun.lib.common.api.registration.Register;
+import net.xun.lib.common.api.registration.RegistryHolder;
 
 public class FabricRegister<T> extends Register<T> {
-
     public FabricRegister(ResourceKey<? extends Registry<T>> registry, String namespace) {
         super(registry, namespace);
     }
@@ -38,8 +31,13 @@ public class FabricRegister<T> extends Register<T> {
 
     @SuppressWarnings("unchecked")
     private static <R> Registry<R> getRegistry(ResourceKey<? extends Registry<R>> key) {
-        return (Registry<R>) BuiltInRegistries.REGISTRY.get(key.location());
+        Registry<R> registry = (Registry<R>) BuiltInRegistries.REGISTRY.get(key.location());
+        if (registry == null) {
+            throw new IllegalStateException("Could not find registry: " + key.location());
+        }
+        return registry;
     }
+
 
     public static class FabricBlocks extends Blocks {
         private final FabricRegister<Block> fabricRegister;
@@ -55,16 +53,8 @@ public class FabricRegister<T> extends Register<T> {
         }
 
         @Override
-        public <B extends Block> RegistryBlock<B> register(String name, Supplier<B> supplier) {
-            RegistryBlock<B> holder = super.register(name, supplier);
-
+        protected <B extends Block> void bind(RegistryHolder<Block, B> holder) {
             fabricRegister.bind(holder);
-            return holder;
-        }
-
-        @Override
-        public void register() {
-            fabricRegister.register();
         }
     }
 
@@ -82,16 +72,8 @@ public class FabricRegister<T> extends Register<T> {
         }
 
         @Override
-        public <I extends Item> RegistryItem<I> register(String name, Supplier<I> supplier) {
-            RegistryItem<I> holder = super.register(name, supplier);
-
+        protected <I extends Item> void bind(RegistryHolder<Item, I> holder) {
             fabricRegister.bind(holder);
-            return holder;
-        }
-
-        @Override
-        public void register() {
-            fabricRegister.register();
         }
     }
 }
