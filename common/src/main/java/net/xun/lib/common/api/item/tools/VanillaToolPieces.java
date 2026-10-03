@@ -17,8 +17,6 @@ import java.util.List;
  * <p>
  * This class is not intended to be instantiated.
  * </p>
- *
- * @since 3.0.0
  */
 public final class VanillaToolPieces {
     private VanillaToolPieces() {

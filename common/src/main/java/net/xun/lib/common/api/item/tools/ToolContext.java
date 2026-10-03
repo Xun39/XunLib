@@ -22,7 +22,6 @@ import java.util.function.UnaryOperator;
  * @param statsByPiece         a map from piece type to its {@link ToolStats}
  * @param propertiesModifier   a global modifier for item properties
  * @param additionalAttributes a global consumer for extra attribute modifiers
- * @since 3.0.0
  */
 public record ToolContext(
         String setName,

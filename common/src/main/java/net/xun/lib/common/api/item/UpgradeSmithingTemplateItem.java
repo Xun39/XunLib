@@ -6,7 +6,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.flag.FeatureFlag;
 import net.minecraft.world.item.SmithingTemplateItem;
-import net.xun.lib.common.api.util.CommonUtils;
+import net.xun.lib.common.api.util.ResourceUtil;
 
 import java.util.List;
 
@@ -50,27 +50,27 @@ public class UpgradeSmithingTemplateItem extends SmithingTemplateItem {
         super(
                 // Applies To description (what items this template works with)
                 Component.translatable(
-                        Util.makeDescriptionId("item", CommonUtils.modLoc("smithing_template." + name + ".applies_to"))
+                        Util.makeDescriptionId("item", ResourceUtil.modLoc("smithing_template." + name + ".applies_to"))
                 ).withStyle(DESCRIPTION_FORMAT),
 
                 // Ingredients description (what materials are needed)
                 Component.translatable(
-                        Util.makeDescriptionId("item", CommonUtils.modLoc("smithing_template." + name + ".ingredients"))
+                        Util.makeDescriptionId("item", ResourceUtil.modLoc("smithing_template." + name + ".ingredients"))
                 ).withStyle(DESCRIPTION_FORMAT),
 
                 // Upgrade title (main template name)
                 Component.translatable(
-                        Util.makeDescriptionId("upgrade", CommonUtils.modLoc(name))
+                        Util.makeDescriptionId("upgrade", ResourceUtil.modLoc(name))
                 ).withStyle(TITLE_FORMAT),
 
                 // Base slot description (left slot explanation)
                 Component.translatable(
-                        Util.makeDescriptionId("item", CommonUtils.modLoc("smithing_template." + name + ".base_slot_description"))
+                        Util.makeDescriptionId("item", ResourceUtil.modLoc("smithing_template." + name + ".base_slot_description"))
                 ),
 
                 // Additions slot description (right slot explanation)
                 Component.translatable(
-                        Util.makeDescriptionId("item", CommonUtils.modLoc("smithing_template." + name + ".additions_slot_description"))
+                        Util.makeDescriptionId("item", ResourceUtil.modLoc("smithing_template." + name + ".additions_slot_description"))
                 ),
                 baseSlotEmptyIcons,
                 additionalSlotEmptyIcons,

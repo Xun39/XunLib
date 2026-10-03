@@ -7,8 +7,8 @@ import net.minecraft.resources.ResourceLocation;
 
 import java.util.Optional;
 
-public final class RegistryOps {
-    private RegistryOps() {
+public final class RegistryUtil {
+    private RegistryUtil() {
     }
 
     public static <T> Optional<ResourceKey<T>> getKey(Holder<T> holder) {

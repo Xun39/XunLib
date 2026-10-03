@@ -33,7 +33,6 @@ import java.util.function.Supplier;
  * </p>
  *
  * @param <T> the type of object supplied by this reference
- * @since 1.0.0
  */
 @ApiStatus.Internal
 public class LazyReference<T> implements Supplier<T> {
@@ -72,7 +71,7 @@ public class LazyReference<T> implements Supplier<T> {
      * prevented but may lead to unpredictable behavior across threads.
      * </p>
      *
-     * @param delegate the supplier that will provide the value (cannot be null)
+     * @param delegate the supplier that will provide the field (cannot be null)
      * @throws NullPointerException if {@code delegate} is null
      */
     public synchronized void bind(Supplier<T> delegate) {
@@ -90,7 +89,7 @@ public class LazyReference<T> implements Supplier<T> {
     }
 
     /**
-     * Returns the value obtained from the bound supplier.
+     * Returns the field obtained from the bound supplier.
      * <p>
      * This method must only be called after {@link #bind(Supplier)} has been invoked.
      * Each call invokes the supplier's {@code get()} method – no result is cached by
@@ -99,7 +98,7 @@ public class LazyReference<T> implements Supplier<T> {
      * concurrently.
      * </p>
      *
-     * @return the value provided by the bound supplier
+     * @return the field provided by the bound supplier
      * @throws IllegalStateException if this reference has not yet been bound to a supplier
      */
     @Override

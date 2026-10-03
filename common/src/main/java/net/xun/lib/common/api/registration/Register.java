@@ -5,7 +5,6 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.xun.lib.common.api.util.CommonUtils;
 import net.xun.lib.common.platform.Services;
 import org.jetbrains.annotations.NotNull;

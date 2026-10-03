@@ -19,8 +19,6 @@ import java.util.Map;
  * <p>
  * This class is not intended to be instantiated.
  * </p>
- *
- * @since 3.0.0
  */
 public final class ToolMetaDataLookup {
 

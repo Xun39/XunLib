@@ -22,7 +22,6 @@ import java.util.function.UnaryOperator;
  * @param itemFactory          the factory that creates the actual item instance
  * @param propertiesModifier   a per‑piece modifier for {@link Item.Properties}
  * @param additionalAttributes a per‑piece consumer for additional attribute modifiers
- * @since 3.0.0
  */
 public record ToolPieceType(
         String nameSuffix,

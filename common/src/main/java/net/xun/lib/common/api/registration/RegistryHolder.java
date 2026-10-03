@@ -72,7 +72,7 @@ public class RegistryHolder<R, T extends R> implements Holder<R>, Supplier<T> {
      */
     public void bind(Holder<R> holder) {
         if (this.holder != null) {
-            throw new IllegalStateException("Try to bind already existing value!");
+            throw new IllegalStateException("Try to bind already existing field!");
         }
 
         this.holder = holder;

@@ -11,7 +11,6 @@ import net.minecraft.world.item.Item;
  * </p>
  *
  * @see ToolItemFactories
- * @since 3.0.0
  */
 @FunctionalInterface
 public interface ToolItemFactory {

@@ -9,8 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public final class BlockPosOps {
-    private BlockPosOps() {
+public final class BlockPosUtil {
+    private BlockPosUtil() {
     }
 
     /**

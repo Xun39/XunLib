@@ -39,8 +39,6 @@ import java.util.function.UnaryOperator;
  * @see ArmorMaterial
  * @see ArmorCustomizer
  * @see ArmorContext
- *
- * @since 1.0.0
  */
 public class ArmorSet extends ItemSet<ArmorPieceType, Item> {
 
@@ -180,7 +178,6 @@ public class ArmorSet extends ItemSet<ArmorPieceType, Item> {
      *
      * @see ArmorSet
      * @see ArmorCustomizer
-     * @since 1.0.0
      */
     public static class Builder {
         private final String name;

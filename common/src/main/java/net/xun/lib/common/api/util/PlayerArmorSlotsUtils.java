@@ -23,13 +23,13 @@ import java.util.Collection;
  *   <li>Slot-specific operations and armor retrieval</li>
  * </ul>
  *
- * @deprecated Since version 3.0.0, use {@link EquipmentSlotsOps} instead, which works with any
+ * @deprecated Since version 3.0.0, use {@link EquipmentSlotsUtil} instead, which works with any
  *             {@link net.minecraft.world.entity.LivingEntity} (including players, mobs, armor stands).
  *             This class will be removed in a future release.
  *
- * @see InventoryOps General inventory utilities
+ * @see InventoryUtil General inventory utilities
  * @see ArmorItem Armor item handling
- * @see EquipmentSlotsOps Replacement utility
+ * @see EquipmentSlotsUtil Replacement utility
  */
 @Deprecated(forRemoval = true)
 public class PlayerArmorSlotsUtils {

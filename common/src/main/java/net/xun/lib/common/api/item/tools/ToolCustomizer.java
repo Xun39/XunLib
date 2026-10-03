@@ -13,7 +13,6 @@ import net.minecraft.world.item.Item;
  * </p>
  *
  * @see ToolSet.Builder#withCustomizer(ToolCustomizer)
- * @since 1.0.0
  */
 public interface ToolCustomizer {
 

@@ -5,7 +5,10 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.xun.lib.common.impl.ModIDManager;
 
-public class ResourceOps {
+public class ResourceUtil {
+    private ResourceUtil() {
+    }
+
     public static ResourceLocation modLoc(String path) {
         return ResourceLocation.fromNamespaceAndPath(ModIDManager.getModId(), path);
     }
@@ -23,6 +26,6 @@ public class ResourceOps {
     }
 
     public static <T> ResourceKey<T> createKey(ResourceKey<? extends Registry<T>> registryKey, String path) {
-        return ResourceKey.create(registryKey, ResourceOps.modLoc(path));
+        return ResourceKey.create(registryKey, ResourceUtil.modLoc(path));
     }
 }

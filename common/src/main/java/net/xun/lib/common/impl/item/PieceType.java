@@ -2,9 +2,6 @@ package net.xun.lib.common.impl.item;
 
 import org.jetbrains.annotations.ApiStatus;
 
-/**
- * @since 2.0.0
- */
 @ApiStatus.Internal
 public interface PieceType {
 

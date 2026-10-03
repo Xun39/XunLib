@@ -5,7 +5,9 @@ import net.minecraft.world.item.ItemStack;
 import net.xun.lib.common.api.item.tools.AbstractHitEffectCustomizer;
 import net.xun.lib.common.api.item.tools.ToolMetaData;
 import net.xun.lib.common.api.item.tools.ToolMetaDataLookup;
+import org.jetbrains.annotations.ApiStatus;
 
+@ApiStatus.Internal
 public final class ToolHitEffectDispatcher {
     private ToolHitEffectDispatcher() {
     }

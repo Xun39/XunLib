@@ -24,7 +24,6 @@ import java.util.function.UnaryOperator;
  * @param customizer           optional customizer override (may be {@code null}, then uses set-level)
  * @param propertiesModifier   a per‑piece modifier for {@link Item.Properties} (never {@code null})
  * @param additionalAttributes a per‑piece consumer for additional attribute modifiers (never {@code null})
- * @since 3.0.0
  */
 public record ArmorPieceType(
         String nameSuffix,

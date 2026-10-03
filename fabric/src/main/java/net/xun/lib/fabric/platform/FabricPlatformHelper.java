@@ -8,12 +8,19 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.xun.lib.fabric.api.registration.FabricRegister;
 import org.jetbrains.annotations.ApiStatus;
 
+import java.nio.file.Path;
+
 @ApiStatus.Internal
 public class FabricPlatformHelper implements IPlatformHelper {
 
     @Override
     public String getPlatformName() {
         return "Fabric";
+    }
+
+    @Override
+    public Path getConfigDir() {
+        return FabricLoader.getInstance().getConfigDir();
     }
 
     @Override

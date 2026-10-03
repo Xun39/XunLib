@@ -4,6 +4,8 @@ import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.xun.lib.common.api.registration.Register;
 
+import java.nio.file.Path;
+
 public interface IPlatformHelper {
 
     /**
@@ -12,6 +14,8 @@ public interface IPlatformHelper {
      * @return The name of the current platform.
      */
     String getPlatformName();
+
+    Path getConfigDir();
 
     /**
      * Checks if a mod with the given id is loaded.

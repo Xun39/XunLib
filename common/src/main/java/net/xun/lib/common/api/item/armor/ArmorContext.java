@@ -22,7 +22,6 @@ import java.util.function.UnaryOperator;
  * @param durabilityFactor     the multiplier for durability (must be non-negative; default 0 uses material default)
  * @param propertiesModifier   a global modifier for item properties (never {@code null})
  * @param additionalAttributes a global consumer for extra attribute modifiers (never {@code null})
- * @since 3.0.0
  */
 public record ArmorContext(
         String setName,

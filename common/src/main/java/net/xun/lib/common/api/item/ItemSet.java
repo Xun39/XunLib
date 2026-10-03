@@ -32,7 +32,6 @@ import java.util.function.Supplier;
  *
  * @param <P> the piece type used to identify individual items in the set
  * @param <T> the common item type represented by this set
- * @since 2.0.0
  */
 public class ItemSet<P extends PieceType, T extends Item> {
 
@@ -125,7 +124,7 @@ public class ItemSet<P extends PieceType, T extends Item> {
      * Binds a supplier to the lazy reference associated with a registry name.
      * <p>
      * This method is intended for use by the registration layer after an item
-     * instance has been registered. The supplied value is subsequently resolved
+     * instance has been registered. The supplied field is subsequently resolved
      * when the corresponding piece is accessed through {@link #get(P)} or
      * {@link #getAll()}.
      * </p>

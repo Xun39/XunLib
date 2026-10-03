@@ -35,7 +35,6 @@ import java.util.function.UnaryOperator;
  * @see ToolStats
  * @see ToolCustomizer
  * @see ToolContext
- * @since 1.0.0
  */
 public class ToolSet extends ItemSet<ToolPieceType, Item> {
 
@@ -163,9 +162,6 @@ public class ToolSet extends ItemSet<ToolPieceType, Item> {
         return new Builder(name, tier);
     }
 
-    /**
-     * @since 1.0.0
-     */
     public static class Builder {
         private final String name;
         private final Tier tier;

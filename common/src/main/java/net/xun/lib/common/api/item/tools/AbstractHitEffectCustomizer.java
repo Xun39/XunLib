@@ -2,9 +2,6 @@ package net.xun.lib.common.api.item.tools;
 
 import net.minecraft.world.entity.LivingEntity;
 
-/**
- * @since 2.1.0
- */
 public abstract class AbstractHitEffectCustomizer implements ToolCustomizer {
 
     /**

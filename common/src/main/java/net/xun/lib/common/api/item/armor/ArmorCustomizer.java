@@ -14,7 +14,6 @@ import net.minecraft.world.item.Item;
  * </p>
  *
  * @see ArmorSet.Builder#withCustomizer(ArmorCustomizer)
- * @since 1.0.0
  */
 public interface ArmorCustomizer {
 
@@ -35,7 +34,7 @@ public interface ArmorCustomizer {
      * </p>
      * <strong>Implementation Notes:</strong>
      * <ul>
-     *   <li>Durability can be obtained from {@code context.material().value().getDurability(context.durabilityFactor())}.</li>
+     *   <li>Durability can be obtained from {@code context.material().field().getDurability(context.durabilityFactor())}.</li>
      *   <li>Properties may be modified but should not be shared between item instances.</li>
      *   <li>The provided {@code properties} have already been processed by global and per‑piece modifiers.</li>
      * </ul>

@@ -1,0 +1,6 @@
+{
+  "xunlib.gui.save": "Save",
+  "xunlib.gui.disabled_by_dependency": "Disabled by dependency setting: %s",
+  "xunlib.gui.info.title": "Information",
+  "xunlib.gui.info.hint": "Hover over an option to view details."
+}

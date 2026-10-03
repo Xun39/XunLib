@@ -1,0 +1,24 @@
+package net.xun.lib.common.api.config;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+@Target(ElementType.FIELD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface ConfigEntry {
+    /**
+     * Translation key or raw fallback string for the option name
+     */
+    String name() default "";
+
+    /**
+     * Category translation key or raw category identifier
+     */
+    String category() default "General";
+
+    double min() default Double.NEGATIVE_INFINITY;
+
+    double max() default Double.POSITIVE_INFINITY;
+}

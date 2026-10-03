@@ -23,10 +23,10 @@ import java.util.Objects;
  *   <li>Swapping or clearing items in hands</li>
  * </ul>
  *
- * @see InventoryOps General inventory utilities
+ * @see InventoryUtil General inventory utilities
  */
-public final class PlayerInvOps {
-    private PlayerInvOps() {
+public final class PlayerInvUtil {
+    private PlayerInvUtil() {
     }
 
     /**
@@ -65,7 +65,7 @@ public final class PlayerInvOps {
      * @throws NullPointerException if container or predicate is null
      */
     public static boolean hasItemCount(Player player, ItemStackPredicate predicate, int minCount, PlayerInventorySection section) {
-        return InventoryOps.hasItemCount(player.getInventory(), predicate, minCount, section.getSlotRange());
+        return InventoryUtil.hasItemCount(player.getInventory(), predicate, minCount, section.getSlotRange());
     }
 
     /**
@@ -78,7 +78,7 @@ public final class PlayerInvOps {
      * @throws NullPointerException if any parameter is null
      */
     public static int findFirstMatchingSlot(Player player, ItemStackPredicate predicate, PlayerInventorySection section) {
-        return InventoryOps.findFirstMatchingSlot(player.getInventory(), predicate, section.getSlotRange());
+        return InventoryUtil.findFirstMatchingSlot(player.getInventory(), predicate, section.getSlotRange());
     }
 
     /**
@@ -171,7 +171,7 @@ public final class PlayerInvOps {
      * @throws NullPointerException if any parameter is null
      */
     public static void extractItems(Player player, ItemStackPredicate predicate, int amount, PlayerInventorySection section, InventoryCycleOrder order) {
-        InventoryOps.extractItems(player.getInventory(), predicate, amount, section.getSlotRange(), order);
+        InventoryUtil.extractItems(player.getInventory(), predicate, amount, section.getSlotRange(), order);
     }
 
     /**
@@ -182,11 +182,11 @@ public final class PlayerInvOps {
      * @throws NullPointerException if container or stack is null
      */
     public static ItemStack insertItem(Player player, ItemStack stack) {
-        return InventoryOps.insertItem(player.getInventory(), stack);
+        return InventoryUtil.insertItem(player.getInventory(), stack);
     }
 
     private static void validatePlayer(@Nullable Player player) {
         Objects.requireNonNull(player, "Player cannot be null");
-        InventoryOps.validateContainer(player.getInventory());
+        InventoryUtil.validateContainer(player.getInventory());
     }
 }
