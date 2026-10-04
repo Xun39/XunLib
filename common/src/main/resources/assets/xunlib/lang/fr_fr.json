@@ -1,0 +1,14 @@
+{
+  "gui.xunlib.config.back": "Retour",
+  "gui.xunlib.config.configure_description": "Configurer les paramètres de ce mod",
+  "gui.xunlib.config.disabled_by_dependency": "Désactivé par le paramètre de dépendance : %s",
+  "gui.xunlib.config.hover_option": "Survolez une option pour voir les détails.",
+  "gui.xunlib.config.information": "Information",
+  "gui.xunlib.config.missing_definition": "Définition de configuration introuvable. L'écran de configuration est enregistré, mais sa définition est manquante.",
+  "gui.xunlib.config.save": "Sauvegarder",
+  "gui.xunlib.config.type": "Type de configuration",
+  "gui.xunlib.config.type.client": "Client",
+  "gui.xunlib.config.type.common": "Commun",
+  "gui.xunlib.config.type.selected": "Type sélectionné : %s",
+  "gui.xunlib.config.type.server": "Serveur"
+}

@@ -1,6 +1,14 @@
 {
-  "xunlib.gui.save": "Save",
-  "xunlib.gui.disabled_by_dependency": "Disabled by dependency setting: %s",
-  "xunlib.gui.info.title": "Information",
-  "xunlib.gui.info.hint": "Hover over an option to view details."
+  "gui.xunlib.config.back": "Back",
+  "gui.xunlib.config.save": "Save",
+  "gui.xunlib.config.type": "Configuration Type",
+  "gui.xunlib.config.type.selected": "Selected Type: %s",
+  "gui.xunlib.config.type.common": "Common",
+  "gui.xunlib.config.type.client": "Client",
+  "gui.xunlib.config.type.server": "Server",
+  "gui.xunlib.config.information": "Information",
+  "gui.xunlib.config.hover_option": "Hover over an option to view details.",
+  "gui.xunlib.config.configure_description": "Configure this mod's settings",
+  "gui.xunlib.config.missing_definition": "Config definition not found. The config screen is registered, but its definition is missing.",
+  "gui.xunlib.config.disabled_by_dependency": "Disabled by dependency setting: %s"
 }

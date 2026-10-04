@@ -1,6 +1,5 @@
 package net.xun.lib.common.api.world.structures;
 
-import com.mojang.datafixers.Products;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -18,7 +17,7 @@ import net.minecraft.world.level.levelgen.structure.pools.JigsawPlacement;
 import net.minecraft.world.level.levelgen.structure.pools.StructureTemplatePool;
 import net.minecraft.world.level.levelgen.structure.pools.alias.PoolAliasLookup;
 import net.minecraft.world.level.levelgen.structure.templatesystem.LiquidSettings;
-import net.xun.lib.common.registry.XLStructureTypes;
+import net.xun.lib.common.internal.registry.XLStructureTypes;
 
 import java.util.Optional;
 

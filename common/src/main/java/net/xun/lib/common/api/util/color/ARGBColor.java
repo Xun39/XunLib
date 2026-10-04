@@ -1,6 +1,6 @@
 package net.xun.lib.common.api.util.color;
 
-import net.xun.lib.common.impl.except.InvalidColorFormatException;
+import net.xun.lib.common.internal.except.InvalidColorFormatException;
 
 public record ARGBColor(int alpha, int red, int green, int blue) implements IColor {
     public ARGBColor {

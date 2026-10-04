@@ -3,38 +3,36 @@ package net.xun.lib.common.api.client.gui;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-import net.xun.lib.common.api.config.ConfigDefinition;
-import net.xun.lib.common.api.config.ConfigOption;
-import net.xun.lib.common.api.config.XunConfigTheme;
-import net.xun.lib.common.api.config.XunLibConfigManager;
+import net.xun.lib.common.api.client.gui.components.*;
+import net.xun.lib.common.api.config.*;
 import net.xun.lib.common.api.util.TranslationUtil;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.Map;
 
-public class XunConfigScreen extends Screen {
-
-    private static final int MARGIN = 18;
-
-    private static final int HEADER_HEIGHT = 48;
-    private static final int FOOTER_HEIGHT = 34;
-
-    private static final int SIDEBAR_WIDTH = 122;
-    private static final int INFO_WIDTH = 190;
-    private static final int GAP = 12;
-
+public class XunConfigScreen extends Screen implements XunConfigOwner {
     private final Screen parent;
-    private final ConfigDefinition config;
+    private final String modId;
     private final XunConfigTheme theme;
 
-    private int selectedCategoryIndex;
+    private ConfigType selectedType;
 
-    private XunConfigScreenComponents.CategoryList categoryList;
-    private XunConfigScreenComponents.OptionList optionList;
+    /**
+     * Actual registered/live config.
+     */
+    private ConfigDefinition registeredConfig;
 
-    private XunConfigScreenComponents.ActionButton saveButton;
-    private XunConfigScreenComponents.ActionButton backButton;
+    /**
+     * Temporary config being edited.
+     */
+    private ConfigDefinition config;
 
+    private int selectedCategory;
     private ConfigOption hoveredOption;
+
+    private ConfigCategoryList categoryList;
+    private ConfigOptionList optionList;
 
     public XunConfigScreen(Screen parent, String modId) {
         this(parent, modId, XunConfigTheme.DEFAULT);
@@ -44,91 +42,99 @@ public class XunConfigScreen extends Screen {
         super(Component.translatableWithFallback(TranslationUtil.translationKey("config", modId, "title"), modId.toUpperCase() + " Settings"));
 
         this.parent = parent;
-        this.config = XunLibConfigManager.getConfig(modId);
+        this.modId = modId;
         this.theme = theme;
+
+        Map<ConfigType, ConfigDefinition> configs = XunConfigManager.getConfigs(modId);
+
+        selectedType = getInitialType(configs);
+
+        selectRegisteredConfig(selectedType);
+    }
+
+    private void selectRegisteredConfig(ConfigType type) {
+        registeredConfig = XunConfigManager.getConfig(modId, type);
+        config = registeredConfig != null ? registeredConfig.createEditorCopy() : null;
     }
 
     @Override
     protected void init() {
         clearWidgets();
 
-        hoveredOption = null;
+        var layout = XunConfigLayout.create(width, height, theme.layout());
 
-        if (config == null) {
-            backButton = addRenderableWidget(new XunConfigScreenComponents.ActionButton(Component.translatableWithFallback("xunlib.gui.back", "Back"), theme, this::closeScreen));
+        Map<ConfigType, ConfigDefinition> configs = XunConfigManager.getConfigs(modId);
 
-            backButton.setPosition(width / 2 - 38, height / 2 + 30);
+        if (configs.isEmpty()) {
+            addRenderableWidget(
+                    new ActionButton(Component.translatableWithFallback("gui.xunlib.config.back", "Back"), theme, this::closeScreen)
+            ).setPosition(width / 2 - 38, height / 2 + 30);
 
             return;
         }
 
-        createLayout();
-    }
+        addRenderableWidget(
+                new ConfigTypeSelector(
+                        this, font, theme,
+                        layout.optionsX(), layout.panelY() + 8, layout.optionsWidth(), 22,
+                        configs.keySet(), selectedType
+                )
+        );
 
-    private void createLayout() {
-        int panelX = MARGIN;
-        int panelY = MARGIN;
+        if (config == null) return;
 
-        int panelWidth = width - MARGIN * 2;
+        addRenderableWidget(new ConfigPanel(font, theme, this, layout.panelX(), layout.panelY(), layout.panelWidth(), layout.panelHeight()));
 
-        int panelHeight = height - MARGIN * 2;
+        rebuildConfigContent(layout);
 
-        int contentTop = panelY + HEADER_HEIGHT;
-
-        int footerTop = panelY + panelHeight - FOOTER_HEIGHT;
-
-        int contentHeight = footerTop - contentTop - 10;
-
-        boolean compact = panelWidth < 760;
-
-        int sidebarWidth = compact ? 108 : SIDEBAR_WIDTH;
-
-        int infoWidth = compact ? 0 : INFO_WIDTH;
-
-        int sidebarX = panelX + 10;
-
-        int optionsX = sidebarX + sidebarWidth + GAP;
-
-        int infoX = panelX + panelWidth - infoWidth - 10;
-
-        int optionsRight = compact ? panelX + panelWidth - 10 : infoX - GAP;
-
-        int optionsWidth = optionsRight - optionsX;
-
-        drawLayoutSeparators(panelX, panelY, panelWidth, contentTop, footerTop, compact);
-
-        // -------------------------------------------------------------
-        // Category list
-        // -------------------------------------------------------------
-
-        categoryList = addRenderableWidget(new XunConfigScreenComponents.CategoryList(this, config, theme, minecraft, sidebarX, contentTop + 10, sidebarWidth, contentHeight - 10));
-
-        categoryList.rebuild(selectedCategoryIndex);
-
-        // -------------------------------------------------------------
-        // Option list
-        // -------------------------------------------------------------
-
-        optionList = addRenderableWidget(new XunConfigScreenComponents.OptionList(this, theme, minecraft, optionsX, contentTop + 10, Math.max(80, optionsWidth), contentHeight - 10));
-
-        if (!config.getCategoryKeys().isEmpty()) {
-            selectCategory(Math.min(selectedCategoryIndex, config.getCategoryKeys().size() - 1));
+        // Only editable in a world (where an integrated server is running)
+        int saveButtonX = layout.panelX() + layout.panelWidth() - 88;
+        if (registeredConfig != null && XunConfigManager.canEdit(registeredConfig)) {
+            addRenderableWidget(
+                    new ActionButton(
+                            Component.translatableWithFallback("gui.xunlib.config.save", "Save"), theme, this::saveAndClose)
+            ).setPosition(saveButtonX, layout.footerY() + 5);
         }
-
-        // -------------------------------------------------------------
-        // Save button
-        // -------------------------------------------------------------
-
-        saveButton = addRenderableWidget(new XunConfigScreenComponents.ActionButton(Component.translatableWithFallback("xunlib.gui.save", "Save"), theme, this::saveAndClose));
-
-        saveButton.setPosition(panelX + panelWidth - 88, footerTop + 5);
+        else if (registeredConfig != null && selectedType == ConfigType.SERVER) {
+            addRenderableWidget(
+                    new ActionButton(
+                            Component.translatableWithFallback("gui.xunlib.config.read_only", "Read Only"), theme, () -> {})
+            ).setPosition(saveButtonX, layout.footerY() + 5);
+        }
     }
 
-    private void drawLayoutSeparators(int panelX, int panelY, int panelWidth, int contentTop, int footerTop, boolean compact) {
-        // The separators are drawn in render(), not here.
+    private void rebuildConfigContent(XunConfigLayout.Layout layout) {
+        categoryList = addRenderableWidget(
+                new ConfigCategoryList(
+                        this, config, theme, minecraft,
+                        layout.sidebarX(), layout.contentWidgetY(), layout.sidebarWidth(), layout.contentWidgetHeight()
+                )
+        );
+        optionList = addRenderableWidget(
+                new ConfigOptionList(
+                        this, theme, minecraft,
+                        layout.optionsX(), layout.contentWidgetY(), layout.optionsWidth(), layout.contentWidgetHeight()
+                )
+        );
+        if (!layout.compact()) {
+            addRenderableWidget(
+                    new ConfigInformationPanel(
+                            font, theme, this,
+                            layout.infoX(), layout.contentWidgetY(), layout.infoWidth(), layout.contentWidgetHeight()
+                    )
+            );
+        }
+        categoryList.rebuild(selectedCategory);
+
+        List<String> categories = config.getCategoryKeys();
+
+        if (!categories.isEmpty()) {
+            selectCategory(Math.min(selectedCategory, categories.size() - 1));
+        }
     }
 
-    void selectCategory(int index) {
+    @Override
+    public void selectCategory(int index) {
         if (config == null) {
             return;
         }
@@ -136,224 +142,78 @@ public class XunConfigScreen extends Screen {
         List<String> categories = config.getCategoryKeys();
 
         if (index < 0 || index >= categories.size()) {
+
             return;
         }
 
-        selectedCategoryIndex = index;
+        selectedCategory = index;
         hoveredOption = null;
 
-        if (categoryList != null) {
-            categoryList.updateSelection(index);
-        }
+        categoryList.updateSelection(index);
 
-        if (optionList != null) {
-            optionList.rebuild(config.getOptionsInCategory(categories.get(index)));
-        }
-    }
-
-    void setHoveredOption(ConfigOption option) {
-        this.hoveredOption = option;
+        optionList.rebuild(config.getOptionsInCategory(categories.get(index)));
     }
 
     @Override
-    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-        graphics.fill(0, 0, width, height, theme.screenBackground());
-
-        drawPanel(graphics);
-
-        if (config == null) {
-            drawMissingConfig(graphics);
-
-            super.render(graphics, mouseX, mouseY, partialTick);
-
+    public void selectConfigType(ConfigType type) {
+        if (selectedType == type) {
             return;
         }
+        selectedType = type;
+        selectedCategory = 0;
 
         hoveredOption = null;
+        selectRegisteredConfig(type);
+        init();
+    }
 
-        drawHeader(graphics);
+    @Override
+    public void setHoveredOption(ConfigOption option) {
+        hoveredOption = option;
+    }
 
-        drawSectionLabels(graphics);
+    @Override
+    public ConfigOption getHoveredOption() {
+        return hoveredOption;
+    }
 
+    @Override
+    public void render(@NotNull GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+        hoveredOption = null;
         super.render(graphics, mouseX, mouseY, partialTick);
-
-        drawInformationPanel(graphics);
-    }
-
-    private void drawPanel(GuiGraphics graphics) {
-        int panelX = MARGIN;
-        int panelY = MARGIN;
-
-        int panelWidth = width - MARGIN * 2;
-
-        int panelHeight = height - MARGIN * 2;
-
-        // Shadow
-        graphics.fill(panelX + 2, panelY + 3, panelX + panelWidth + 2, panelY + panelHeight + 3, theme.panelShadow());
-
-        // Gradient
-        graphics.fillGradient(panelX, panelY, panelX + panelWidth, panelY + panelHeight, theme.panelTop(), theme.panelBottom());
-
-        // Border
-        graphics.fill(panelX, panelY, panelX + panelWidth, panelY + 1, theme.panelBorder());
-
-        graphics.fill(panelX, panelY + panelHeight - 1, panelX + panelWidth, panelY + panelHeight, theme.panelBorder());
-
-        graphics.fill(panelX, panelY, panelX + 1, panelY + panelHeight, theme.panelBorder());
-
-        graphics.fill(panelX + panelWidth - 1, panelY, panelX + panelWidth, panelY + panelHeight, theme.panelBorder());
-    }
-
-    private void drawHeader(GuiGraphics graphics) {
-        int x = MARGIN + 16;
-        int y = MARGIN + 12;
-
-        graphics.drawString(font, title, x, y, theme.text(), false);
-
-        Component subtitle = Component.translatableWithFallback("xunlib.gui.configure_description", "Configure this mod's settings");
-
-        graphics.drawString(font, subtitle, x, y + 14, theme.textMuted(), false);
-    }
-
-    private void drawSectionLabels(GuiGraphics graphics) {
-        int panelX = MARGIN;
-        int panelWidth = width - MARGIN * 2;
-
-        boolean compact = panelWidth < 760;
-
-        int sidebarWidth = compact ? 108 : SIDEBAR_WIDTH;
-
-        int infoWidth = compact ? 0 : INFO_WIDTH;
-
-        int contentTop = MARGIN + HEADER_HEIGHT;
-
-        int sidebarX = panelX + 10;
-
-        int optionsX = sidebarX + sidebarWidth + GAP;
-
-        graphics.drawString(font, Component.translatableWithFallback("xunlib.gui.categories", "Categories"), sidebarX + 4, contentTop, theme.textMuted(), false);
-
-        graphics.drawString(font, Component.translatableWithFallback("xunlib.gui.settings", "Settings"), optionsX + 4, contentTop, theme.textMuted(), false);
-
-        if (infoWidth > 0) {
-            int infoX = panelX + panelWidth - infoWidth - 10;
-
-            graphics.drawString(font, Component.translatableWithFallback("xunlib.gui.information", "Information"), infoX + 4, contentTop, theme.textMuted(), false);
-        }
-    }
-
-    private void drawInformationPanel(GuiGraphics graphics) {
-        int panelX = MARGIN;
-        int panelWidth = width - MARGIN * 2;
-
-        boolean compact = panelWidth < 760;
-
-        if (compact) {
-            return;
-        }
-
-        int infoX = panelX + panelWidth - INFO_WIDTH - 10;
-
-        int infoY = MARGIN + HEADER_HEIGHT + 10;
-
-        int infoWidth = INFO_WIDTH;
-
-        int infoHeight = height - MARGIN - infoY - FOOTER_HEIGHT - 8;
-
-        drawCard(graphics, infoX, infoY, infoWidth, infoHeight, false, true, theme);
-
-        Component titleComponent = Component.translatableWithFallback("xunlib.gui.information", "Information");
-
-        Component descriptionComponent;
-
-        if (hoveredOption == null) {
-            descriptionComponent = Component.translatableWithFallback("xunlib.gui.hover_option", "Hover over an option to view its details.");
-        }
-        else {
-            titleComponent = Component.translatableWithFallback(hoveredOption.nameKey, hoveredOption.nameFallback);
-
-            if (!hoveredOption.isVisible()) {
-                descriptionComponent = Component.translatableWithFallback("xunlib.gui.disabled_by_dependency", "Disabled by dependency setting: " + String.valueOf(hoveredOption.dependsOnField));
-            }
-            else {
-                descriptionComponent = Component.translatableWithFallback(hoveredOption.descriptionKey, hoveredOption.descriptionFallback);
-            }
-        }
-
-        graphics.drawString(font, titleComponent, infoX + 10, infoY + 12, theme.accent(), false);
-
-        graphics.drawWordWrap(font, descriptionComponent, infoX + 10, infoY + 34, infoWidth - 20, theme.textMuted());
-
-        if (hoveredOption != null && hoveredOption.isVisible()) {
-
-            graphics.fill(infoX + 10, infoY + 64, infoX + infoWidth - 10, infoY + 65, theme.panelBorder());
-
-            Component type = Component.translatableWithFallback("xunlib.gui.type", "Type");
-
-            graphics.drawString(font, type, infoX + 10, infoY + 75, theme.textMuted(), false);
-
-            String typeName = hoveredOption.type.getSimpleName();
-
-            graphics.drawString(font, typeName, infoX + 10, infoY + 89, theme.text(), false);
-        }
-    }
-
-    private void drawMissingConfig(GuiGraphics graphics) {
-        int centerX = width / 2;
-
-        int centerY = height / 2 - 20;
-
-        Component title = Component.translatableWithFallback("xunlib.gui.missing_definition", "Config definition not found");
-
-        Component description = Component.translatableWithFallback("xunlib.gui.missing_definition_description", "The config screen is registered, but no config definition was registered for this mod.");
-
-        graphics.drawCenteredString(font, title, centerX, centerY, theme.text());
-
-        graphics.drawWordWrap(font, description, centerX - 180, centerY + 18, 360, theme.textMuted());
-    }
-
-    private static void drawCard(GuiGraphics graphics, int x, int y, int width, int height, boolean hovered, boolean enabled, XunConfigTheme theme) {
-        int background = !enabled ? theme.cardDisabled() : hovered ? theme.cardHover() : theme.cardBackground();
-
-        int border = !enabled ? 0x10FFFFFF : hovered ? theme.accent() : theme.cardBorder();
-
-        graphics.fill(x, y, x + width, y + height, background);
-
-        graphics.fill(x, y, x + width, y + 1, border);
-
-        graphics.fill(x, y + height - 1, x + width, y + height, border);
-
-        graphics.fill(x, y, x + 1, y + height, border);
-
-        graphics.fill(x + width - 1, y, x + width, y + height, border);
     }
 
     private void saveAndClose() {
-        if (config == null) {
-            closeScreen();
-            return;
+        if (registeredConfig != null && config != null) {
+            XunConfigManager.saveEditedConfig(registeredConfig, config);
         }
-
-        XunLibConfigManager.saveConfig(config.modId);
 
         closeScreen();
     }
 
     private void closeScreen() {
-        if (minecraft != null) {
-            minecraft.setScreen(parent);
-        }
+        assert minecraft != null;
+        minecraft.setScreen(parent);
     }
 
     @Override
     public void onClose() {
-        // ESC leaves without saving, matching the
-        // usual config-screen expectation.
         closeScreen();
     }
 
-    @Override
-    public void renderBackground(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-        // We draw our own background.
+    private static ConfigType getInitialType(Map<ConfigType, ConfigDefinition> configs) {
+        if (configs.containsKey(ConfigType.COMMON)) {
+            return ConfigType.COMMON;
+        }
+
+        if (configs.containsKey(ConfigType.CLIENT)) {
+            return ConfigType.CLIENT;
+        }
+
+        if (configs.containsKey(ConfigType.SERVER)) {
+            return ConfigType.SERVER;
+        }
+
+        return ConfigType.COMMON;
     }
 }

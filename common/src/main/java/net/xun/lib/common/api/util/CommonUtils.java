@@ -1,12 +1,9 @@
 package net.xun.lib.common.api.util;
 
-import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.xun.lib.common.impl.ModIDManager;
-
-import java.util.Optional;
+import net.xun.lib.common.internal.ModIDManager;
 
 @Deprecated
 public final class CommonUtils {

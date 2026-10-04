@@ -6,7 +6,7 @@
   "compatibilityLevel": "JAVA_21",
   "mixins": [],
   "client": [
-    "MixinTitleScreen"
+    "net.xun.lib.fabric.internal.mixin.MixinTitleScreen"
   ],
   "server": [],
   "injectors": {

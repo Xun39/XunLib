@@ -1,7 +1,7 @@
 package net.xun.lib.common.api.util;
 
 import net.minecraft.network.chat.Component;
-import net.xun.lib.common.impl.ModIDManager;
+import net.xun.lib.common.internal.ModIDManager;
 
 public class TranslationUtil {
     private TranslationUtil() {

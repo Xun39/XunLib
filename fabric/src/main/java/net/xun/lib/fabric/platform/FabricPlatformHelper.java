@@ -1,7 +1,10 @@
 package net.xun.lib.fabric.platform;
 
+import net.fabricmc.api.EnvType;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.level.storage.LevelResource;
 import net.xun.lib.common.api.registration.Register;
 import net.xun.lib.common.platform.services.IPlatformHelper;
 import net.fabricmc.loader.api.FabricLoader;
@@ -21,6 +24,11 @@ public class FabricPlatformHelper implements IPlatformHelper {
     @Override
     public Path getConfigDir() {
         return FabricLoader.getInstance().getConfigDir();
+    }
+
+    @Override
+    public boolean isPhysicalClient() {
+        return FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT;
     }
 
     @Override

@@ -2,6 +2,9 @@ package net.xun.lib.neoforge.platform;
 
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.level.storage.LevelResource;
+import net.neoforged.api.distmarker.Dist;
 import net.neoforged.fml.loading.FMLPaths;
 import net.xun.lib.common.api.registration.Register;
 import net.xun.lib.common.platform.services.IPlatformHelper;
@@ -23,6 +26,11 @@ public class NeoForgePlatformHelper implements IPlatformHelper {
     @Override
     public Path getConfigDir() {
         return FMLPaths.CONFIGDIR.get();
+    }
+
+    @Override
+    public boolean isPhysicalClient() {
+        return FMLLoader.getDist() == Dist.CLIENT;
     }
 
     @Override

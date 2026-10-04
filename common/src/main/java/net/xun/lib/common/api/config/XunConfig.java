@@ -10,5 +10,7 @@ import java.lang.annotation.Target;
 public @interface XunConfig {
     String modId();
 
+    ConfigType type() default ConfigType.COMMON;
+
     String fileName() default "";
 }

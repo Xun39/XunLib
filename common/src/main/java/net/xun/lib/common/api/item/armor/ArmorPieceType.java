@@ -3,7 +3,7 @@ package net.xun.lib.common.api.item.armor;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
-import net.xun.lib.common.impl.item.PieceType;
+import net.xun.lib.common.internal.item.PieceType;
 
 import java.util.Objects;
 import java.util.function.Consumer;

@@ -1,0 +1,14 @@
+{
+  "gui.xunlib.config.back": "戻る",
+  "gui.xunlib.config.configure_description": "このModの設定を構成",
+  "gui.xunlib.config.disabled_by_dependency": "依存関係の設定により無効化: %s",
+  "gui.xunlib.config.hover_option": "詳細を表示するにはオプションにホバーしてください。",
+  "gui.xunlib.config.information": "情報",
+  "gui.xunlib.config.missing_definition": "設定の定義が見つかりません。設定画面は登録されていますが、定義が見つかりません。",
+  "gui.xunlib.config.save": "保存",
+  "gui.xunlib.config.type": "設定タイプ",
+  "gui.xunlib.config.type.client": "クライアント",
+  "gui.xunlib.config.type.common": "共通",
+  "gui.xunlib.config.type.selected": "選択されたタイプ: %s",
+  "gui.xunlib.config.type.server": "サーバー"
+}

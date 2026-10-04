@@ -1,6 +1,7 @@
 package net.xun.lib.common.api.config;
 
 import net.minecraft.network.chat.Component;
+import net.xun.lib.common.XunLibConstants;
 import net.xun.lib.common.api.util.TranslationUtil;
 
 import java.lang.reflect.Field;
@@ -14,13 +15,16 @@ public class ConfigOption {
 
     public final String categoryKey;
     public final String categoryFallback;
+
     public final String nameKey;
     public final String nameFallback;
+
     public final String descriptionKey;
     public final String descriptionFallback;
 
     public final String dependsOnField;
     public final String requiredValue;
+
     public final double minValue;
     public final double maxValue;
 
@@ -28,41 +32,39 @@ public class ConfigOption {
         this.holder = holder;
         this.field = field;
         this.instance = instance;
+
         this.fieldName = field.getName();
         this.type = field.getType();
-        this.field.setAccessible(true);
+
+        field.setAccessible(true);
 
         ConfigEntry entry = field.getAnnotation(ConfigEntry.class);
-        ConfigDescription comment = field.getAnnotation(ConfigDescription.class);
+
+        ConfigDescription description = field.getAnnotation(ConfigDescription.class);
+
         VisibleWhen dependsOn = field.getAnnotation(VisibleWhen.class);
 
-        // Category resolution
-        String catRaw = (entry != null && !entry.category().isEmpty()) ? entry.category() : "General";
-        this.categoryFallback = catRaw;
-        this.categoryKey = catRaw.contains(".")
-                ? catRaw
-                : TranslationUtil.translationKey("config", holder.modId, "category", catRaw.toLowerCase());
+        // Category
+        String rawCategory = entry != null && !entry.category().isEmpty() ? entry.category() : "General";
+        this.categoryFallback = rawCategory;
+        this.categoryKey = rawCategory.contains(".") ? rawCategory : TranslationUtil.translationKey("config", holder.modId, holder.type.name().toLowerCase(), "category", rawCategory.toLowerCase());
 
-        // Option name resolution
-        String nameRaw = (entry != null && !entry.name().isEmpty()) ? entry.name() : fieldName;
-        this.nameKey = nameRaw.contains(".")
-                ? nameRaw
-                : TranslationUtil.translationKey("config", holder.modId, "option", fieldName);
-        this.nameFallback = nameRaw;
+        // Option Name
+        String rawName = entry != null && !entry.name().isEmpty() ? entry.name() : fieldName;
+        this.nameKey = rawName.contains(".") ? rawName : TranslationUtil.translationKey("config", holder.modId, "option", fieldName);
+        this.nameFallback = rawName;
 
-        // Comment/tooltip resolution
-        if (comment != null && !comment.value().isEmpty()) {
-            this.descriptionKey = comment.value().contains(".")
-                    ? comment.value()
-                    : TranslationUtil.translationKey("config", holder.modId, "option", fieldName, "comment");
-            this.descriptionFallback = comment.value();
+        // Description
+        if (description != null && !description.value().isEmpty()) {
+            this.descriptionKey = description.value().contains(".") ? description.value() : TranslationUtil.translationKey("config", holder.modId, "option", fieldName, "description");
+            this.descriptionFallback = description.value();
         }
         else {
-            this.descriptionKey = TranslationUtil.translationKey("config", holder.modId, "option", fieldName, "comment");
+            this.descriptionKey = TranslationUtil.translationKey("config", holder.modId, "option", fieldName, "description");
             this.descriptionFallback = "No description provided.";
         }
 
-        // Dependency resolution
+        // Dependency
         if (dependsOn != null) {
             this.dependsOnField = dependsOn.field();
             this.requiredValue = dependsOn.is();
@@ -72,8 +74,9 @@ public class ConfigOption {
             this.requiredValue = null;
         }
 
-        this.minValue = (entry != null) ? entry.min() : Double.NEGATIVE_INFINITY;
-        this.maxValue = (entry != null) ? entry.max() : Double.POSITIVE_INFINITY;
+        // Range
+        this.minValue = entry != null ? entry.min() : Double.NEGATIVE_INFINITY;
+        this.maxValue = entry != null ? entry.max() : Double.POSITIVE_INFINITY;
     }
 
     public Component getDisplayName() {
@@ -89,6 +92,7 @@ public class ConfigOption {
             return field.get(instance);
         }
         catch (IllegalAccessException e) {
+            XunLibConstants.LOGGER.error("Failed to read config field '{}.{}'", field.getDeclaringClass().getName(), field.getName(), e);
             return null;
         }
     }
@@ -98,25 +102,34 @@ public class ConfigOption {
             field.set(instance, value);
         }
         catch (IllegalAccessException e) {
-            e.printStackTrace();
+            XunLibConstants.LOGGER.error("Failed to set config field '{}.{}' to value '{}'", field.getDeclaringClass().getName(), field.getName(), value, e);
         }
     }
 
     /**
-     * Recursively checks if parent dependencies are met
+     * Recursively checks whether parent dependencies are satisfied.
      */
     public boolean isVisible() {
         if (dependsOnField == null || dependsOnField.isEmpty()) {
             return true;
         }
-        ConfigOption dependencyOption = holder.findOption(dependsOnField);
-        if (dependencyOption == null) return true;
 
-        if (!dependencyOption.isVisible()) return false;
+        ConfigOption dependency = holder.findOption(dependsOnField);
 
-        Object val = dependencyOption.getValue();
-        if (val == null) return false;
+        if (dependency == null) {
+            return true;
+        }
 
-        return String.valueOf(val).equalsIgnoreCase(requiredValue);
+        if (!dependency.isVisible()) {
+            return false;
+        }
+
+        Object value = dependency.getValue();
+
+        if (value == null) {
+            return false;
+        }
+
+        return String.valueOf(value).equalsIgnoreCase(requiredValue);
     }
 }

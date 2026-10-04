@@ -1,0 +1,14 @@
+{
+  "gui.xunlib.config.back": "返回",
+  "gui.xunlib.config.configure_description": "配置此模组的设置",
+  "gui.xunlib.config.disabled_by_dependency": "因依赖项设置而禁用：%s",
+  "gui.xunlib.config.hover_option": "悬停在选项上以查看详情。",
+  "gui.xunlib.config.information": "信息",
+  "gui.xunlib.config.missing_definition": "未找到配置定义。配置界面已注册，但缺少其定义。",
+  "gui.xunlib.config.save": "保存",
+  "gui.xunlib.config.type": "配置类型",
+  "gui.xunlib.config.type.client": "客户端",
+  "gui.xunlib.config.type.common": "通用",
+  "gui.xunlib.config.type.selected": "已选类型：%s",
+  "gui.xunlib.config.type.server": "服务端"
+}

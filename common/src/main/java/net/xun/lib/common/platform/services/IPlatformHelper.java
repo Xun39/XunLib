@@ -2,6 +2,8 @@ package net.xun.lib.common.platform.services;
 
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.level.storage.LevelResource;
 import net.xun.lib.common.api.registration.Register;
 
 import java.nio.file.Path;
@@ -16,6 +18,12 @@ public interface IPlatformHelper {
     String getPlatformName();
 
     Path getConfigDir();
+
+    default Path getServerConfigOverrideDir(MinecraftServer server) {
+        return server.getWorldPath(LevelResource.ROOT).resolve("serverconfig");
+    }
+
+    boolean isPhysicalClient();
 
     /**
      * Checks if a mod with the given id is loaded.

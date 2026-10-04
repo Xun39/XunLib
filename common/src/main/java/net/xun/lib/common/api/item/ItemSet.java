@@ -2,8 +2,8 @@ package net.xun.lib.common.api.item;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
-import net.xun.lib.common.impl.item.PieceType;
-import net.xun.lib.common.impl.util.LazyReference;
+import net.xun.lib.common.internal.item.PieceType;
+import net.xun.lib.common.internal.util.LazyReference;
 
 import java.util.*;
 import java.util.function.BiFunction;

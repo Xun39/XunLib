@@ -1,6 +1,6 @@
 package net.xun.lib.common.api;
 
-import net.xun.lib.common.impl.ModIDManager;
+import net.xun.lib.common.internal.ModIDManager;
 
 public class ModSetup {
 

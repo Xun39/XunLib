@@ -3,7 +3,7 @@ package net.xun.lib.common.api.util;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.xun.lib.common.impl.ModIDManager;
+import net.xun.lib.common.internal.ModIDManager;
 
 public class ResourceUtil {
     private ResourceUtil() {
