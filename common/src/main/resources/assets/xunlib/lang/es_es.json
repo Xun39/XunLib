@@ -5,6 +5,8 @@
   "gui.xunlib.config.hover_option": "Pasa el cursor sobre una opción para ver los detalles.",
   "gui.xunlib.config.information": "Información",
   "gui.xunlib.config.missing_definition": "No se encontró la definición de configuración. La pantalla de configuración está registrada, pero falta su definición.",
+  "gui.xunlib.config.option_type": "Tipo",
+  "gui.xunlib.config.read_only": "Solo lectura",
   "gui.xunlib.config.save": "Guardar",
   "gui.xunlib.config.type": "Tipo de configuración",
   "gui.xunlib.config.type.client": "Cliente",

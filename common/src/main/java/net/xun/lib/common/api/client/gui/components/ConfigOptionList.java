@@ -1,15 +1,10 @@
 package net.xun.lib.common.api.client.gui.components;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.ContainerObjectSelectionList;
-import net.minecraft.client.gui.components.events.GuiEventListener;
-import net.minecraft.client.gui.narration.NarratableEntry;
 import net.xun.lib.common.api.client.gui.XunConfigScreen;
 import net.xun.lib.common.api.config.ConfigOption;
 import net.xun.lib.common.api.config.XunConfigOwner;
 import net.xun.lib.common.api.config.XunConfigTheme;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -17,10 +12,9 @@ public class ConfigOptionList extends AbstractScrollableConfigList<ConfigOptionL
     private final XunConfigOwner owner;
 
     public ConfigOptionList(XunConfigScreen owner, XunConfigTheme theme, Minecraft minecraft, int x, int y, int width, int height) {
-        super(minecraft, width, height, y, 44, theme);
+        super(minecraft, width, height, y, theme.layout().card().rowHeight(), theme);
 
         this.owner = owner;
-
         setX(x);
     }
 
@@ -34,28 +28,21 @@ public class ConfigOptionList extends AbstractScrollableConfigList<ConfigOptionL
         setScrollAmount(0);
     }
 
-    public static final class Entry extends ContainerObjectSelectionList.Entry<Entry> {
-        private final ConfigOptionButton button;
+    public EnumDropdownControlWidget getOpenDropdown() {
+        for (Entry entry : children()) {
+            ConfigOptionCard card = entry.getWidget();
 
+            if (card.controlWidget() instanceof EnumDropdownControlWidget dropdown && dropdown.isExpanded()) {
+                return dropdown;
+            }
+        }
+
+        return null;
+    }
+
+    public static final class Entry extends SingleWidgetEntry<Entry, ConfigOptionCard> {
         Entry(XunConfigOwner owner, ConfigOption option, XunConfigTheme theme) {
-            this.button = new ConfigOptionButton(owner, option, theme);
-        }
-
-        @Override
-        public void render(@NotNull GuiGraphics graphics, int index, int top, int left, int width, int height, int mouseX, int mouseY, boolean hovering, float partialTick) {
-            button.active = button.isActiveForOption();
-            button.setRectangle(width, height - 4, left, top + 2);
-            button.render(graphics, mouseX, mouseY, partialTick);
-        }
-
-        @Override
-        public @NotNull List<? extends GuiEventListener> children() {
-            return List.of(button);
-        }
-
-        @Override
-        public @NotNull List<? extends NarratableEntry> narratables() {
-            return List.of(button);
+            super(new ConfigOptionCard(owner, option, theme, theme.layout().card().height()), theme.layout().card().entryPaddingY());
         }
     }
 }

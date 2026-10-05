@@ -5,6 +5,8 @@
   "gui.xunlib.config.hover_option": "Наведите курсор на параметр, чтобы просмотреть подробности.",
   "gui.xunlib.config.information": "Информация",
   "gui.xunlib.config.missing_definition": "Определение конфигурации не найдено. Экран конфигурации зарегистрирован, но его определение отсутствует.",
+  "gui.xunlib.config.option_type": "Тип",
+  "gui.xunlib.config.read_only": "Только для чтения",
   "gui.xunlib.config.save": "Сохранить",
   "gui.xunlib.config.type": "Тип конфигурации",
   "gui.xunlib.config.type.client": "Клиент",

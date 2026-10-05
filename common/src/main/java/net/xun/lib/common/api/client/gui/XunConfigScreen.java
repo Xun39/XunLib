@@ -18,14 +18,7 @@ public class XunConfigScreen extends Screen implements XunConfigOwner {
 
     private ConfigType selectedType;
 
-    /**
-     * Actual registered/live config.
-     */
     private ConfigDefinition registeredConfig;
-
-    /**
-     * Temporary config being edited.
-     */
     private ConfigDefinition config;
 
     private int selectedCategory;
@@ -61,14 +54,19 @@ public class XunConfigScreen extends Screen implements XunConfigOwner {
     protected void init() {
         clearWidgets();
 
-        var layout = XunConfigLayout.create(width, height, theme.layout());
+        categoryList = null;
+        optionList = null;
+
+        XunConfigLayout.Layout layout = XunConfigLayout.create(width, height, theme.layout());
 
         Map<ConfigType, ConfigDefinition> configs = XunConfigManager.getConfigs(modId);
 
         if (configs.isEmpty()) {
+            var metrics = theme.layout().button();
+
             addRenderableWidget(
                     new ActionButton(Component.translatableWithFallback("gui.xunlib.config.back", "Back"), theme, this::closeScreen)
-            ).setPosition(width / 2 - 38, height / 2 + 30);
+            ).setRectangle(metrics.emptyStateWidth(), metrics.emptyStateHeight(), layout.emptyStateButton().x(), layout.emptyStateButton().y());
 
             return;
         }
@@ -76,30 +74,33 @@ public class XunConfigScreen extends Screen implements XunConfigOwner {
         addRenderableWidget(
                 new ConfigTypeSelector(
                         this, font, theme,
-                        layout.optionsX(), layout.panelY() + 8, layout.optionsWidth(), 22,
+                        layout.typeSelector().x(), layout.typeSelector().y(), layout.typeSelector().width(), layout.typeSelector().height(),
                         configs.keySet(), selectedType
                 )
         );
 
-        if (config == null) return;
+        if (config == null) {
+            return;
+        }
 
-        addRenderableWidget(new ConfigPanel(font, theme, this, layout.panelX(), layout.panelY(), layout.panelWidth(), layout.panelHeight()));
+        addRenderableWidget(
+                new ConfigPanel(
+                        font, theme, this,
+                        layout.panel().x(), layout.panel().y(), layout.panel().width(), layout.panel().height()
+                )
+        );
 
         rebuildConfigContent(layout);
 
-        // Only editable in a world (where an integrated server is running)
-        int saveButtonX = layout.panelX() + layout.panelWidth() - 88;
         if (registeredConfig != null && XunConfigManager.canEdit(registeredConfig)) {
-            addRenderableWidget(
-                    new ActionButton(
-                            Component.translatableWithFallback("gui.xunlib.config.save", "Save"), theme, this::saveAndClose)
-            ).setPosition(saveButtonX, layout.footerY() + 5);
+            addRenderableWidget(new ActionButton(
+                    Component.translatableWithFallback("gui.xunlib.config.save", "Save"), theme, this::saveAndClose)
+            ).setRectangle(layout.footerButton().width(), layout.footerButton().height(), layout.footerButton().x(), layout.footerButton().y());
         }
         else if (registeredConfig != null && selectedType == ConfigType.SERVER) {
             addRenderableWidget(
-                    new ActionButton(
-                            Component.translatableWithFallback("gui.xunlib.config.read_only", "Read Only"), theme, () -> {})
-            ).setPosition(saveButtonX, layout.footerY() + 5);
+                    new ActionButton(Component.translatableWithFallback("gui.xunlib.config.read_only", "Read Only"), theme, () -> {})
+            ).setRectangle(layout.footerButton().width(), layout.footerButton().height(), layout.footerButton().x(), layout.footerButton().y());
         }
     }
 
@@ -107,20 +108,21 @@ public class XunConfigScreen extends Screen implements XunConfigOwner {
         categoryList = addRenderableWidget(
                 new ConfigCategoryList(
                         this, config, theme, minecraft,
-                        layout.sidebarX(), layout.contentWidgetY(), layout.sidebarWidth(), layout.contentWidgetHeight()
+                        layout.sidebar().x(), layout.sidebar().y(), layout.sidebar().width(), layout.sidebar().height()
                 )
         );
         optionList = addRenderableWidget(
                 new ConfigOptionList(
                         this, theme, minecraft,
-                        layout.optionsX(), layout.contentWidgetY(), layout.optionsWidth(), layout.contentWidgetHeight()
+                        layout.options().x(), layout.contentWidgets().y(), layout.options().width(), layout.contentWidgets().height()
                 )
         );
+
         if (!layout.compact()) {
             addRenderableWidget(
                     new ConfigInformationPanel(
                             font, theme, this,
-                            layout.infoX(), layout.contentWidgetY(), layout.infoWidth(), layout.contentWidgetHeight()
+                            layout.info().x(), layout.contentWidgets().y(), layout.info().width(), layout.contentWidgets().height()
                     )
             );
         }
@@ -142,9 +144,10 @@ public class XunConfigScreen extends Screen implements XunConfigOwner {
         List<String> categories = config.getCategoryKeys();
 
         if (index < 0 || index >= categories.size()) {
-
             return;
         }
+
+        closeOpenDropdown();
 
         selectedCategory = index;
         hoveredOption = null;
@@ -159,11 +162,15 @@ public class XunConfigScreen extends Screen implements XunConfigOwner {
         if (selectedType == type) {
             return;
         }
+
+        closeOpenDropdown();
+
         selectedType = type;
         selectedCategory = 0;
-
         hoveredOption = null;
+
         selectRegisteredConfig(type);
+
         init();
     }
 
@@ -177,10 +184,47 @@ public class XunConfigScreen extends Screen implements XunConfigOwner {
         return hoveredOption;
     }
 
+    private EnumDropdownControlWidget getOpenDropdown() {
+        return optionList == null ? null : optionList.getOpenDropdown();
+    }
+
+    private void closeOpenDropdown() {
+        EnumDropdownControlWidget dropdown = getOpenDropdown();
+
+        if (dropdown != null) {
+            dropdown.setExpanded(false);
+        }
+    }
+
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        EnumDropdownControlWidget dropdown = getOpenDropdown();
+
+        if (dropdown != null) {
+            if (dropdown.handlePopupClick(mouseX, mouseY, button)) {
+                return true;
+            }
+
+            if (!dropdown.contains(mouseX, mouseY)) {
+                dropdown.setExpanded(false);
+                return true;
+            }
+        }
+
+        return super.mouseClicked(mouseX, mouseY, button);
+    }
+
     @Override
     public void render(@NotNull GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         hoveredOption = null;
+
         super.render(graphics, mouseX, mouseY, partialTick);
+
+        EnumDropdownControlWidget dropdown = getOpenDropdown();
+
+        if (dropdown != null) {
+            dropdown.renderPopup(graphics, mouseX, mouseY);
+        }
     }
 
     private void saveAndClose() {
@@ -192,12 +236,14 @@ public class XunConfigScreen extends Screen implements XunConfigOwner {
     }
 
     private void closeScreen() {
-        assert minecraft != null;
-        minecraft.setScreen(parent);
+        if (minecraft != null) {
+            minecraft.setScreen(parent);
+        }
     }
 
     @Override
     public void onClose() {
+        closeOpenDropdown();
         closeScreen();
     }
 

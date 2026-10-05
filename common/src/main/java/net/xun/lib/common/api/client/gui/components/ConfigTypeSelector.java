@@ -7,16 +7,17 @@ import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
-import net.xun.lib.common.api.client.util.GuiDrawUtil;
+import net.xun.lib.common.api.client.gui.IThemedConfigGui;
 import net.xun.lib.common.api.config.ConfigType;
 import net.xun.lib.common.api.config.XunConfigOwner;
 import net.xun.lib.common.api.config.XunConfigTheme;
+import net.xun.lib.common.api.util.Area;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.EnumSet;
 
-public class ConfigTypeSelector extends AbstractWidget {
+public class ConfigTypeSelector extends AbstractWidget implements IAreaWidget, IThemedConfigGui {
     private static final ConfigType[] TYPES = { ConfigType.COMMON, ConfigType.CLIENT, ConfigType.SERVER };
 
     private final Font font;
@@ -72,7 +73,7 @@ public class ConfigTypeSelector extends AbstractWidget {
 
             graphics.fill(left, getY(), right, getY() + height, background);
 
-            GuiDrawUtil.border(graphics, left, getY(), right, getY() + height, selected ? theme.accent() : theme.cardBorder());
+            drawBorder(graphics, Area.fromCorners(left, getY(), right, getY() + height), selected ? theme.accent().primary() : theme.card().border());
 
             Component label = getTypeName(type);
 
@@ -88,30 +89,30 @@ public class ConfigTypeSelector extends AbstractWidget {
 
     private int getBackgroundColor(boolean available, boolean selected, boolean hovered) {
         if (!available) {
-            return theme.cardDisabled();
+            return theme.card().disabled();
         }
 
         if (selected) {
-            return theme.sidebarSelected();
+            return theme.sidebar().selected();
         }
 
         if (hovered) {
-            return theme.cardHover();
+            return theme.card().hover();
         }
 
-        return theme.cardBackground();
+        return theme.card().background();
     }
 
     private int getTextColor(boolean available, boolean selected) {
         if (!available) {
-            return theme.textDisabled();
+            return theme.text().disabled();
         }
 
         if (selected) {
-            return theme.text();
+            return theme.text().primary();
         }
 
-        return theme.textMuted();
+        return theme.text().muted();
     }
 
     private static Component getTypeName(ConfigType type) {
@@ -152,5 +153,15 @@ public class ConfigTypeSelector extends AbstractWidget {
                 NarratedElementType.USAGE,
                 Component.translatable("gui.xunlib.config.type.selected", getTypeName(selectedType))
         );
+    }
+
+    @Override
+    public AbstractWidget widget() {
+        return this;
+    }
+
+    @Override
+    public XunConfigTheme theme() {
+        return this.theme;
     }
 }

@@ -21,4 +21,6 @@ public @interface ConfigEntry {
     double min() default Double.NEGATIVE_INFINITY;
 
     double max() default Double.POSITIVE_INFINITY;
+
+    double step() default 0.0;
 }

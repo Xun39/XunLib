@@ -5,6 +5,8 @@
   "gui.xunlib.config.hover_option": "Fahre über eine Option, um Details anzuzeigen.",
   "gui.xunlib.config.information": "Informationen",
   "gui.xunlib.config.missing_definition": "Konfigurationsdefinition nicht gefunden. Der Konfigurationsbildschirm ist registriert, aber seine Definition fehlt.",
+  "gui.xunlib.config.option_type": "Typ",
+  "gui.xunlib.config.read_only": "Schreibgeschützt",
   "gui.xunlib.config.save": "Speichern",
   "gui.xunlib.config.type": "Konfigurationstyp",
   "gui.xunlib.config.type.client": "Client",

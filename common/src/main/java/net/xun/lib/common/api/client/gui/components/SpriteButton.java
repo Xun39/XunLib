@@ -6,6 +6,7 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.xun.lib.common.api.util.Area;
 import org.jetbrains.annotations.Nullable;
 
 public class SpriteButton extends Button {
@@ -143,6 +144,14 @@ public class SpriteButton extends Button {
         public Builder pos(int x, int y) {
             this.x = x;
             this.y = y;
+            return this;
+        }
+
+        public Builder bounds(Area area) {
+            this.x = area.x();
+            this.y = area.y();
+            this.width = area.width();
+            this.height = area.height();
             return this;
         }
 

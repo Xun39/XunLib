@@ -5,6 +5,8 @@
   "gui.xunlib.config.hover_option": "悬停在选项上以查看详情。",
   "gui.xunlib.config.information": "信息",
   "gui.xunlib.config.missing_definition": "未找到配置定义。配置界面已注册，但缺少其定义。",
+  "gui.xunlib.config.option_type": "类型",
+  "gui.xunlib.config.read_only": "只读",
   "gui.xunlib.config.save": "保存",
   "gui.xunlib.config.type": "配置类型",
   "gui.xunlib.config.type.client": "客户端",

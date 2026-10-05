@@ -5,13 +5,15 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
-import net.xun.lib.common.api.config.XunConfigOwner;
+import net.xun.lib.common.api.client.gui.IThemedConfigGui;
 import net.xun.lib.common.api.config.ConfigOption;
+import net.xun.lib.common.api.config.XunConfigLayout;
+import net.xun.lib.common.api.config.XunConfigOwner;
 import net.xun.lib.common.api.config.XunConfigTheme;
-import net.xun.lib.common.api.client.util.GuiDrawUtil;
+import net.xun.lib.common.api.util.Area;
 import org.jetbrains.annotations.NotNull;
 
-public class ConfigInformationPanel extends AbstractWidget {
+public class ConfigInformationPanel extends AbstractWidget implements IAreaWidget, IThemedConfigGui {
     private final Font font;
     private final XunConfigTheme theme;
     private final XunConfigOwner owner;
@@ -27,10 +29,13 @@ public class ConfigInformationPanel extends AbstractWidget {
     }
 
     @Override
-    protected void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-        graphics.fill(getX(), getY(), getRight(), getBottom(), theme.cardBackground());
+    protected void renderWidget(@NotNull GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+        Area area = bounds();
 
-        GuiDrawUtil.border(graphics, getX(), getY(), getRight(), getBottom(), theme.cardBorder());
+        XunConfigLayout.Information metrics = layout().information();
+
+        fill(graphics, area, theme.card().background());
+        drawBorder(graphics, area, theme.card().border());
 
         ConfigOption option = owner.getHoveredOption();
 
@@ -43,27 +48,61 @@ public class ConfigInformationPanel extends AbstractWidget {
         }
         else {
             title = option.getDisplayName();
+
             description = option.isVisible()
                     ? option.getDescription()
                     : Component.translatableWithFallback(
                             "gui.xunlib.config.disabled_by_dependency",
-                    "Disabled by dependency setting: " + (option.dependsOnField != null ? option.dependsOnField : "unknown"));
+                            "Disabled by dependency setting: " + (option.dependsOnField != null ? option.dependsOnField : "unknown")
+            );
         }
 
-        graphics.drawString(font, title, getX() + 10, getY() + 12, theme.accent(), false);
+        int titleX = Math.max(0, area.width() - metrics.paddingLeft() - metrics.paddingRight());
+        Area titleArea = Area.of(
+                area.x() + metrics.paddingLeft(),
+                area.y() + metrics.titleTop(),
+                titleX,
+                font.lineHeight
+        );
+        Area descriptionArea = Area.of(
+                area.x() + metrics.paddingLeft(),
+                area.y() + metrics.descriptionTop(),
+                titleX,
+                Math.max(0, area.height() - metrics.descriptionTop())
+        );
 
-        graphics.drawWordWrap(font, description, getX() + 10, getY() + 34, getWidth() - 20, theme.textMuted());
+        graphics.drawString(font, title, titleArea.x(), titleArea.y(), theme.accent().primary(), false);
+        graphics.drawWordWrap(font, description, descriptionArea.x(), descriptionArea.y(), descriptionArea.width(), theme.text().muted());
 
-//        if (option != null && option.isVisible()) {
-//            graphics.fill(getX() + 10, getY() + 64, getRight() - 10, getY() + 65, theme.panelBorder());
-//
-//            graphics.drawString(font, Component.translatableWithFallback("xunlib.gui.config.type", "Type"), getX() + 10, getY() + 75, theme.textMuted(), false);
-//
-//            graphics.drawString(font, option.type.getSimpleName(), getX() + 10, getY() + 89, theme.text(), false);
-//        }
+
+        if (option != null && option.isVisible()) {
+            Area separator = Area.of(descriptionArea.x(), area.y() + metrics.typeSeparatorTop(), descriptionArea.width(), metrics.typeSeparatorHeight());
+
+            fill(graphics, separator, theme.panel().border());
+
+            graphics.drawString(
+                    font, Component.translatableWithFallback("gui.xunlib.config.option_type", "Type"),
+                    area.x() + metrics.paddingLeft(),
+                    area.y() + metrics.typeLabelTop(),
+                    theme.text().muted(),
+                    false
+            );
+
+            graphics.drawString(font, option.type.getSimpleName(), area.x() + metrics.paddingLeft(), area.y() + metrics.typeValueTop(), theme.text().primary(), false);
+        }
     }
 
     @Override
     protected void updateWidgetNarration(@NotNull NarrationElementOutput narration) {
+    }
+
+    @Override
+    public XunConfigTheme theme() {
+        return theme;
+    }
+
+    @Override
+    public AbstractWidget widget() {
+        return this;
     }
 }

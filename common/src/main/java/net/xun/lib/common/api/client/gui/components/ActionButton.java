@@ -4,14 +4,15 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.network.chat.Component;
+import net.xun.lib.common.api.config.XunConfigLayout;
 import net.xun.lib.common.api.config.XunConfigTheme;
+import org.jetbrains.annotations.NotNull;
 
-public class ActionButton extends AbstractThemedConfigButton {
+public class ActionButton extends AbstractThemedConfigButton implements IAreaWidget {
     private final Runnable onPress;
 
     public ActionButton(Component message, XunConfigTheme theme, Runnable onPress) {
-        super(theme, 76, 22, message);
-
+        super(theme, theme.layout().button().width(), theme.layout().button().height(), message);
         this.onPress = onPress;
     }
 
@@ -21,14 +22,30 @@ public class ActionButton extends AbstractThemedConfigButton {
     }
 
     @Override
-    protected void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+    protected void renderWidget(@NotNull GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+        XunConfigLayout.Button metrics = layout().button();
+        var area = bounds();
+
         boolean hovered = isHoveredOrFocused();
+        int background = hovered ? theme.accent().secondary() : theme.accent().primary();
 
-        int background = hovered ? theme.accentSecondary() : theme.accent();
+        fill(graphics, area, background);
 
-        graphics.fill(getX(), getY(), getRight(), getBottom(), background);
-        graphics.fill(getX(), getY(), getRight(), getY() + 1, 0x45FFFFFF);
+        int highlightHeight = metrics.highlightHeight();
+        if (highlightHeight > 0) {
+            fill(graphics, area.topEdge(highlightHeight), theme.overlay().buttonHighlight());
+        }
 
-        AbstractWidget.renderScrollingString(graphics, Minecraft.getInstance().font, getMessage(), getX() + 8, getY() + 6, getRight() - 8, getBottom() - 5, theme.text());
+        int left = area.x() + metrics.textPadding();
+        int top = area.y() + metrics.textTop();
+        int right = area.x2() - metrics.textPadding();
+        int bottom = area.y2() - metrics.textBottom();
+
+        AbstractWidget.renderScrollingString(graphics, Minecraft.getInstance().font, getMessage(), left, top, right, bottom, theme.text().primary());
+    }
+
+    @Override
+    public AbstractWidget widget() {
+        return this;
     }
 }

@@ -8,7 +8,9 @@
   "gui.xunlib.config.type.server": "Server",
   "gui.xunlib.config.information": "Information",
   "gui.xunlib.config.hover_option": "Hover over an option to view details.",
+  "gui.xunlib.config.option_type": "Type",
   "gui.xunlib.config.configure_description": "Configure this mod's settings",
   "gui.xunlib.config.missing_definition": "Config definition not found. The config screen is registered, but its definition is missing.",
-  "gui.xunlib.config.disabled_by_dependency": "Disabled by dependency setting: %s"
+  "gui.xunlib.config.disabled_by_dependency": "Disabled by dependency setting: %s",
+  "gui.xunlib.config.read_only": "Read Only"
 }

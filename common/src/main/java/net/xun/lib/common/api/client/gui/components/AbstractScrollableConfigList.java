@@ -4,10 +4,12 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ContainerObjectSelectionList;
 import net.minecraft.util.Mth;
+import net.xun.lib.common.api.config.XunConfigLayout;
 import net.xun.lib.common.api.config.XunConfigTheme;
+import net.xun.lib.common.api.util.Area;
 import org.jetbrains.annotations.NotNull;
 
-public abstract class AbstractScrollableConfigList<E extends ContainerObjectSelectionList.Entry<E>> extends AbstractConfigList<E> {
+public abstract class AbstractScrollableConfigList<E extends ContainerObjectSelectionList.Entry<E>> extends AbstractThemedConfigList<E> {
     private boolean draggingScrollbar;
     private double scrollbarGrabOffset;
 
@@ -15,36 +17,81 @@ public abstract class AbstractScrollableConfigList<E extends ContainerObjectSele
         super(minecraft, width, height, y, itemHeight, theme);
     }
 
-    @Override protected void renderDecorations(@NotNull GuiGraphics g, int mx, int my) {
-        renderCustomScrollbar(g, mx, my);
+    private Area scrollbarTrackArea() {
+        XunConfigLayout.List listLayout = layout().list();
+        XunConfigLayout.Scrollbar scrollbarLayout = layout().scrollbar();
+
+        int x = getX() + getWidth() - listLayout.scrollbarInset() - scrollbarLayout.width();
+        return Area.of(x, getY(), scrollbarLayout.width(), getHeight());
+    }
+
+    private Area scrollbarThumbArea() {
+        Area track = scrollbarTrackArea();
+
+        int thumbHeight = getScrollbarThumbHeight();
+        int travel = track.height() - thumbHeight;
+
+        if (getMaxScroll() <= 0 || travel <= 0) {
+            return Area.of(track.x(), track.y(), track.width(), thumbHeight);
+        }
+
+        double progress = getScrollAmount() / getMaxScroll();
+
+        int thumbY = track.y() + (int) (travel * progress);
+        return Area.of(track.x(), thumbY, track.width(), thumbHeight);
+    }
+
+    @Override
+    protected int getScrollbarPosition() {
+        return scrollbarTrackArea().x();
+    }
+
+    @Override
+    protected void renderDecorations(@NotNull GuiGraphics graphics, int mouseX, int mouseY) {
+        renderCustomScrollbar(graphics, mouseX, mouseY);
+    }
+
+    private void renderCustomScrollbar(GuiGraphics graphics, int mouseX, int mouseY) {
+        if (getMaxScroll() <= 0) {
+            return;
+        }
+        Area track = scrollbarTrackArea();
+        Area thumb = scrollbarThumbArea();
+        Area hitArea = track.expandX(track.width());
+
+        boolean hovered = draggingScrollbar || hitArea.contains(mouseX, mouseY);
+
+        drawScrollbar(graphics, track, thumb, hovered);
     }
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (button == 0 && getMaxScroll() > 0) {
-            int scrollbarX = getScrollbarPosition();
+            Area track = scrollbarTrackArea();
+            Area hitArea = track.expandX(track.width());
 
-            if (mouseX >= scrollbarX - 5 && mouseX <= scrollbarX + 5 && mouseY >= getY() && mouseY <= getBottom()) {
+            if (hitArea.contains(mouseX, mouseY)) {
+                Area thumb = scrollbarThumbArea();
+                int travel = track.height() - thumb.height();
 
-                int thumbHeight = getScrollbarThumbHeight();
+                // Check if Y coordinate aligns with the thumb (using the expanded hit area X bounds)
+                if (mouseY >= thumb.y() && mouseY <= thumb.y() + thumb.height()) {
+                    draggingScrollbar = true;
+                    scrollbarGrabOffset = mouseY - thumb.y();
+                }
+                else if (travel > 0) {
+                    // Track click: jump thumb center to cursor and initiate drag
+                    double target = mouseY - track.y() - thumb.height() / 2.0;
+                    double percentage = Mth.clamp(target / travel, 0.0, 1.0);
 
-                int thumbY = getScrollbarThumbY();
-
-                if (mouseY >= thumbY && mouseY <= thumbY + thumbHeight) {
+                    setScrollAmount(percentage * getMaxScroll());
 
                     draggingScrollbar = true;
-                    scrollbarGrabOffset = mouseY - thumbY;
-
-                    setFocused(null);
-
-                    return true;
+                    scrollbarGrabOffset = thumb.height() / 2.0;
                 }
 
-                // Clicking the track moves the thumb toward the click.
-                double position = (mouseY - getY()) / (double) getHeight();
-
-                setScrollAmount(position * getMaxScroll());
-
+                setFocused(null);
+                setDragging(true); // Signal Minecraft's ContainerEventHandler
                 return true;
             }
         }
@@ -55,23 +102,19 @@ public abstract class AbstractScrollableConfigList<E extends ContainerObjectSele
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
         if (draggingScrollbar && button == 0) {
+            Area track = scrollbarTrackArea();
             int thumbHeight = getScrollbarThumbHeight();
-
-            int travel = getHeight() - thumbHeight;
+            int travel = track.height() - thumbHeight;
 
             if (travel <= 0) {
                 setScrollAmount(0);
                 return true;
             }
 
-            double thumbTop = mouseY - getY() - scrollbarGrabOffset;
-
-            double percentage = thumbTop / travel;
-
-            percentage = Mth.clamp(percentage, 0.0, 1.0);
+            double thumbTop = mouseY - track.y() - scrollbarGrabOffset;
+            double percentage = Mth.clamp(thumbTop / travel, 0.0, 1.0);
 
             setScrollAmount(percentage * getMaxScroll());
-
             return true;
         }
 
@@ -82,6 +125,7 @@ public abstract class AbstractScrollableConfigList<E extends ContainerObjectSele
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
         if (button == 0 && draggingScrollbar) {
             draggingScrollbar = false;
+            setDragging(false);
             return true;
         }
 
@@ -89,44 +133,16 @@ public abstract class AbstractScrollableConfigList<E extends ContainerObjectSele
     }
 
     private int getScrollbarThumbHeight() {
+        XunConfigLayout.Scrollbar scrollbarLayout = layout().scrollbar();
+
         int contentHeight = getHeight() + getMaxScroll();
 
-        return Math.max(18, (int) ((double) getHeight() * getHeight() / contentHeight));
-    }
-
-    private int getScrollbarThumbY() {
-        int thumbHeight = getScrollbarThumbHeight();
-
-        int travel = getHeight() - thumbHeight;
-
-        if (getMaxScroll() <= 0) {
-            return getY();
+        if (contentHeight <= 0) {
+            return getHeight();
         }
 
-        double progress = getScrollAmount() / getMaxScroll();
+        int calculatedHeight = (int) ((double) getHeight() * getHeight() / contentHeight);
 
-        return getY() + (int) (travel * progress);
-    }
-
-    private void renderCustomScrollbar(GuiGraphics graphics, int mouseX, int mouseY) {
-        if (getMaxScroll() <= 0) {
-            return;
-        }
-
-        int x = getScrollbarPosition();
-        int y = getY();
-        int height = getHeight();
-
-        int thumbHeight = getScrollbarThumbHeight();
-
-        int thumbY = getScrollbarThumbY();
-
-        // Track
-        graphics.fill(x, y, x + 4, y + height, theme.scrollbarTrack());
-
-        boolean hovered = mouseX >= x - 3 && mouseX <= x + 7 && mouseY >= thumbY && mouseY <= thumbY + thumbHeight;
-
-        // Thumb
-        graphics.fill(x, thumbY, x + 4, thumbY + thumbHeight, draggingScrollbar ? theme.scrollbarThumbHover() : hovered ? theme.scrollbarThumbHover() : theme.scrollbarThumb());
+        return Math.min(getHeight(), Math.max(scrollbarLayout.minThumbHeight(), calculatedHeight));
     }
 }

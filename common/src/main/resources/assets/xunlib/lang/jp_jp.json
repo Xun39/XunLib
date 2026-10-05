@@ -5,6 +5,8 @@
   "gui.xunlib.config.hover_option": "詳細を表示するにはオプションにホバーしてください。",
   "gui.xunlib.config.information": "情報",
   "gui.xunlib.config.missing_definition": "設定の定義が見つかりません。設定画面は登録されていますが、定義が見つかりません。",
+  "gui.xunlib.config.option_type": "タイプ",
+  "gui.xunlib.config.read_only": "読み取り専用",
   "gui.xunlib.config.save": "保存",
   "gui.xunlib.config.type": "設定タイプ",
   "gui.xunlib.config.type.client": "クライアント",

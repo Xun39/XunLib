@@ -27,6 +27,7 @@ public class ConfigOption {
 
     public final double minValue;
     public final double maxValue;
+    public final double stepValue;
 
     public ConfigOption(ConfigDefinition holder, Field field, Object instance) {
         this.holder = holder;
@@ -77,6 +78,19 @@ public class ConfigOption {
         // Range
         this.minValue = entry != null ? entry.min() : Double.NEGATIVE_INFINITY;
         this.maxValue = entry != null ? entry.max() : Double.POSITIVE_INFINITY;
+        this.stepValue = entry != null ? entry.step() : 0.0;
+    }
+
+    public Number getMin() {
+        return minValue != Double.NEGATIVE_INFINITY ? minValue : null;
+    }
+
+    public Number getMax() {
+        return maxValue != Double.POSITIVE_INFINITY ? maxValue : null;
+    }
+
+    public Number getStep() {
+        return stepValue > 0.0 ? stepValue : null;
     }
 
     public Component getDisplayName() {
