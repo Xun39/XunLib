@@ -14,9 +14,12 @@ public @interface ConfigEntry {
     String name() default "";
 
     /**
-     * Category translation key or raw category identifier
+     * Optional category override.
+     *
+     * <p>If empty, the category inherited from the containing
+     * {@link ConfigGroup} is used.</p>
      */
-    String category() default "General";
+    String category() default "";
 
     double min() default Double.NEGATIVE_INFINITY;
 
