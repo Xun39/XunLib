@@ -1,5 +1,7 @@
 {
   "gui.xunlib.config.back": "Indietro",
+  "gui.xunlib.config.category.collapse": "Comprimi categoria",
+  "gui.xunlib.config.category.expand": "Espandi categoria",
   "gui.xunlib.config.configure_description": "Configura le impostazioni di questa mod",
   "gui.xunlib.config.disabled_by_dependency": "Disabilitato dall'impostazione della dipendenza: %s",
   "gui.xunlib.config.hover_option": "Passa il cursore su un'opzione per visualizzare i dettagli.",

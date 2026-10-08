@@ -6,6 +6,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.ApiStatus;
 
 @ApiStatus.Internal
-public interface ClientTickable {
-    void clientTick(Level level, BlockPos pos, BlockState state);
+public interface IServerTickable {
+    void serverTick(Level level, BlockPos pos, BlockState state);
 }

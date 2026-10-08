@@ -1,5 +1,7 @@
 {
   "gui.xunlib.config.back": "戻る",
+  "gui.xunlib.config.category.collapse": "カテゴリを折りたたむ",
+  "gui.xunlib.config.category.expand": "カテゴリを展開",
   "gui.xunlib.config.configure_description": "このModの設定を構成",
   "gui.xunlib.config.disabled_by_dependency": "依存関係の設定により無効化: %s",
   "gui.xunlib.config.hover_option": "詳細を表示するにはオプションにホバーしてください。",

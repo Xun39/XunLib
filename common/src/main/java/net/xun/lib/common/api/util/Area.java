@@ -208,6 +208,10 @@ public record Area(int x, int y, int width, int height) {
         return new Area(x + width - t, y + t, t, height - 2 * t);
     }
 
+    public Area before(int width, int gap) {
+        return new Area(x - gap - width, y, width, height);
+    }
+
     /**
      * Centers a rectangle of the requested size inside this area.
      */

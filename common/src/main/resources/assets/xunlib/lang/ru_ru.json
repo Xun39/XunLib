@@ -1,5 +1,7 @@
 {
   "gui.xunlib.config.back": "Назад",
+  "gui.xunlib.config.category.collapse": "Свернуть категорию",
+  "gui.xunlib.config.category.expand": "Развернуть категорию",
   "gui.xunlib.config.configure_description": "Настроить параметры этого мода",
   "gui.xunlib.config.disabled_by_dependency": "Отключено настройкой зависимости: %s",
   "gui.xunlib.config.hover_option": "Наведите курсор на параметр, чтобы просмотреть подробности.",

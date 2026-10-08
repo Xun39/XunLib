@@ -1,5 +1,7 @@
 {
   "gui.xunlib.config.back": "Zurück",
+  "gui.xunlib.config.category.collapse": "Kategorie einklappen",
+  "gui.xunlib.config.category.expand": "Kategorie ausklappen",
   "gui.xunlib.config.configure_description": "Einstellungen dieses Mods konfigurieren",
   "gui.xunlib.config.disabled_by_dependency": "Deaktiviert durch Abhängigkeitseinstellung: %s",
   "gui.xunlib.config.hover_option": "Fahre über eine Option, um Details anzuzeigen.",

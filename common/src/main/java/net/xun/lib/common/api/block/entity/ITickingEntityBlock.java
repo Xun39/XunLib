@@ -6,15 +6,16 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public interface TickingEntityBlock extends EntityBlock {
+public interface ITickingEntityBlock extends EntityBlock {
 
     BlockEntityType<?> getAssociatedType();
 
     @Override
     @Nullable
-    default <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
+    default <T extends BlockEntity> BlockEntityTicker<T> getTicker(@NotNull Level level, @NotNull BlockState state, @NotNull BlockEntityType<T> type) {
         return type == getAssociatedType() ? ITickableBlockEntity.createTicker(type) : null;
     }
 }

@@ -9,13 +9,17 @@ import java.lang.reflect.Field;
 public class ConfigOption {
     public final String fieldName;
     public final String path;
+
     public final Field field;
     public final Object instance;
     public final ConfigDefinition holder;
+
     public final Class<?> type;
 
     public final String categoryKey;
     public final String categoryFallback;
+
+    public final String categoryPath;
 
     public final String nameKey;
     public final String nameFallback;
@@ -30,7 +34,7 @@ public class ConfigOption {
     public final double maxValue;
     public final double stepValue;
 
-    public ConfigOption(ConfigDefinition holder, Field field, Object instance, String path, String inheritedCategory) {
+    public ConfigOption(ConfigDefinition holder, Field field, Object instance, String path, String categoryKey, String categoryFallback) {
         this.holder = holder;
         this.field = field;
         this.instance = instance;
@@ -39,35 +43,29 @@ public class ConfigOption {
         this.fieldName = field.getName();
         this.type = field.getType();
 
+        this.categoryKey = categoryKey;
+        this.categoryFallback = categoryFallback;
+
+        String resolvedCategoryPath = "";
+        String prefix = "config." + holder.modId + "." + holder.type.name().toLowerCase() + ".category.";
+
+        if (categoryKey.startsWith(prefix)) {
+            resolvedCategoryPath = categoryKey.substring(prefix.length());
+        }
+
+        this.categoryPath = resolvedCategoryPath;
+
         field.setAccessible(true);
 
         ConfigEntry entry = field.getAnnotation(ConfigEntry.class);
         ConfigDescription description = field.getAnnotation(ConfigDescription.class);
         VisibleWhen dependsOn = field.getAnnotation(VisibleWhen.class);
 
-        // Category
-        String rawCategory;
-
-        if (entry != null && !entry.category().isEmpty()) {
-            rawCategory = entry.category();
-        }
-        else if (inheritedCategory != null && !inheritedCategory.isEmpty()) {
-            rawCategory = inheritedCategory;
-        }
-        else {
-            rawCategory = "General";
-        }
-
-        this.categoryFallback = rawCategory;
-        this.categoryKey = rawCategory.contains(".") ? rawCategory : TranslationUtil.translationKey("config", holder.modId, holder.type.name().toLowerCase(), "category", rawCategory.toLowerCase());
-
-        // Option Name
         String rawName = entry != null && !entry.name().isEmpty() ? entry.name() : fieldName;
 
         this.nameKey = rawName.contains(".") ? rawName : TranslationUtil.translationKey("config", holder.modId, "option", path);
-        this.nameFallback = rawName;
+        this.nameFallback = humanize(rawName);
 
-        // Description
         if (description != null && !description.value().isEmpty()) {
             this.descriptionKey = description.value().contains(".") ? description.value() : TranslationUtil.translationKey("config", holder.modId, "option", path, "description");
             this.descriptionFallback = description.value();
@@ -77,7 +75,6 @@ public class ConfigOption {
             this.descriptionFallback = "No description provided.";
         }
 
-        // Dependency
         if (dependsOn != null) {
             this.dependsOnField = dependsOn.field();
             this.requiredValue = dependsOn.is();
@@ -87,7 +84,6 @@ public class ConfigOption {
             this.requiredValue = null;
         }
 
-        // Range
         this.minValue = entry != null ? entry.min() : Double.NEGATIVE_INFINITY;
         this.maxValue = entry != null ? entry.max() : Double.POSITIVE_INFINITY;
         this.stepValue = entry != null ? entry.step() : 0.0;
@@ -115,9 +111,9 @@ public class ConfigOption {
 
     public Object getValue() {
         try {
-            return field.get(instance);
+            return holder.getFieldValue(field, instance, path);
         }
-        catch (IllegalAccessException e) {
+        catch (Exception e) {
             XunLibConstants.LOGGER.error("Failed to read config field '{}.{}'", field.getDeclaringClass().getName(), field.getName(), e);
             return null;
         }
@@ -125,16 +121,13 @@ public class ConfigOption {
 
     public void setValue(Object value) {
         try {
-            field.set(instance, value);
+            holder.setFieldValue(field, instance, path, value);
         }
-        catch (IllegalAccessException e) {
+        catch (Exception e) {
             XunLibConstants.LOGGER.error("Failed to set config field '{}.{}' to value '{}'", field.getDeclaringClass().getName(), field.getName(), value, e);
         }
     }
 
-    /**
-     * Recursively checks whether parent dependencies are satisfied.
-     */
     public boolean isVisible() {
         if (dependsOnField == null || dependsOnField.isEmpty()) {
             return true;
@@ -162,5 +155,33 @@ public class ConfigOption {
     private String getParentPath() {
         int separator = path.lastIndexOf('.');
         return separator >= 0 ? path.substring(0, separator) : "";
+    }
+
+    private static String humanize(String text) {
+        if (text == null || text.isEmpty()) {
+            return "";
+        }
+
+        String[] words = text.replace('-', '_').split("_");
+
+        StringBuilder result = new StringBuilder();
+
+        for (String word : words) {
+            if (word.isEmpty()) {
+                continue;
+            }
+
+            if (!result.isEmpty()) {
+                result.append(' ');
+            }
+
+            result.append(Character.toUpperCase(word.charAt(0)));
+
+            if (word.length() > 1) {
+                result.append(word.substring(1));
+            }
+        }
+
+        return result.toString();
     }
 }

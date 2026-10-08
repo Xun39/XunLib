@@ -1,5 +1,7 @@
 {
   "gui.xunlib.config.back": "返回",
+  "gui.xunlib.config.category.collapse": "折叠分类",
+  "gui.xunlib.config.category.expand": "展开分类",
   "gui.xunlib.config.configure_description": "配置此模组的设置",
   "gui.xunlib.config.disabled_by_dependency": "因依赖项设置而禁用：%s",
   "gui.xunlib.config.hover_option": "悬停在选项上以查看详情。",

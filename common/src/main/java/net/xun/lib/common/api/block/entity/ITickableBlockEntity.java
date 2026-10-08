@@ -6,10 +6,10 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.xun.lib.common.internal.block.entity.ClientTickable;
-import net.xun.lib.common.internal.block.entity.ServerTickable;
+import net.xun.lib.common.internal.block.entity.IClientTickable;
+import net.xun.lib.common.internal.block.entity.IServerTickable;
 
-public interface ITickableBlockEntity extends ClientTickable, ServerTickable {
+public interface ITickableBlockEntity extends IClientTickable, IServerTickable {
 
     default void serverTick(Level level, BlockPos pos, BlockState state) {}
     default void clientTick(Level level, BlockPos pos, BlockState state) {}
@@ -19,11 +19,11 @@ public interface ITickableBlockEntity extends ClientTickable, ServerTickable {
             if (be.getType() != expectedType) return;
 
             if (level.isClientSide()) {
-                if (be instanceof ClientTickable ct) {
+                if (be instanceof IClientTickable ct) {
                     ct.clientTick(level, pos, state);
                 }
             } else {
-                if (be instanceof ServerTickable st) {
+                if (be instanceof IServerTickable st) {
                     st.serverTick(level, pos, state);
                 }
             }

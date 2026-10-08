@@ -1,11 +1,11 @@
-package net.xun.lib.common.api.client.gui.components;
+package net.xun.lib.common.api.client.gui.config.components;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ContainerObjectSelectionList;
-import net.xun.lib.common.api.client.gui.IThemedConfigGui;
-import net.xun.lib.common.api.config.XunConfigLayout;
-import net.xun.lib.common.api.config.XunConfigTheme;
+import net.xun.lib.common.api.client.gui.config.IThemedConfigGui;
+import net.xun.lib.common.api.client.gui.config.XunConfigTheme;
+import net.xun.lib.common.api.client.gui.config.layout.ListLayout;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class AbstractThemedConfigList<E extends ContainerObjectSelectionList.Entry<E>> extends ContainerObjectSelectionList<E> implements IThemedConfigGui {
@@ -18,25 +18,25 @@ public abstract class AbstractThemedConfigList<E extends ContainerObjectSelectio
 
     @Override
     public int getRowLeft() {
-        XunConfigLayout.List metrics = layout().list();
+        ListLayout metrics = layout().list();
         return getX() + metrics.rowLeftInset();
     }
 
     @Override
     public int getRowRight() {
-        XunConfigLayout.List metrics = layout().list();
+        ListLayout metrics = layout().list();
         return getX() + getWidth() - metrics.rowRightInset();
     }
 
     @Override
     public int getRowWidth() {
-        XunConfigLayout.List metrics = layout().list();
+        ListLayout metrics = layout().list();
         return metrics.rowWidth(getWidth());
     }
 
     @Override
     protected int getScrollbarPosition() {
-        return getX() + getWidth() - layout().list().scrollbarInset();
+        return getX() + getWidth() - layout().list().scrollbarInset() - SCROLLBAR_WIDTH;
     }
 
     @Override

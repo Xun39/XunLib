@@ -1,5 +1,7 @@
 {
   "gui.xunlib.config.back": "Voltar",
+  "gui.xunlib.config.category.collapse": "Recolher categoria",
+  "gui.xunlib.config.category.expand": "Expandir categoria",
   "gui.xunlib.config.configure_description": "Configurar as opções deste mod",
   "gui.xunlib.config.disabled_by_dependency": "Desativado pela configuração de dependência: %s",
   "gui.xunlib.config.hover_option": "Passe o cursor sobre uma opção para ver os detalhes.",

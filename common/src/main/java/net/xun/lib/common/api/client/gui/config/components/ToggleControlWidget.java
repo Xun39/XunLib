@@ -1,12 +1,13 @@
-package net.xun.lib.common.api.client.gui.components;
+package net.xun.lib.common.api.client.gui.config.components;
 
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
-import net.xun.lib.common.api.client.gui.IThemedConfigGui;
+import net.xun.lib.common.api.client.gui.components.IAreaWidget;
+import net.xun.lib.common.api.client.gui.config.IThemedConfigGui;
 import net.xun.lib.common.api.config.ConfigOption;
-import net.xun.lib.common.api.config.XunConfigTheme;
+import net.xun.lib.common.api.client.gui.config.XunConfigTheme;
 import org.jetbrains.annotations.NotNull;
 
 public class ToggleControlWidget extends AbstractWidget implements IAreaWidget, IThemedConfigGui {

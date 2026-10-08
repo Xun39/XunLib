@@ -1,4 +1,4 @@
-package net.xun.lib.common.api.client.gui.components;
+package net.xun.lib.common.api.client.gui.config.components;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -6,10 +6,11 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
-import net.xun.lib.common.api.client.gui.IThemedConfigGui;
+import net.xun.lib.common.api.client.gui.components.IAreaWidget;
+import net.xun.lib.common.api.client.gui.config.IThemedConfigGui;
 import net.xun.lib.common.api.config.ConfigOption;
-import net.xun.lib.common.api.config.XunConfigLayout;
-import net.xun.lib.common.api.config.XunConfigTheme;
+import net.xun.lib.common.api.client.gui.config.XunConfigTheme;
+import net.xun.lib.common.api.client.gui.config.layout.DropdownLayout;
 import net.xun.lib.common.api.util.Area;
 import org.jetbrains.annotations.NotNull;
 
@@ -46,7 +47,7 @@ public class EnumDropdownControlWidget extends AbstractWidget implements IAreaWi
     }
 
     public Area popupArea() {
-        XunConfigLayout.Dropdown metrics = layout().dropdown();
+        DropdownLayout metrics = layout().dropdown();
         return bounds().offset(0, bounds().height() + metrics.popupGap()).withHeight(enumValues().length * metrics.itemHeight());
     }
 
@@ -59,13 +60,12 @@ public class EnumDropdownControlWidget extends AbstractWidget implements IAreaWi
             return false;
         }
 
-        XunConfigLayout.Dropdown metrics = layout().dropdown();
-        Area popup = popupArea();
+        DropdownLayout metrics = layout().dropdown();
 
+        Area popup = popupArea();
         int index = (int) ((mouseY - popup.y()) / metrics.itemHeight());
 
         Object[] values = enumValues();
-
         if (index < 0 || index >= values.length) {
             return false;
         }
@@ -73,7 +73,6 @@ public class EnumDropdownControlWidget extends AbstractWidget implements IAreaWi
         option.setValue(values[index]);
         expanded = false;
         playDownSound(Minecraft.getInstance().getSoundManager());
-
         return true;
     }
 
@@ -97,34 +96,36 @@ public class EnumDropdownControlWidget extends AbstractWidget implements IAreaWi
 
         expanded = !expanded;
         playDownSound(Minecraft.getInstance().getSoundManager());
-
         return true;
     }
 
     @Override
     protected void renderWidget(@NotNull GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         active = option.isVisible();
-        Area button = bounds();
 
+        Area button = bounds();
         boolean hovered = active && button.contains(mouseX, mouseY);
+
         int background = !active ? theme.card().disabled() : hovered || expanded ? theme.card().hover() : theme.card().background();
         int border = !active ? theme.card().disabledBorder() : hovered || expanded ? theme.accent().primary() : theme.card().border();
 
         fill(graphics, button, background);
         drawBorder(graphics, button, border);
-
         Font font = Minecraft.getInstance().font;
 
-        XunConfigLayout.Dropdown metrics = layout().dropdown();
-        int textPadding = metrics.textPadding();
+        DropdownLayout metrics = layout().dropdown();
 
         String value = String.valueOf(option.getValue());
-
-        String display = truncate(font, value, Math.max(0, button.width() - textPadding * 2 - metrics.chevronSize()));
+        int textPadding = metrics.textPadding();
+        int textWidth = Math.max(0, button.width() - textPadding * 2 - metrics.arrowSize() - metrics.chevronThickness());
+        String display = truncate(font, value, textWidth);
         int textColor = active ? theme.text().primary() : theme.text().disabled();
-        graphics.drawString(font, display, button.x() + textPadding, button.centerY() - font.lineHeight / 2 + 1, textColor, false);
 
-        drawChevron(graphics, button.x() + button.width() - textPadding - metrics.chevronSize(), button.centerY(), expanded, textColor);
+        graphics.drawString(font, display, button.x() + textPadding, button.centerY() - font.lineHeight / 2 + metrics.textOffsetY(), textColor, false);
+
+        int chevronSize = metrics.arrowSize();
+        Area chevron = Area.of(button.x() + button.width() - textPadding - chevronSize, button.centerY() - chevronSize / 2, chevronSize, chevronSize);
+        drawChevron(graphics, chevron, expanded, textColor);
     }
 
     public void renderPopup(GuiGraphics graphics, int mouseX, int mouseY) {
@@ -137,9 +138,8 @@ public class EnumDropdownControlWidget extends AbstractWidget implements IAreaWi
             return;
         }
 
-        XunConfigLayout.Dropdown metrics = layout().dropdown();
+        DropdownLayout metrics = layout().dropdown();
         Area popup = popupArea();
-
         Font font = Minecraft.getInstance().font;
 
         drawShadow(graphics, popup);
@@ -147,7 +147,6 @@ public class EnumDropdownControlWidget extends AbstractWidget implements IAreaWi
         drawBorder(graphics, popup, theme.card().border());
 
         Object current = option.getValue();
-
         for (int i = 0; i < values.length; i++) {
             Object value = values[i];
 
@@ -168,24 +167,10 @@ public class EnumDropdownControlWidget extends AbstractWidget implements IAreaWi
             }
 
             int color = hovered ? theme.text().primary() : selected ? theme.accent().primary() : theme.text().muted();
-            String text = truncate(font, String.valueOf(value), Math.max(0, item.width() - metrics.textPadding() * 2));
-            graphics.drawString(font, text, item.x() + metrics.textPadding(), item.centerY() - font.lineHeight / 2 + 1, color, false);
-        }
-    }
+            int availableWidth = Math.max(0, item.width() - metrics.textPadding() * 2);
 
-    private void drawChevron(GuiGraphics graphics, int cx, int cy, boolean up, int color) {
-        int size = layout().dropdown().chevronSize();
-        int half = Math.max(1, size / 2);
-
-        if (up) {
-            graphics.fill(cx - half, cy + half, cx + half + 1, cy + half + 1, color);
-            graphics.fill(cx - half + 1, cy, cx + half, cy + 1, color);
-            graphics.fill(cx, cy - half, cx + 1, cy, color);
-        }
-        else {
-            graphics.fill(cx - half, cy - half, cx + half + 1, cy - half + 1, color);
-            graphics.fill(cx - half + 1, cy, cx + half, cy + 1, color);
-            graphics.fill(cx, cy + half, cx + 1, cy + half + 1, color);
+            String text = truncate(font, String.valueOf(value), availableWidth);
+            graphics.drawString(font, text, item.x() + metrics.textPadding(), item.centerY() - font.lineHeight / 2 + metrics.itemTextOffsetY(), color, false);
         }
     }
 

@@ -1,39 +1,46 @@
-package net.xun.lib.common.api.client.gui.components;
+package net.xun.lib.common.api.client.gui.config.components;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractContainerWidget;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.events.GuiEventListener;
-import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
-import net.minecraft.network.chat.Component;
-import net.xun.lib.common.api.client.gui.IThemedConfigGui;
+import net.minecraft.client.gui.layouts.FrameLayout;
+import net.minecraft.client.gui.layouts.GridLayout;
+import net.xun.lib.common.api.client.gui.components.IAreaWidget;
+import net.xun.lib.common.api.client.gui.config.IThemedConfigGui;
+import net.xun.lib.common.api.client.gui.config.IConfigOwnerScreen;
+import net.xun.lib.common.api.client.gui.config.layout.*;
 import net.xun.lib.common.api.config.ConfigOption;
-import net.xun.lib.common.api.config.XunConfigLayout;
-import net.xun.lib.common.api.config.XunConfigOwner;
-import net.xun.lib.common.api.config.XunConfigTheme;
+import net.xun.lib.common.api.client.gui.config.XunConfigLayout;
+import net.xun.lib.common.api.client.gui.config.XunConfigTheme;
 import net.xun.lib.common.api.util.Area;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
 public class ConfigOptionCard extends AbstractContainerWidget implements IThemedConfigGui, IAreaWidget {
-    private final XunConfigOwner owner;
+    private final IConfigOwnerScreen owner;
     private final ConfigOption option;
     private final XunConfigTheme theme;
+
+    private final ConfigOptionTextWidget textWidget;
     private final AbstractWidget controlWidget;
 
-    public ConfigOptionCard(XunConfigOwner owner, ConfigOption option, XunConfigTheme theme, int height) {
+    public ConfigOptionCard(IConfigOwnerScreen owner, ConfigOption option, XunConfigTheme theme, int height) {
         super(0, 0, 0, height, option.getDisplayName());
 
         this.owner = owner;
         this.option = option;
         this.theme = theme;
 
-        this.active = option.isVisible();
+        this.textWidget = new ConfigOptionTextWidget(option, theme);
 
         this.controlWidget = OptionControlFactory.createControl(option, theme);
+
+        this.active = option.isVisible();
+
+        updateLayout();
     }
 
     public ConfigOption option() {
@@ -44,43 +51,47 @@ public class ConfigOptionCard extends AbstractContainerWidget implements IThemed
         return controlWidget;
     }
 
-    public Area controlColumn() {
-        XunConfigLayout layout = layout();
-        return bounds().withRightEdge(layout.control().columnWidth());
-    }
-
-    public Area textArea() {
-        XunConfigLayout layout = layout();
-
-        Area card = bounds();
-        Area controls = controlColumn();
-
-        int left = card.x() + layout.card().paddingLeft();
-        int right = controls.x() - layout.card().controlGap();
-
-        return Area.fromCorners(left, card.y(), Math.max(left, right), card.y2());
-    }
-
-    private Area controlBounds() {
-        Area column = controlColumn();
-        return column.centered(controlWidget.getWidth(), controlWidget.getHeight());
-    }
-
-    private void updateLayout() {
-        if (controlWidget == null) {
-            return;
-        }
-        Area area = controlBounds();
-        controlWidget.setRectangle(area.width(), area.height(), area.x(), area.y());
-    }
-
     private void updateActiveState() {
         boolean enabled = option.isVisible();
 
-        this.active = enabled;
+        active = enabled;
+
+        textWidget.active = false;
+        textWidget.visible = true;
 
         controlWidget.active = enabled;
         controlWidget.visible = true;
+    }
+
+    private void updateLayout() {
+        if (textWidget == null || controlWidget == null) {
+            return;
+        }
+
+        CardLayout metrics = layout().card();
+
+        int controlColumnWidth = Math.max(controlWidget.getWidth(), layout().control().columnWidth());
+        int gap = Math.max(0, metrics.controlGap());
+
+        int availableWidth = Math.max(0, width - metrics.paddingLeft() - metrics.paddingRight());
+
+        int textWidth = Math.max(0, availableWidth - controlColumnWidth - gap);
+        int textHeight = Math.max(0, height);
+
+        textWidget.setSize(textWidth, textHeight);
+
+        FrameLayout controlCell = new FrameLayout(controlColumnWidth, textHeight);
+        controlCell.addChild(controlWidget, settings -> settings.alignHorizontallyRight().alignVerticallyMiddle());
+        controlCell.arrangeElements();
+
+        GridLayout rowLayout = new GridLayout();
+        rowLayout.columnSpacing(gap);
+
+        rowLayout.addChild(textWidget, 0, 0, settings -> settings.alignHorizontallyLeft().alignVerticallyMiddle());
+        rowLayout.addChild(controlCell, 0, 1, settings -> settings.alignHorizontallyLeft().alignVerticallyMiddle());
+
+        rowLayout.setPosition(getX() + metrics.paddingLeft(), getY());
+        rowLayout.arrangeElements();
     }
 
     @Override
@@ -116,37 +127,23 @@ public class ConfigOptionCard extends AbstractContainerWidget implements IThemed
     @Override
     protected void renderWidget(@NotNull GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         updateActiveState();
-        Area card = bounds();
 
+        Area card = bounds();
         boolean hovered = active && card.contains(mouseX, mouseY);
+
         if (hovered) {
             owner.setHoveredOption(option);
         }
 
         drawCard(graphics, card, active, hovered);
 
-        Minecraft minecraft = Minecraft.getInstance();
-        XunConfigLayout.Card metrics = layout().card();
-
-        Area text = textArea();
-        Area titleArea = Area.of(text.x(), text.y() + metrics.titleTop(), text.width(), metrics.titleHeight());
-        Area descriptionArea = Area.of(text.x(), text.y() + metrics.descriptionTop(), text.width(), metrics.descriptionHeight());
-
-        int textColor = active ? theme.text().primary() : theme.text().disabled();
-        int mutedColor = active ? theme.text().muted() : theme.text().disabled();
-
-        AbstractWidget.renderScrollingString(graphics, minecraft.font, getMessage(), titleArea.x(), titleArea.y(), titleArea.x2(), titleArea.y2(), textColor);
-
-        Component description = Component.translatableWithFallback(option.descriptionKey, option.descriptionFallback);
-        String descriptionText = truncate(minecraft.font, description.getString(), descriptionArea.width());
-
-        graphics.drawString(minecraft.font, descriptionText, descriptionArea.x(), descriptionArea.y(), mutedColor, false);
+        textWidget.render(graphics, mouseX, mouseY, partialTick);
         controlWidget.render(graphics, mouseX, mouseY, partialTick);
     }
 
     @Override
     public @NotNull List<? extends GuiEventListener> children() {
-        return List.of(controlWidget);
+        return List.of(textWidget, controlWidget);
     }
 
     @Override
@@ -160,7 +157,7 @@ public class ConfigOptionCard extends AbstractContainerWidget implements IThemed
 
     @Override
     public XunConfigTheme theme() {
-        return this.theme;
+        return theme;
     }
 
     private static final class OptionControlFactory {
@@ -172,21 +169,19 @@ public class ConfigOptionCard extends AbstractContainerWidget implements IThemed
             Class<?> type = option.type;
 
             if (type == boolean.class || type == Boolean.class) {
-                XunConfigLayout.Toggle metrics = layout.toggle();
+                ToggleLayout metrics = layout.toggle();
                 return new ToggleControlWidget(option, theme, 0, 0, metrics.width(), metrics.height());
             }
-
             if (type.isEnum()) {
-                XunConfigLayout.Dropdown metrics = layout.dropdown();
+                DropdownLayout metrics = layout.dropdown();
                 return new EnumDropdownControlWidget(option, theme, 0, 0, metrics.width(), metrics.height());
             }
-
             if (Number.class.isAssignableFrom(type) || type == byte.class || type == short.class || type == int.class || type == long.class || type == float.class || type == double.class) {
-                XunConfigLayout.Slider metrics = layout.slider();
+                SliderLayout metrics = layout.slider();
                 return new NumberSliderControlWidget(option, theme, 0, 0, metrics.width(), metrics.height());
             }
 
-            XunConfigLayout.Control metrics = layout.control();
+            ControlLayout metrics = layout.control();
             return new ReadOnlyValueWidget(option, theme, 0, 0, metrics.defaultWidth(), metrics.defaultHeight());
         }
     }

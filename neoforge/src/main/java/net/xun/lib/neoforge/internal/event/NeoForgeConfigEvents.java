@@ -6,6 +6,7 @@ import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
 import net.neoforged.neoforge.event.server.ServerStoppingEvent;
 import net.xun.lib.common.XunLibConstants;
 import net.xun.lib.common.api.config.XunConfigManager;
+import net.xun.lib.common.internal.config.XunConfigRegistry;
 import org.jetbrains.annotations.ApiStatus;
 
 @EventBusSubscriber(modid = XunLibConstants.MOD_ID)
@@ -16,11 +17,11 @@ public final class NeoForgeConfigEvents {
 
     @SubscribeEvent
     private static void onServerAboutToStart(ServerAboutToStartEvent event) {
-        XunConfigManager.loadServerConfigs(event.getServer());
+        XunConfigRegistry.loadServerConfigs(event.getServer());
     }
 
     @SubscribeEvent
     private static void onServerStopping(ServerStoppingEvent event) {
-        XunConfigManager.unloadServerConfigs(event.getServer());
+        XunConfigRegistry.unloadServerConfigs(event.getServer());
     }
 }

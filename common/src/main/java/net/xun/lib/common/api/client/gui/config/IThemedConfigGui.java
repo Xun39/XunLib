@@ -1,9 +1,10 @@
-package net.xun.lib.common.api.client.gui;
+package net.xun.lib.common.api.client.gui.config;
 
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
-import net.xun.lib.common.api.config.XunConfigLayout;
-import net.xun.lib.common.api.config.XunConfigTheme;
+import net.xun.lib.common.api.client.gui.config.layout.DecorationLayout;
+import net.xun.lib.common.api.client.gui.config.layout.SliderLayout;
+import net.xun.lib.common.api.client.gui.config.layout.ToggleLayout;
 import net.xun.lib.common.api.util.Area;
 import org.jetbrains.annotations.NotNull;
 
@@ -30,7 +31,7 @@ public interface IThemedConfigGui {
     }
 
     default void drawShadow(@NotNull GuiGraphics graphics, @NotNull Area area) {
-        XunConfigLayout.Decoration decoration = layout().decoration();
+        DecorationLayout decoration = layout().decoration();
         fill(graphics, area.offset(decoration.shadowDx(), decoration.shadowDy()), theme().panel().shadow());
     }
 
@@ -45,7 +46,7 @@ public interface IThemedConfigGui {
         drawBorder(graphics, area, border);
 
         if (hovered) {
-            XunConfigLayout.Decoration decoration = layout().decoration();
+            DecorationLayout decoration = layout().decoration();
             drawLeftStrip(graphics, area, decoration.accentStripWidth(), decoration.accentStripInset(), theme.accent().primary());
         }
     }
@@ -58,11 +59,37 @@ public interface IThemedConfigGui {
         fill(graphics, area.insetY(inset).withRightEdge(width), color);
     }
 
+    default void drawChevron(@NotNull GuiGraphics graphics, @NotNull Area area, boolean expanded, int color) {
+        if (area.isEmpty()) {
+            return;
+        }
+
+        int centerX = area.centerX();
+        int centerY = area.centerY();
+
+        int size = Math.max(2, Math.min(area.width(), area.height()) / 2);
+
+        if (expanded) {
+            // Down chevron
+            for (int i = 0; i < size; i++) {
+                graphics.fill(centerX - size + i, centerY - size / 2 + i, centerX - size + i + 1, centerY - size / 2 + i + 1, color);
+                graphics.fill(centerX + size - i - 1, centerY - size / 2 + i, centerX + size - i, centerY - size / 2 + i + 1, color);
+            }
+        }
+        else {
+            // Right chevron
+            for (int i = 0; i < size; i++) {
+                graphics.fill(centerX - size / 2 + i, centerY - size + i, centerX - size / 2 + i + 1, centerY - size + i + 1, color);
+                graphics.fill(centerX + size / 2 - i - 1, centerY + i, centerX + size / 2 - i, centerY + i + 1, color);
+            }
+        }
+    }
+
     default void drawToggle(@NotNull GuiGraphics graphics, @NotNull Area area, boolean on, boolean enabled) {
         if (area.isEmpty()) return;
 
         XunConfigTheme theme = theme();
-        XunConfigLayout.Toggle toggle = layout().toggle();
+        ToggleLayout toggle = layout().toggle();
 
         int track = !enabled ? theme.card().disabled() : on ? theme.toggle().on() : theme.toggle().off();
         fill(graphics, area, track);
@@ -86,7 +113,7 @@ public interface IThemedConfigGui {
         }
 
         XunConfigTheme theme = theme();
-        XunConfigLayout.Slider slider = layout().slider();
+        SliderLayout slider = layout().slider();
 
         double value = Math.clamp(fraction, 0.0, 1.0);
 

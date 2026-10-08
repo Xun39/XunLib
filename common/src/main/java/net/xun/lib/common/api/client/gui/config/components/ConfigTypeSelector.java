@@ -1,4 +1,4 @@
-package net.xun.lib.common.api.client.gui.components;
+package net.xun.lib.common.api.client.gui.config.components;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -7,10 +7,11 @@ import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
-import net.xun.lib.common.api.client.gui.IThemedConfigGui;
+import net.xun.lib.common.api.client.gui.components.IAreaWidget;
+import net.xun.lib.common.api.client.gui.config.IConfigOwnerScreen;
+import net.xun.lib.common.api.client.gui.config.IThemedConfigGui;
 import net.xun.lib.common.api.config.ConfigType;
-import net.xun.lib.common.api.config.XunConfigOwner;
-import net.xun.lib.common.api.config.XunConfigTheme;
+import net.xun.lib.common.api.client.gui.config.XunConfigTheme;
 import net.xun.lib.common.api.util.Area;
 import org.jetbrains.annotations.NotNull;
 
@@ -21,13 +22,13 @@ public class ConfigTypeSelector extends AbstractWidget implements IAreaWidget, I
     private static final ConfigType[] TYPES = { ConfigType.COMMON, ConfigType.CLIENT, ConfigType.SERVER };
 
     private final Font font;
-    private final XunConfigOwner owner;
+    private final IConfigOwnerScreen owner;
     private final XunConfigTheme theme;
     private final EnumSet<ConfigType> availableTypes;
 
     private ConfigType selectedType;
 
-    public ConfigTypeSelector(XunConfigOwner owner, Font font, XunConfigTheme theme, int x, int y, int width, int height, Collection<ConfigType> availableTypes, ConfigType selectedType) {
+    public ConfigTypeSelector(IConfigOwnerScreen owner, Font font, XunConfigTheme theme, int x, int y, int width, int height, Collection<ConfigType> availableTypes, ConfigType selectedType) {
         super(x, y, width, height, Component.translatableWithFallback("gui.xunlib.config.type", "Configuration Type"));
 
         this.owner = owner;
@@ -116,11 +117,13 @@ public class ConfigTypeSelector extends AbstractWidget implements IAreaWidget, I
     }
 
     private static Component getTypeName(ConfigType type) {
-        return Component.translatableWithFallback("gui.xunlib.config.type." + type.name().toLowerCase(), switch (type) {
-            case COMMON -> "Common";
-            case CLIENT -> "Client";
-            case SERVER -> "Server";
-        });
+        return Component.translatableWithFallback(
+                "gui.xunlib.config.type." + type.name().toLowerCase(), switch (type) {
+                    case COMMON -> "Common";
+                    case CLIENT -> "Client";
+                    case SERVER -> "Server";
+                }
+        );
     }
 
     @Override

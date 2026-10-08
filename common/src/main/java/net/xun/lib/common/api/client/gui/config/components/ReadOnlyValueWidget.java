@@ -1,4 +1,4 @@
-package net.xun.lib.common.api.client.gui.components;
+package net.xun.lib.common.api.client.gui.config.components;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -6,9 +6,10 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
-import net.xun.lib.common.api.client.gui.IThemedConfigGui;
+import net.xun.lib.common.api.client.gui.components.IAreaWidget;
+import net.xun.lib.common.api.client.gui.config.IThemedConfigGui;
 import net.xun.lib.common.api.config.ConfigOption;
-import net.xun.lib.common.api.config.XunConfigTheme;
+import net.xun.lib.common.api.client.gui.config.XunConfigTheme;
 import org.jetbrains.annotations.NotNull;
 
 public class ReadOnlyValueWidget extends AbstractWidget implements IAreaWidget, IThemedConfigGui {
@@ -21,7 +22,7 @@ public class ReadOnlyValueWidget extends AbstractWidget implements IAreaWidget, 
         this.option = option;
         this.theme = theme;
 
-        active = false;
+        this.active = false;
     }
 
     @Override
@@ -32,14 +33,8 @@ public class ReadOnlyValueWidget extends AbstractWidget implements IAreaWidget, 
     @Override
     protected void renderWidget(@NotNull GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         Font font = Minecraft.getInstance().font;
-
         String text = String.valueOf(option.getValue());
-
-        int padding = layout().control().valueRightPadding();
-        int rightEdge = bounds().x2() - padding;
-        int maxWidth = Math.max(0, bounds().width() - padding);
-
-        drawRightAligned(graphics, font, text, rightEdge, bounds().centerY() - font.lineHeight / 2, theme.text().muted(), maxWidth);
+        drawRightAligned(graphics, font, text, getX() + width, getY() + (height - font.lineHeight) / 2, theme.text().muted(), width);
     }
 
     @Override
