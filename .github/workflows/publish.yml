@@ -1,0 +1,96 @@
+name: Publish Mod
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Make Gradle executable
+        run: chmod +x gradlew
+
+      - name: Verify version
+        id: version
+        shell: bash
+        run: |
+          project_version="$(grep '^version=' gradle.properties | cut -d'=' -f2)"
+          tag_version="${GITHUB_REF_NAME#v}"
+          
+          echo "Gradle version: $project_version"
+          echo "Release tag:    $GITHUB_REF_NAME"
+          echo "Release version: $tag_version"
+          
+          if [[ "$project_version" != "$tag_version" ]]; then
+            echo "ERROR: GitHub release tag and gradle.properties version do not match."
+            echo "Expected tag: v${project_version}"
+            exit 1
+          fi
+          
+          echo "version=$project_version" >> "$GITHUB_OUTPUT"
+
+      - name: Build
+        run: ./gradlew build --no-daemon
+
+      - name: Publish Fabric
+        uses: Kir-Antipov/mc-publish@v3.3
+        with:
+          modrinth-id: Y91RXtkK
+          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
+
+          curseforge-id: 1245630
+          curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
+
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-tag: ${{ github.event.release.tag_name }}
+
+          files: |
+            fabric/build/libs/!(*-@(dev|sources|javadoc)).jar
+            fabric/build/libs/*-@(sources|javadoc).jar
+
+          loaders: fabric
+          game-versions: 1.21.1
+          environment: client | server
+
+          name: XunLib ${{ steps.version.outputs.version }}
+          version: ${{ steps.version.outputs.version }}
+          version-type: release
+
+          changelog-file: release-changelog.md
+
+      - name: Publish NeoForge
+        uses: Kir-Antipov/mc-publish@v3.3
+        with:
+          modrinth-id: Y91RXtkK
+          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
+
+          curseforge-id: 1245630
+          curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
+
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-tag: ${{ github.event.release.tag_name }}
+
+          files: |
+            neoforge/build/libs/!(*-@(dev|sources|javadoc)).jar
+            neoforge/build/libs/*-@(sources|javadoc).jar
+
+          loaders: neoforge
+          game-versions: 1.21.1
+          environment: client | server
+
+          name: XunLib ${{ steps.version.outputs.version }}
+          version: ${{ steps.version.outputs.version }}
+          version-type: release
+
+          changelog-file: release-changelog.md
