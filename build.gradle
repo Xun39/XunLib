@@ -1,6 +1,7 @@
 plugins {
     id 'fabric-loom' version '1.7-SNAPSHOT' apply false
     id 'net.neoforged.moddev' version '0.1.110' apply false
+    id 'org.moddedmc.wiki.toolkit' version '0.5.0'
 }
 
 subprojects {
@@ -35,4 +36,13 @@ subprojects {
     tasks.withType(GenerateModuleMetadata) {
         enabled = false
     }
+}
+
+wiki {
+    docs {
+        xunlib {
+            root = file('wiki')
+        }
+    }
+    wikiAccessToken = providers.environmentVariable('MODDED_MC_WIKI_TOKEN')
 }

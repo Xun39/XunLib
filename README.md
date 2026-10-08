@@ -1,101 +1,158 @@
-# Xun Lib 
-*1.21.x | NeoForge/Fabric | MIT*
+# XunLib
+*Minecraft 1.21.1 · Fabric / NeoForge · MIT*
 
-A **common code library mod** for Minecraft, providing reusable utilities for inventory/armor management, fuzzy item matching, effect handling, and other common utilities. Designed to simplify mod development by abstracting repetitive tasks.
+[![CurseForge](https://img.shields.io/badge/CurseForge-XunLib-orange?logo=curseforge&logoColor=white)](https://www.curseforge.com/minecraft/mc-mods/xunlib)
+[![Modrinth](https://img.shields.io/badge/Modrinth-XunLib-00AF5C?logo=modrinth&logoColor=white)](https://modrinth.com/mod/xunlib)
 
-**⚠️ Warning**: This mod is in **early development**. Untested code, bugs, and breaking changes are expected! Use with caution.
+A **common code library for Minecraft mod development**, providing reusable APIs and utilities to reduce boilerplate and make mod development easier.
+
+> **⚠️ Note:** XunLib is actively developed. APIs may change between releases, particularly across major versions.
 
 ---
 
 ## Table of Contents
+
 - [Features](#features)
+    - [Utilities](#utilities)
+    - [Registration](#registration)
+    - [Configuration](#configuration)
+    - [Item Sets](#item-sets)
+    - [Effects](#effects)
+    - [Block Entities](#block-entities)
+    - [World & Structures](#world--structures)
+    - [Client & GUI](#client--gui)
 - [Installation](#installation)
+- [Documentation](#documentation)
 - [Contributing](#contributing)
 - [License](#license)
-- [Disclaimer](#disclaimer)
-  
+
 ---
 
 ## Features
 
-### **Common Utilities**
-- **General Helpers**: Simplify repetitive tasks with utility methods for logging, validation, and world interactions.
-- **Block Position Tools**: 
-  - Calculate distances, and iterate over block areas.
-- **Color Utilities**:
-  - **Conversions**: Seamlessly convert between RGB, HSV, and HSL color spaces.
-  - **Blending**: Blend colors with customizable interpolation modes.
-  - **Classes**: `HSVColor` and `HSLColor` classes for advanced color manipulation.
+### Utilities
+
+A collection of reusable utilities for common mod-development tasks.
+
+Includes utilities for:
+
+- Inventories and equipment
+- Item stacks
+- Block positions and areas
+- Colors
+- Resources and translations
+- Registries
+- World interactions
 
 ---
 
-### **Inventory & Armor Management**
-- **Container Agnostic**:
-  - Insert/extract items from any container type (chests, hoppers, etc.) with built-in slot validation.
-  - Check item compatibility and simulate transfers without modifying inventories.
-- **Armor-Specific Tools**:
-  - Equip/unequip armor items with durability checks.
-  - Validate armor slots based on item type or custom rules.
+### Registration
+
+A simple, strongly typed registration API for common mod development.
+
+Provides reusable registration abstractions for items, blocks, and other registry objects while keeping registration code concise.
 
 ---
 
-### **Fuzzy Item Matching**
-- **Customizable Comparison**:
-  - Compare items by count, enchantments, NBT tags, or durability.
-  - Ignore specific properties (e.g., ignore count for "any amount" checks).
-- **Advanced Filters**:
-  - Whitelist/blacklist items by data components, ...*(not implemented yet)*
-  - Chain multiple conditions for complex matching logic.
+### Configuration
+
+A complete configuration system with support for:
+
+- Common, client, and server configurations
+- Nested configuration groups
+- Validation and numeric constraints
+- Conditional options
+- Translatable names and descriptions
+- Automatic JSON serialization
+- In-game configuration screens
+
+See the [documentation](#documentation) for details.
 
 ---
 
-### **Mob Effect Utilities**
-- **Effect Management**:
-  - Apply/remove effects with duration and amplifier control.
+### Item Sets
+
+Reusable APIs for creating related groups of items.
+
+Includes support for:
+
+- Tool sets
+- Armor sets
+- Custom item creation
+- Customization of item properties and attributes
 
 ---
 
-### **@PersistentNbt Annotation**
-- **Auto-Serialization**:
-  - Annotate fields in `BlockEntity` classes to automatically save/load them to NBT.
-  - Supports primitives, strings, lists, and compound tags.
-- **Reduce Boilerplate**:
-  - Eliminate manual `saveAdditional`/`loadAdditional` overrides for annotated fields.
+### Effects
+
+Utilities for working with mob effects and effect instances.
+
+Provides convenient effect creation, application, and configurable effect stacking behavior.
+
+---
+
+### Block Entities
+
+Common APIs for working with block entities and their supporting systems.
+
+Includes ticking interfaces, container-related utilities, and helpers for creating block entity types from common code.
+
+---
+
+### World & Structures
+
+Utilities and APIs for world-related development.
+
+Includes spatial utilities, rectangular areas, structure helpers, and terrain-aware Jigsaw structure support.
+
+---
+
+### Client & GUI
+
+Client-side utilities and reusable GUI components.
+
+XunLib also provides the client interface used by its configuration system, making it possible to build configurable mods without creating an entire configuration UI from scratch.
+
 ---
 
 ## Installation
-Add the jar file to your project and write this in your **`build.gradle`** file:
-   ```gradle  
-   dependencies {  
-       // Other dependencies...  
-       implementation files("libs/xunlib-[loader]-[version].jar")  // basically the path, if you put that inside of api/ instead libs/, change it.
-   }  
-   ```  
-   - Replace `[loader]` with the loader that you use.
-   - Replace `[version]` with the version that you want.
----
 
-### **Notes**  
-- **Path Troubleshooting**: If Gradle fails to find the JAR, double-check:  
-  - The JAR is in the correct folder (e.g., `libs`).  
-  - The filename in `build.gradle` matches the actual JAR filename **exactly** (case-sensitive). 
+Download the appropriate XunLib release for your Minecraft version and loader from [CurseForge](https://www.curseforge.com/minecraft/mc-mods/xunlib) or [Modrinth](https://modrinth.com/mod/xunlib).
 
----
+For development, add the XunLib JAR to your project's libraries and declare it as a dependency in Gradle.
 
-## Contributing  
-This project is open to contributions!  
-1. **Report Bugs**: Open an issue on [GitHub Issues](https://github.com/Xun39/XunLib/issues).
-2. **Pull Requests**: Fork the repo and submit a PR (include tests if possible).  
+Example:
+
+```gradle
+dependencies {
+    implementation files("libs/xunlib-neoforge-1.21.1-3.0.0.jar")
+}
+```
+
+For Fabric, use the corresponding Fabric artifact.
+
+The exact artifact name depends on the loader and XunLib version.
 
 ---
 
-## License  
-This mod is licensed under **[MIT License](LICENSE)**.  
+## Documentation
+
+Detailed API documentation and guides are available on the [XunLib Wiki](https://github.com/Xun39/XunLib/wiki).
+
+You can also refer to the [source code](https://github.com/Xun39/XunLib) and the [CHANGELOG](CHANGELOG.md) for implementation details and release-specific changes.
 
 ---
 
-## Disclaimer  
-**This mod is experimental!**  
-- Untested code may cause crashes or unexpected behavior.  
-- Always back up your world before testing.  
-- API methods may change in future updates.  
+## Contributing
+
+Contributions are welcome.
+
+For bugs, suggestions, and feature requests, please use [GitHub Issues](https://github.com/Xun39/XunLib/issues).
+
+Pull requests are also welcome. For larger API changes, please consider opening an issue first so the design can be discussed before implementation.
+
+---
+
+## License
+
+XunLib is licensed under the **[MIT License](LICENSE)**.

@@ -1,0 +1,16 @@
+{
+  "schema": "1",
+  "id": "xunlib",
+  "platforms": {
+    "curseforge": "xunlib",
+    "modrinth": "xunlib"
+  },
+  "modid": "xunlib",
+  "owners": [ "xun39" ],
+  "licenses": {
+    "project": {
+      "id": "MIT",
+      "url": "https://github.com/Xun39/XunLib/blob/main/LICENSE"
+    }
+  }
+}

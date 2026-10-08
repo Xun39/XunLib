@@ -1,0 +1,140 @@
+---
+title: Setting Up
+---
+
+Below are the instructions to set up XunLib 1.21.1-3.0.0+, make sure you are targeting the right version.
+
+## Build script
+
+Xunlib does not have a repository that contains all its published artifacts, so you'll need to use either Curse Maven or Modrinth Maven.
+
+Add the following code to your `build.gradle`:
+
+<CodeTabs>
+
+```groovy !!tabs Curse Maven
+repositories {
+    maven {
+        url "https://cursemaven.com"
+    }
+}
+```
+
+```groovy !!tabs Modrinth Maven
+repositories {
+    maven {
+        url = "https://api.modrinth.com/maven"
+    }
+}
+```
+
+</CodeTabs>
+
+If you are using Gradle 6.2+, you can use this instead, though it is not required.
+
+<CodeTabs>
+
+```groovy !!tabs Curse Maven
+repositories {
+    exclusiveContent {
+        forRepository {
+            maven {
+                url "https://cursemaven.com"
+            }
+        }
+        filter {
+            includeGroup "curse.maven"
+        }
+    }
+}
+```
+
+```groovy !!tabs Modrinth Maven
+repositories {
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = "Modrinth"
+                url = "https://api.modrinth.com/maven"
+            }
+        }
+        filter {
+            includeGroup "maven.modrinth"
+        }
+    }
+}
+```
+
+</CodeTabs>
+
+
+Then, add XunLib to the dependencies section:
+
+<CodeTabs>
+
+```gradle !!tabs Curse Maven
+dependencies {
+    modImplementation "curse.maven:xunlib-1245630:${xunlib_version_artifact}" // Fabric
+    implementation "curse.maven:xunlib-1245630:${xunlib_version_artifact}" // NeoForge
+}
+```
+
+```gradle !!tabs Modrinth Maven
+dependencies {
+    modImplementation "maven.modrinth:xunlib:${minecraft_version}-${xunlib_version}" // Fabric
+    implementation "maven.modrinth:xunlib:${minecraft_version}-${xunlib_version}" // NeoForge
+}
+```
+
+</CodeTabs>
+
+Finally, define the XunLib version in `gradle.properties`:
+
+```properties
+xunlib_version=3.0.0
+```
+
+<Callout type="tip">
+    When using Curse Maven, you can find the version artifact on XunLib's CurseForge page under the **Files** tab. Expand the version you want to use to find it.
+</Callout>
+
+For Modrinth Maven, you can also shorten the dependency version from `${minecraft_version}-${xunlib_version}` to just `${xunlib_version}`. When doing this, 
+include the Minecraft version directly in the property:
+
+```properties
+xunlib_version=1.21.1-3.0.0
+```
+
+This is completely optional; both formats work.
+
+## Initialize your mod ID
+
+Whenever you use a ResourceUtil or TranslationUtil method that relies on the current mod ID, make sure to call `ModSetup.setModId()` during your mod's initialization.
+
+These methods internally use `ModIdManager.getModId()` to determine the current mod ID. XunLib can automatically detect the mod ID in some situations, 
+but the detection is intentionally strict. Because of this, explicitly setting the mod ID is recommended and can prevent errors caused by ambiguous or unsupported environments.
+
+<CodeTabs>
+
+```java !!tabs NeoForge
+public final class ExampleMod {
+    public static final String MOD_ID = "examplemod";
+
+    public static void init() {
+        ModSetup.setModId(MOD_ID);
+    }
+}
+```
+
+```java !!tabs Fabric
+public class ExampleMod implements ModInitializer {
+    public static final String MOD_ID = "examplemod";
+
+    @Override
+    public void onInitialize() {
+        ModSetup.setModId(MOD_ID);
+    }
+}
+```
+
+</CodeTabs>
