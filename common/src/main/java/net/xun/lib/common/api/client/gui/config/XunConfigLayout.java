@@ -81,7 +81,7 @@ public record XunConfigLayout(
         int contentWidth = Math.max(0, panel.width() - horizontalPadding * 2);
 
         // Vertical content bounds
-        int verticalPadding = Math.min(Math.max(0, s.contentPadding()), contentHeight / 2);
+        int verticalPadding = Math.clamp(s.contentPadding(), 0, contentHeight / 2);
         int contentWidgetsY = contentTop + verticalPadding;
         int contentWidgetsHeight = Math.max(0, contentHeight - verticalPadding * 2);
 
@@ -90,7 +90,7 @@ public record XunConfigLayout(
         // Sidebar
         int requestedSidebarWidth = compact ? c.sidebarWidthCompact() : c.sidebarWidth();
 
-        int sidebarWidth = Math.min(Math.max(0, requestedSidebarWidth), contentWidgets.width());
+        int sidebarWidth = Math.clamp(requestedSidebarWidth, 0, contentWidgets.width());
         Area sidebar = Area.of(contentWidgets.x(), contentWidgets.y(), sidebarWidth, contentWidgets.height());
 
         Area info;
@@ -98,7 +98,7 @@ public record XunConfigLayout(
             info = Area.of(contentWidgets.x2(), contentWidgets.y(), 0, 0);
         }
         else {
-            int infoWidth = Math.min(Math.max(0, c.infoWidth()), contentWidgets.width());
+            int infoWidth = Math.clamp(c.infoWidth(), 0, contentWidgets.width());
             info = Area.of(Math.max(contentWidgets.x(), contentWidgets.x2() - infoWidth), contentWidgets.y(), infoWidth, contentWidgets.height());
         }
 

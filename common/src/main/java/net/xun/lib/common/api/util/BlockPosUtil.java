@@ -43,7 +43,7 @@ public final class BlockPosUtil {
                 center.offset(-radius, 0, -radius),
                 center.offset(radius, 0 ,radius)
         ).filter(pos -> isWithinCube(pos, center, radius))
-                .forEach(pos -> square.add(pos));
+                .forEach(square::add);
         return square;
     }
 

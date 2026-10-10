@@ -6,7 +6,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.ItemStack;
-import net.xun.lib.common.api.inventory.ItemStackPredicate;
+import net.xun.lib.common.api.item.ItemStackPredicate;
 
 import java.util.Arrays;
 import java.util.List;

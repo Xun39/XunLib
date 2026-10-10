@@ -38,26 +38,29 @@ jobs:
       - name: Make Gradle executable
         run: chmod +x gradlew
 
+
       - name: Verify version
         id: version
         shell: bash
         env:
           RELEASE_TAG: ${{ inputs.release_tag || github.event.release.tag_name }}
         run: |
-          project_version="$(grep '^version=' gradle.properties | cut -d'=' -f2- | tr -d '\r')"
-          tag_version="${RELEASE_TAG#v}"
+          minecraft_version="$(grep '^minecraft_version=' gradle.properties | cut -d'=' -f2- | tr -d '\r')"
+          mod_version="$(grep '^version=' gradle.properties | cut -d'=' -f2- | tr -d '\r')"
+          release_version="${minecraft_version}-${mod_version}"
 
-          echo "Gradle version: $project_version"
-          echo "Release tag:    $RELEASE_TAG"
-          echo "Release version: $tag_version"
-          
-          if [[ "$project_version" != "$tag_version" ]]; then
-            echo "ERROR: Release tag and gradle.properties version do not match."
-            echo "Expected tag: v${project_version}"
+          echo "Minecraft version: $minecraft_version"
+          echo "Mod version:       $mod_version"
+          echo "Release version:   $release_version"
+          echo "Release tag:       $RELEASE_TAG"
+
+          if [[ "$RELEASE_TAG" != "$release_version" ]]; then
+            echo "ERROR: Release tag does not match the project versions."
+            echo "Expected tag: $release_version"
             exit 1
           fi
-          
-          echo "version=$project_version" >> "$GITHUB_OUTPUT"
+
+          echo "version=$release_version" >> "$GITHUB_OUTPUT"
           echo "tag=$RELEASE_TAG" >> "$GITHUB_OUTPUT"
 
       - name: Build
@@ -70,14 +73,17 @@ jobs:
           modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
           modrinth-files: |
             fabric/build/libs/!(*-@(dev|sources|javadoc)).jar
+            fabric/build/libs/*-@(sources|javadoc).jar
 
           curseforge-id: 1245630
           curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
           curseforge-files: |
             fabric/build/libs/!(*-@(dev|sources|javadoc)).jar
+            fabric/build/libs/*-@(sources|javadoc).jar
 
           github-token: ${{ secrets.GITHUB_TOKEN }}
           github-tag: ${{ steps.version.outputs.tag }}
+          github-version: ${{ steps.version.outputs.version }}
           github-files: |
             fabric/build/libs/!(*-@(dev|sources|javadoc)).jar
             fabric/build/libs/*-@(sources|javadoc).jar
@@ -88,6 +94,8 @@ jobs:
 
           name: XunLib ${{ steps.version.outputs.version }}
           version: ${{ steps.version.outputs.version }}
+          modrinth-version: ${{ steps.version.outputs.version }}+fabric
+          curseforge-version: ${{ steps.version.outputs.version }}+fabric
           version-type: release
           changelog-file: release-changelog.md
 
@@ -98,14 +106,17 @@ jobs:
           modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
           modrinth-files: |
             neoforge/build/libs/!(*-@(dev|sources|javadoc)).jar
+            neoforge/build/libs/*-@(sources|javadoc).jar
 
           curseforge-id: 1245630
           curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
           curseforge-files: |
             neoforge/build/libs/!(*-@(dev|sources|javadoc)).jar
+            neoforge/build/libs/*-@(sources|javadoc).jar
 
           github-token: ${{ secrets.GITHUB_TOKEN }}
           github-tag: ${{ steps.version.outputs.tag }}
+          github-version: ${{ steps.version.outputs.version }}
           github-files: |
             neoforge/build/libs/!(*-@(dev|sources|javadoc)).jar
             neoforge/build/libs/*-@(sources|javadoc).jar
@@ -116,5 +127,7 @@ jobs:
 
           name: XunLib ${{ steps.version.outputs.version }}
           version: ${{ steps.version.outputs.version }}
+          modrinth-version: ${{ steps.version.outputs.version }}+neoforge
+          curseforge-version: ${{ steps.version.outputs.version }}+neoforge
           version-type: release
           changelog-file: release-changelog.md

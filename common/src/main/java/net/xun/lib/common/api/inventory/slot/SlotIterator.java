@@ -3,6 +3,7 @@ package net.xun.lib.common.api.inventory.slot;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+@Deprecated(since = "3.1.0", forRemoval = true)
 public class SlotIterator implements Iterator<Integer> {
 
     private int current;

@@ -5,7 +5,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.xun.lib.common.internal.ModIDManager;
 
-@Deprecated
+@Deprecated(since = "3.0.0")
 public final class CommonUtils {
     private CommonUtils() {
     }

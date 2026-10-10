@@ -9,6 +9,7 @@ import java.util.stream.IntStream;
 /**
  * Flexible slot range that can adapt to different container sizes.
  */
+@Deprecated(since = "3.1.0", forRemoval = true)
 public class SlotRange {
     private final IntSupplier startSupplier;
     private final IntSupplier endSupplier;

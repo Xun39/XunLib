@@ -3,14 +3,11 @@ package net.xun.lib.common.api.inventory;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
 import net.xun.lib.common.api.inventory.slot.SlotRange;
-import net.xun.lib.common.api.util.InventoryUtil;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
+@Deprecated(since = "3.1.0", forRemoval = true)
 public enum InventoryCycleOrder {
 
     /** Slots 0 → max (standard iteration) */
@@ -29,7 +26,7 @@ public enum InventoryCycleOrder {
      * @return List of slots in processing order
      */
     public List<Integer> getSlotOrder(Container container, @Nullable SlotRange range) {
-        InventoryUtil.validateContainer(container, true);
+        Objects.requireNonNull(container);
 
         int minSlot = 0;
         int maxSlot = container.getContainerSize() - 1;

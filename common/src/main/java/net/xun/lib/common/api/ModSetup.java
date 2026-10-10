@@ -7,7 +7,7 @@ public class ModSetup {
     /**
      * Set your mod ID,
      * <p>
-     *     used in {@link net.xun.lib.common.api.util.CommonUtils} for all mod ID
+     *     used in {@link net.xun.lib.common.api.util.ResourceUtil} and {@link net.xun.lib.common.api.util.TranslationUtil} for all mod ID
      *     related methods
      * @param modId Your mod ID
      */

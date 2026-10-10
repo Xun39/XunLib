@@ -4,7 +4,21 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog 1.1.0], and this project adheres to [Semantic Versioning 2.0.0].
 
-## [3.0.0-1.21.1] - 2026-10-07
+## [1.21.1-3.1.0] - 2026-10-09
+
+### Changed
+
+- Moved `ItemStackPredicate` from `api.inventory` to `api.item`.
+- Refactored `SlotRange`, renamed it to `ContainerSlotRange`, and moved it to `api.block.entity.container`. See the relevant commit for details.
+- Updated `InventoryUtil` methods that previously accepted `SlotRange` to use `ContainerSlotRange` instead.
+- Renamed `InventoryUtil.insertItem()` to `tryInsertStack()` for a clearer description of its behavior.
+
+### Deprecated
+
+- Deprecated all APIs under `api.inventory` and marked them for removal.
+- Deprecated `PlayerInvUtil` because most of its methods were simple one-line wrappers around existing functionality.
+
+## [1.21.1-3.0.0] - 2026-10-07
 
 ### Added
 
@@ -17,22 +31,22 @@ The format is based on [Keep a Changelog 1.1.0], and this project adheres to [Se
 ### Changed
 
 - Renamed `TickingEntityBlock` to `ITickingEntityBlock`.
-- Moved `InventoryPredicates` to `api.inventory` and renamed it to `ItemStackPredicate`.
+- Moved `InventoryPredicates` from `api.inventory` to `api.inventory` and renamed it to `ItemStackPredicate`.
 - Moved color utilities from `misc.color` to `util.color`.
 - Renamed `IColorBase` to `IColor`.
 - Renamed `RGBColor` to `ARGBColor`.
 - Renamed utility classes ending in `Utils` to `Util`.
 - Split `CommonUtils` into `ResourceUtil` and `TranslationUtil`.
 - Renamed `ArmorSlotsUtils` to `EquipmentSlotUtil`.
-    - It now uses `net.minecraft.world.entity.EquipmentSlot` rather than fixed slot indexes.
+    - Replaced fixed slot indexes with `net.minecraft.world.entity.EquipmentSlot`.
 - Renamed `MobEffectUtils` to `MobEffectUtil`.
     - Renamed `applySingleEffect` to `applyEffect`.
     - Renamed `applyEffectsWithStrategy` to `applyEffectWithStrategy`.
 - Renamed `PlayerInventoryUtils` to `PlayerInvUtil`.
-- Moved the `TakeOnlySlot` class from `api.inventory.slot` to `api.block.entity.container.slot`.
-- Moved the entire registration API from `api.registries` to `api.registration`.
+- Moved `TakeOnlySlot` from `api.inventory.slot` to `api.block.entity.container.slot`.
+- Moved the registration API from `api.registries` to `api.registration`.
 - Refactored `EffectStackingStrategy` into an interface with a single `apply(LivingEntity, MobEffectInstance, MobEffectInstance)` method.
-- Added the `EffectStackingStrategies` class containing the built-in stacking strategies, allowing custom strategies to be implemented more easily.
+- Added `EffectStackingStrategies` to provide built-in stacking strategies while allowing custom implementations.
 
 ### Removed
 
@@ -41,14 +55,13 @@ The format is based on [Keep a Changelog 1.1.0], and this project adheres to [Se
 - Removed the HSL color implementation.
 - Removed `ColorCombiner`.
 - Removed `hasEffect(LivingEntity, MobEffectInstance)` from `MobEffectUtil`.
-- Removed `clearEffect` and `clearEffects` from `MobEffectUtil`, as they were only wrappers around single-line operations.
-- Removed fixed-index slot handling from `ArmorSlotsUtils` in favor of `EquipmentSlot`.
+- Removed `clearEffect` and `clearEffects` from `MobEffectUtil`, as they were simple wrappers around single-line operations.
 
-## [2.1.5-1.21.1] - 2026-01-05
+## [1.21.1-2.1.5] - 2026-01-05
 
 ### Removed
 
-- Removed the entire `@PersistentNbt` annotation system and its automatic NBT serialization/deserialization.
+- Removed the entire `@PersistentNbt` annotation system and its automatic NBT serialization and deserialization.
 
 ### Changed
 
@@ -56,21 +69,20 @@ The format is based on [Keep a Changelog 1.1.0], and this project adheres to [Se
 
 ### Fixed
 
-- Fixed `combineAsNamespacedID` formatting so that it correctly inserts a colon (`:`) between the namespace and path.
+- Fixed `combineAsNamespacedID` to correctly insert a colon (`:`) between the namespace and path.
     - Before: `namespacepath_part1_part2`
     - After: `namespace:path_part1_part2`
 
-## [2.1.4-1.21.1] - 2025-06-16
+## [1.21.1-2.1.4] - 2025-06-16
 
 ### Added
 
 - Added `getName()` to `ToolSet` and `ArmorSet`.
     - Returns the base material name, such as `ruby` for `Ruby Armor`.
     - Simplifies language JSON datagen.
+- Added mob effect utility methods for checking and clearing effects: `hasEffect`, `clearEffect`, and `clearEffects`.
 
-- Added `hasEffect`, `clearEffect`, and `clearEffects` helpers to the mob effect utilities.
-
-## [2.1.3-1.21.1] - 2025-06-13
+## [1.21.1-2.1.3] - 2025-06-13
 
 ### Added
 
@@ -83,7 +95,7 @@ The format is based on [Keep a Changelog 1.1.0], and this project adheres to [Se
 - Updated `withVanillaBalance()` to correctly use Iron-tier attack damage and attack speed attributes.
 - Restored the static `Registries` map in the common utilities to resolve `getKey()` and `getRegistryId()` issues.
 
-## [2.1.0-1.21.1] - 2025-06-06
+## [1.21.1-2.1.0] - 2025-06-06
 
 ### Changed
 
@@ -98,15 +110,14 @@ The format is based on [Keep a Changelog 1.1.0], and this project adheres to [Se
 ### Removed
 
 - Removed Forge support due to incompatibilities with its registration system.
-- Removed the legacy lazy registry references.
+- Removed legacy lazy registry references.
 
 ### Breaking Changes
 
 - Mods using the old lazy registry API must migrate to the new `RegistryHolder`-based API.
-- Forge is no longer supported.
-- Fabric and NeoForge remain supported.
+- Forge is no longer supported. Fabric and NeoForge remain supported.
 
-## [1.6.2-1.21.1] - 2025-05-09
+## [1.21.1-1.6.2] - 2025-05-09
 
 ### Changed
 
@@ -114,9 +125,9 @@ The format is based on [Keep a Changelog 1.1.0], and this project adheres to [Se
 
 ### Breaking Changes
 
-- The registration API was marked as unstable and may require further changes in future releases.
+- Marked the registration API as unstable and subject to further changes.
 
-## [1.5.1-1.21.1] - 2025-04-27
+## [1.21.1-1.5.1] - 2025-04-27
 
 ### Added
 
@@ -128,15 +139,13 @@ The format is based on [Keep a Changelog 1.1.0], and this project adheres to [Se
 
 ### Fixed
 
-- Fixed `ArmorSet` and `ToolSet` item initialization occurring too late, which could cause:
-    - Registry freeze errors on Forge and NeoForge.
-    - Intrusive holder creation crashes on Fabric.
+- Fixed `ArmorSet` and `ToolSet` item initialization occurring too late, which could cause registry freeze errors on Forge and NeoForge and intrusive holder creation crashes on Fabric.
 
 ### Changed
 
 - Delayed item initialization in `ArmorSet` and `ToolSet` to prevent unsafe registry access during class loading.
 
-## [1.5.0-1.21.1] - 2025-04-25
+## [1.21.1-1.5.0] - 2025-04-25
 
 ### Added
 
@@ -162,9 +171,12 @@ The format is based on [Keep a Changelog 1.1.0], and this project adheres to [Se
 - Moved all exceptions into the `.exceptions` package.
 - Renamed `InventorySection` to `PlayerInventorySection`.
 - Renamed `EffectUtils` to `MobEffectUtils`.
+
+### Removed
+
 - Removed the `ALL` filter mode from fuzzy item matching configurations.
 
-## [1.4.0-1.21.1] - 2025-04-21
+## [1.21.1-1.4.0] - 2025-04-21
 
 ### Added
 
@@ -180,7 +192,7 @@ The format is based on [Keep a Changelog 1.1.0], and this project adheres to [Se
     - `addItems(...)` → `insertItems(...)`
     - `removeItems(...)` → `extractItems(...)`
 
-## [1.2.1-1.21.1] - 2025-04-19
+## [1.21.1-1.2.1] - 2025-04-19
 
 ### Added
 
@@ -191,3 +203,6 @@ The format is based on [Keep a Changelog 1.1.0], and this project adheres to [Se
 
 [Keep a Changelog 1.1.0]: https://keepachangelog.com/en/1.1.0/
 [Semantic Versioning 2.0.0]: https://semver.org/spec/v2.0.0.html
+
+[1.21.1-3.1.0]: https://github.com/Xun39/XunLib/releases/tag/1.21.1-3.1.0
+[1.21.1-3.0.0]: https://github.com/Xun39/XunLib/releases/tag/v3.0.0

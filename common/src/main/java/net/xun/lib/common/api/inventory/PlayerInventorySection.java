@@ -19,6 +19,7 @@ import java.util.function.IntPredicate;
  *   <li>{@code ALL} (0-40 inclusive)</li>
  * </ul>
  */
+@Deprecated(since = "3.1.0", forRemoval = true)
 public enum PlayerInventorySection {
 
     HOTBAR(0, 9),

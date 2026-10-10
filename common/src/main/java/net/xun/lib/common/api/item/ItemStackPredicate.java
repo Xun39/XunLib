@@ -1,4 +1,4 @@
-package net.xun.lib.common.api.inventory;
+package net.xun.lib.common.api.item;
 
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
@@ -10,7 +10,6 @@ import java.util.Objects;
 import java.util.function.Predicate;
 
 public interface ItemStackPredicate extends Predicate<ItemStack> {
-
     ItemStackPredicate IS_DAMAGED = stack -> !stack.isEmpty() && stack.isDamaged() && stack.isDamageableItem();
     ItemStackPredicate IS_FULL_STACK = stack -> !stack.isEmpty() && stack.getCount() >= stack.getMaxStackSize();
     ItemStackPredicate IS_EMPTY = ItemStack::isEmpty;

@@ -6,7 +6,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.ItemStack;
-import net.xun.lib.common.api.inventory.ItemStackPredicate;
+import net.xun.lib.common.api.item.ItemStackPredicate;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -31,7 +31,7 @@ import java.util.Collection;
  * @see ArmorItem Armor item handling
  * @see EquipmentSlotsUtil Replacement utility
  */
-@Deprecated(forRemoval = true)
+@Deprecated(since = "3.0.0", forRemoval = true)
 public class PlayerArmorSlotsUtils {
 
     private static final int[] ALL_ARMOR_SLOTS = {

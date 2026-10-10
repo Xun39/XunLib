@@ -5,26 +5,18 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.xun.lib.common.api.inventory.ItemStackPredicate;
+import net.xun.lib.common.api.block.entity.container.ContainerSlotRange;
+import net.xun.lib.common.api.item.ItemStackPredicate;
 import net.xun.lib.common.api.inventory.InventoryCycleOrder;
 import net.xun.lib.common.api.inventory.PlayerInventorySection;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
 /**
- * Specific utilities for managing player inventory, disable client-side by default
- * <p>
- * Methods for operating player inventory including:
- * <ul>
- *   <li>Checking and managing items in player's hands</li>
- *   <li>Searching and removing items from specific inventory sections</li>
- *   <li>Swapping or clearing items in hands</li>
- * </ul>
- *
- * @see InventoryUtil General inventory utilities
+ * @deprecated Since 3.1.0, directly use {@link InventoryUtil} instead. This class will be removed in a future release
  */
+@Deprecated(since = "3.1.0", forRemoval = true)
 public final class PlayerInvUtil {
     private PlayerInvUtil() {
     }
@@ -37,7 +29,7 @@ public final class PlayerInvUtil {
      * @throws NullPointerException if player is null
      */
     public static boolean hasEmptyHand(@NotNull Player player) {
-        validatePlayer(player);
+        Objects.requireNonNull(player);
         return player.getMainHandItem().isEmpty() ||
                 player.getOffhandItem().isEmpty();
     }
@@ -65,7 +57,7 @@ public final class PlayerInvUtil {
      * @throws NullPointerException if container or predicate is null
      */
     public static boolean hasItemCount(Player player, ItemStackPredicate predicate, int minCount, PlayerInventorySection section) {
-        return InventoryUtil.hasItemCount(player.getInventory(), predicate, minCount, section.getSlotRange());
+        return InventoryUtil.hasItemCount(ContainerSlotRange.of(player.getInventory()), predicate, minCount);
     }
 
     /**
@@ -78,7 +70,7 @@ public final class PlayerInvUtil {
      * @throws NullPointerException if any parameter is null
      */
     public static int findFirstMatchingSlot(Player player, ItemStackPredicate predicate, PlayerInventorySection section) {
-        return InventoryUtil.findFirstMatchingSlot(player.getInventory(), predicate, section.getSlotRange());
+        return InventoryUtil.findFirstMatchingSlot(ContainerSlotRange.of(player.getInventory()), predicate);
     }
 
     /**
@@ -88,7 +80,7 @@ public final class PlayerInvUtil {
      * @throws NullPointerException if player is null
      */
     public static void swapHands(@NotNull Player player) {
-        validatePlayer(player);
+        Objects.requireNonNull(player);
         Inventory inventory = player.getInventory();
 
         ItemStack mainHandItem = player.getMainHandItem();
@@ -108,7 +100,7 @@ public final class PlayerInvUtil {
      * @throws NullPointerException if player or item is null
      */
     public static void setItemInMainHand(@NotNull Player player, @NotNull ItemStack item) {
-        validatePlayer(player);
+        Objects.requireNonNull(player);
         Objects.requireNonNull(item, "Item cannot be null");
         player.getInventory().setItem(EquipmentSlot.MAINHAND.getIndex(), item);
     }
@@ -123,7 +115,7 @@ public final class PlayerInvUtil {
      * @throws NullPointerException if player or item is null
      */
     public static void setItemInOffHand(@NotNull Player player, @NotNull ItemStack item) {
-        validatePlayer(player);
+        Objects.requireNonNull(player);
         Objects.requireNonNull(item, "Item cannot be null");
         player.getInventory().setItem(EquipmentSlot.OFFHAND.getIndex(), item);
     }
@@ -135,7 +127,7 @@ public final class PlayerInvUtil {
      * @throws NullPointerException if player is null
      */
     public static void clearBothHands(@NotNull Player player) {
-        validatePlayer(player);
+        Objects.requireNonNull(player);
         player.getInventory().setItem(EquipmentSlot.MAINHAND.getIndex(), ItemStack.EMPTY);
         player.getInventory().setItem(EquipmentSlot.OFFHAND.getIndex(), ItemStack.EMPTY);
     }
@@ -150,7 +142,7 @@ public final class PlayerInvUtil {
      * @throws NullPointerException if player or item is null
      */
     public static void addItemToHands(@NotNull Player player, @NotNull ItemStack item) {
-        validatePlayer(player);
+        Objects.requireNonNull(player);
         Objects.requireNonNull(item, "Item cannot be null");
 
         if (player.getMainHandItem().isEmpty()) {
@@ -170,8 +162,8 @@ public final class PlayerInvUtil {
      * @param order Slot processing order
      * @throws NullPointerException if any parameter is null
      */
-    public static void extractItems(Player player, ItemStackPredicate predicate, int amount, PlayerInventorySection section, InventoryCycleOrder order) {
-        InventoryUtil.extractItems(player.getInventory(), predicate, amount, section.getSlotRange(), order);
+    public static int extractItems(Player player, ItemStackPredicate predicate, int amount, PlayerInventorySection section, InventoryCycleOrder order) {
+        return InventoryUtil.extractItems(ContainerSlotRange.of(player.getInventory()), predicate, amount);
     }
 
     /**
@@ -182,11 +174,6 @@ public final class PlayerInvUtil {
      * @throws NullPointerException if container or stack is null
      */
     public static ItemStack insertItem(Player player, ItemStack stack) {
-        return InventoryUtil.insertItem(player.getInventory(), stack);
-    }
-
-    private static void validatePlayer(@Nullable Player player) {
-        Objects.requireNonNull(player, "Player cannot be null");
-        InventoryUtil.validateContainer(player.getInventory());
+        return InventoryUtil.tryInsertStack(player.getInventory(), stack);
     }
 }
