@@ -17,7 +17,7 @@ import net.minecraft.world.level.levelgen.structure.pools.JigsawPlacement;
 import net.minecraft.world.level.levelgen.structure.pools.StructureTemplatePool;
 import net.minecraft.world.level.levelgen.structure.pools.alias.PoolAliasLookup;
 import net.minecraft.world.level.levelgen.structure.templatesystem.LiquidSettings;
-import net.xun.lib.common.internal.content.XLStructureTypes;
+import net.xun.lib.common.internal.content.XunLibStructureTypes;
 
 import java.util.Optional;
 
@@ -158,7 +158,7 @@ public class TerrainAwareJigsawStructure extends Structure {
 
     @Override
     public StructureType<?> type() {
-        return XLStructureTypes.TERRAIN_AWARE_JIGSAW.get();
+        return XunLibStructureTypes.TERRAIN_AWARE_JIGSAW.get();
     }
 
     public record TerrainPlacement(int minX, int maxX, int minZ, int maxZ, int maxVariance, int sampleStep,
