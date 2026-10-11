@@ -11,6 +11,7 @@ import net.minecraft.world.level.block.Block;
 import net.xun.lib.common.api.registration.Register;
 import net.xun.lib.common.api.registration.RegistryHolder;
 
+@Deprecated(since = "3.2.0", forRemoval = true)
 public class FabricRegister<T> extends Register<T> {
     public FabricRegister(ResourceKey<? extends Registry<T>> registry, String namespace) {
         super(registry, namespace);

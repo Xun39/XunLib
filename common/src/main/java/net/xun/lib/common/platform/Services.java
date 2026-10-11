@@ -2,6 +2,7 @@ package net.xun.lib.common.platform;
 
 import net.xun.lib.common.XunLibConstants;
 import net.xun.lib.common.platform.services.IPlatformHelper;
+import net.xun.lib.common.platform.services.IRegistrationHelper;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.ServiceLoader;
@@ -9,6 +10,8 @@ import java.util.ServiceLoader;
 public class Services {
 
     public static final IPlatformHelper PLATFORM = load(IPlatformHelper.class);
+
+    public static final IRegistrationHelper REGISTRATION = load(IRegistrationHelper.class);
 
     public static <T> T load(Class<T> clazz) {
 

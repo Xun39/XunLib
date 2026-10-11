@@ -17,7 +17,7 @@ import net.minecraft.world.level.levelgen.structure.pools.JigsawPlacement;
 import net.minecraft.world.level.levelgen.structure.pools.StructureTemplatePool;
 import net.minecraft.world.level.levelgen.structure.pools.alias.PoolAliasLookup;
 import net.minecraft.world.level.levelgen.structure.templatesystem.LiquidSettings;
-import net.xun.lib.common.internal.registry.XLStructureTypes;
+import net.xun.lib.common.internal.content.XLStructureTypes;
 
 import java.util.Optional;
 

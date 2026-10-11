@@ -19,6 +19,7 @@ import java.util.function.Supplier;
  *
  * @param <T> The concrete item type (must extend {@link Item})
  */
+@Deprecated(since = "3.2.0", forRemoval = true)
 public class RegistryItem<T extends Item> extends RegistryHolder<Item, T> implements ItemLike {
 
     /**

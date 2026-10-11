@@ -26,6 +26,7 @@ import java.util.stream.Stream;
  * @param <R> The base registry type (e.g. {@code Item})
  * @param <T> The concrete type of the held object (must extend {@code R})
  */
+@Deprecated(since = "3.2.0", forRemoval = true)
 public class RegistryHolder<R, T extends R> implements Holder<R>, Supplier<T> {
 
     public static <R, T extends R> RegistryHolder<R, T> create(ResourceKey<R> key, Supplier<T> supplier) {

@@ -27,6 +27,7 @@ import java.util.function.Supplier;
  *
  * @param <R> The base type of objects being registered (e.g. Block, Item)
  */
+@Deprecated(since = "3.2.0", forRemoval = true)
 public abstract class Register<R> implements Iterable<R> {
 
     /**

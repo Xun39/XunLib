@@ -20,6 +20,7 @@ import java.util.function.Supplier;
  *
  * @param <T> The concrete block type (must extend {@link Block})
  */
+@Deprecated(since = "3.2.0", forRemoval = true)
 public class RegistryBlock<T extends Block> extends RegistryHolder<Block, T> implements ItemLike {
 
     /**
