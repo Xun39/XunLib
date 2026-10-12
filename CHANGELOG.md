@@ -4,6 +4,22 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog 1.1.0], and this project adheres to [Semantic Versioning 2.0.0].
 
+## [1.21.1-3.2.0] - 2026-10-12
+
+### Added
+- Added `RegistryContainer`, a namespace-scoped registration container that provides access to a `Registrar<Registry>` for any registry.
+- Added convenience methods to `RegistryContainer` for direct registration: `register()`, `registerItem()`, and `registerBlock()`.
+
+### Changed
+- Reworked the registration backend and introduced the replacement API: `Registrar`, `RegistryEntry`, `ItemEntry`, and `BlockEntry`. Although the public API changes are largely renames, the underlying implementation has been substantially redesigned.
+
+### Deprecated
+- Deprecated `Register`, `RegistryHolder`, `RegistryItem`, and `RegistryBlock`, marking them for removal. Use `Registrar`, `RegistryEntry`, `ItemEntry`, and `BlockEntry` instead.
+
+### Fixed
+- Removed the unused Mod Menu integration from the Fabric module.
+- Corrected the mixin package reference in `xunlib.fabric.mixins.json`.
+
 ## [1.21.1-3.1.0] - 2026-10-09
 
 ### Changed
@@ -204,5 +220,6 @@ The format is based on [Keep a Changelog 1.1.0], and this project adheres to [Se
 [Keep a Changelog 1.1.0]: https://keepachangelog.com/en/1.1.0/
 [Semantic Versioning 2.0.0]: https://semver.org/spec/v2.0.0.html
 
+[1.21.1-3.2.0]: https://github.com/Xun39/XunLib/releases/tag/1.21.1-3.2.0
 [1.21.1-3.1.0]: https://github.com/Xun39/XunLib/releases/tag/1.21.1-3.1.0
 [1.21.1-3.0.0]: https://github.com/Xun39/XunLib/releases/tag/v3.0.0
