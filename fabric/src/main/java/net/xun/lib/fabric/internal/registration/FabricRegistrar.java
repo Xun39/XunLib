@@ -12,10 +12,12 @@ import net.xun.lib.common.api.registration.ItemEntry;
 import net.xun.lib.common.api.registration.Registrar;
 import net.xun.lib.common.api.registration.RegistryEntry;
 import net.xun.lib.common.api.util.RegistryUtil;
+import net.xun.lib.common.internal.registration.RegistrationState;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 @ApiStatus.Internal
@@ -23,10 +25,10 @@ public class FabricRegistrar<T> implements Registrar<T> {
     private final ResourceKey<? extends Registry<T>> registryKey;
     private final String namespace;
 
-    private final Map<String, PendingEntry<T, ? extends T>> pendingRegistrations = new LinkedHashMap<>();
+    private final Map<ResourceLocation, PendingEntry<T, ? extends T>> pendingRegistrations = new LinkedHashMap<>();
 
     private volatile Registry<T> registry;
-    private boolean registered;
+    private RegistrationState state = RegistrationState.STARTED;
 
     public FabricRegistrar(ResourceKey<? extends Registry<T>> registryKey, String namespace) {
         this.registryKey = Objects.requireNonNull(registryKey, "registryKey");
@@ -35,45 +37,45 @@ public class FabricRegistrar<T> implements Registrar<T> {
 
     @Override
     public synchronized <R extends T> RegistryEntry<T, R> register(String name, Supplier<? extends R> supplier) {
+        if (state != RegistrationState.STARTED) {
+            throw new IllegalStateException("Cannot register entries in registry " + registryKey.location() + " after registration has started (state: " + state + ")");
+        }
         Objects.requireNonNull(name, "name");
         Objects.requireNonNull(supplier, "supplier");
 
-        if (registered) {
-            throw new IllegalStateException("Cannot register entries after registration has started: " + registryKey.location());
-        }
-
-        if (pendingRegistrations.containsKey(name)) {
-            throw new IllegalArgumentException("Duplicate registration '" + namespace + ":" + name + "' in registry " + registryKey.location());
-        }
-
         ResourceLocation id = ResourceLocation.fromNamespaceAndPath(namespace, name);
+        if (pendingRegistrations.containsKey(id)) {
+            throw new IllegalArgumentException("Duplicate registration '" + id + "' in registry " + registryKey.location());
+        }
+
         ResourceKey<T> key = ResourceKey.create(registryKey, id);
         RegistryEntry<T, R> entry = createEntry(key, () -> RegistryUtil.findHolderFromRegistry(key, registry));
 
-        pendingRegistrations.put(name, new PendingEntry<>(key, supplier, entry));
-
+        pendingRegistrations.put(id, new PendingEntry<>(key, supplier, entry));
         return entry;
     }
 
     @Override
     public synchronized void registerEntries() {
-        if (registered) {
+        if (state == RegistrationState.REGISTERED) {
             return;
         }
-
-        if (pendingRegistrations.isEmpty()) {
-            registered = true;
-            return;
+        if (state == RegistrationState.REGISTERING) {
+            throw new IllegalStateException("Registration is already in progress for registry " + registryKey.location());
         }
 
-        Registry<T> registry = RegistryUtil.getRegistryFromRegistryKey(registryKey);
-        this.registry = registry;
+        state = RegistrationState.REGISTERING;
+        try {
+            Registry<T> registry = RegistryUtil.getRegistryFromRegistryKey(registryKey);
+            this.registry = registry;
 
-        // Prevent registration from being attempted twice if a failure occurs partway through the registration process.
-        registered = true;
-
-        for (PendingEntry<T, ? extends T> pending : pendingRegistrations.values()) {
-            pending.register(registry);
+            for (PendingEntry<T, ? extends T> pending : pendingRegistrations.values()) {
+                pending.register(registry);
+            }
+            state = RegistrationState.REGISTERED;
+        }
+        catch (RuntimeException e) {
+            throw new RuntimeException("Registration failed for unknown reason");
         }
     }
 
@@ -94,13 +96,9 @@ public class FabricRegistrar<T> implements Registrar<T> {
         }
 
         @Override
-        public <I extends Item> ItemEntry<I> registerItem(String name, Supplier<I> supplier) {
-            return (ItemEntry<I>) register(name, supplier);
-        }
-
-        @Override
-        public ItemEntry<Item> registerSimple(String name, Item.Properties properties) {
-            return registerItem(name, () -> new Item(properties));
+        @SuppressWarnings("unchecked")
+        public synchronized <I extends Item> ItemEntry<I> register(String name, Supplier<? extends I> supplier) {
+            return (ItemEntry<I>) super.register(name, supplier);
         }
     }
 
@@ -113,24 +111,22 @@ public class FabricRegistrar<T> implements Registrar<T> {
         }
 
         @Override
-        public <B extends Block> BlockEntry<B> registerBlock(String name, Supplier<? extends B> supplier) {
-            return (BlockEntry<B>) register(name, supplier);
-        }
-
-        @Override
-        public <B extends Block> BlockEntry<B> registerWithItem(String name, Supplier<? extends B> blockSupplier) {
-            BlockEntry<B> block = registerBlock(name, blockSupplier);
-
-            itemRegistrar.register(name, () -> new BlockItem(block.get(), new Item.Properties()));
-
-            return block;
+        @SuppressWarnings("unchecked")
+        public synchronized  <B extends Block> BlockEntry<B> register(String name, Supplier<? extends B> supplier) {
+            return (BlockEntry<B>) super.register(name, supplier);
         }
 
         @Override
         public <B extends Block> BlockEntry<B> registerWithItem(String name, Supplier<? extends B> supplier, Supplier<? extends BlockItem> itemSupplier) {
-            BlockEntry<B> block = registerBlock(name, supplier);
+            BlockEntry<B> block = this.register(name, supplier);
             itemRegistrar.register(name, itemSupplier);
+            return block;
+        }
 
+        @Override
+        public <B extends Block> BlockEntry<B> registerWithItem(String name, Supplier<? extends B> blockSupplier, Function<? super B, ? extends BlockItem> itemFactory) {
+            BlockEntry<B> block = this.register(name, blockSupplier);
+            itemRegistrar.register(name, () -> itemFactory.apply(block.get()));
             return block;
         }
     }

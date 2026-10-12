@@ -6,6 +6,7 @@ import net.minecraft.core.HolderOwner;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
@@ -29,8 +30,13 @@ public class RegistryEntry<T, R extends T> implements Supplier<R>, Holder<T> {
         return new RegistryEntry<>(key, holderLookup);
     }
 
-    public synchronized void bind(Supplier<R> supplier) {
-        this.supplier = Objects.requireNonNull(supplier, "supplier cannot be null");
+    @ApiStatus.Internal
+    public final synchronized void bind(Supplier<R> supplier) {
+        Objects.requireNonNull(supplier, "supplier cannot be null");
+        if (this.supplier != null) {
+            throw new IllegalStateException("Entry '" + key + "' has already been bound");
+        }
+        this.supplier = supplier;
     }
 
     private Optional<Holder<T>> findHolder() {

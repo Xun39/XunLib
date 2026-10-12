@@ -7,6 +7,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 public interface Registrar<T> extends Iterable<RegistryEntry<T, ? extends T>> {
@@ -20,9 +21,21 @@ public interface Registrar<T> extends Iterable<RegistryEntry<T, ? extends T>> {
     }
 
     interface Items extends Registrar<Item> {
-        <I extends Item> ItemEntry<I> registerItem(String name, Supplier<I> supplier);
 
-        ItemEntry<Item> registerSimple(String name, Item.Properties properties);
+        @Override
+        <I extends Item> ItemEntry<I> register(String name, Supplier<? extends I> supplier);
+
+        default <I extends Item> ItemEntry<I> registerItem(String name, Function<Item.Properties, ? extends I> factory, Item.Properties properties) {
+            return register(name, () -> factory.apply(properties));
+        }
+
+        default ItemEntry<Item> registerSimple(String name, Item.Properties properties) {
+            return registerItem(name, Item::new, properties);
+        }
+
+        default ItemEntry<Item> registerSimple(String name) {
+            return registerSimple(name, new Item.Properties());
+        }
 
         @Override
         default <R extends Item> RegistryEntry<Item, R> createEntry(ResourceKey<Item> key, Supplier<Optional<Holder<Item>>> holderLookup) {
@@ -31,11 +44,17 @@ public interface Registrar<T> extends Iterable<RegistryEntry<T, ? extends T>> {
     }
 
     interface Blocks extends Registrar<Block> {
-        <B extends Block> BlockEntry<B> registerBlock(String name, Supplier<? extends B> supplier);
 
-        <B extends Block> BlockEntry<B> registerWithItem(String name, Supplier<? extends B> supplier);
+        @Override
+        <B extends Block> BlockEntry<B> register(String name, Supplier<? extends B> supplier);
+
+        default <B extends Block> BlockEntry<B> registerWithItem(String name, Supplier<? extends B> supplier) {
+            return registerWithItem(name, supplier, block -> new BlockItem(block, new Item.Properties()));
+        }
 
         <B extends Block> BlockEntry<B> registerWithItem(String name, Supplier< ? extends B> supplier, Supplier<? extends BlockItem> itemSupplier);
+
+        <B extends Block> BlockEntry<B> registerWithItem(String name, Supplier<? extends B> blockSupplier, Function<? super B, ? extends BlockItem> itemFactory);
 
         @Override
         default <R extends Block> RegistryEntry<Block, R> createEntry(ResourceKey<Block> key, Supplier<Optional<Holder<Block>>> holderLookup) {

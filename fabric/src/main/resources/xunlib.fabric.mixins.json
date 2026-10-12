@@ -1,12 +1,12 @@
 {
   "required": true,
   "minVersion": "0.8",
-  "package": "net.xun.lib.fabric.mixin",
+  "package": "net.xun.lib.fabric.internal.mixin",
   "refmap": "${mod_id}.refmap.json",
   "compatibilityLevel": "JAVA_21",
   "mixins": [],
   "client": [
-    "net.xun.lib.fabric.internal.mixin.MixinTitleScreen"
+    "MixinTitleScreen"
   ],
   "server": [],
   "injectors": {
