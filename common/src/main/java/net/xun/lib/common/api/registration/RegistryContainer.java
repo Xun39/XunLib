@@ -6,6 +6,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.xun.lib.common.platform.Services;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -20,6 +21,8 @@ public final class RegistryContainer {
 
     private final String namespace;
     private final Map<ResourceKey<?>, Registrar<?>> registrars = new LinkedHashMap<>();
+
+    private final Map<RegistrationEvent<?>, List<RegistrationCallback<?>>> callbacks = new LinkedHashMap<>();
 
     private RegistryContainer(String namespace) {
         this.namespace = namespace;
@@ -100,5 +103,37 @@ public final class RegistryContainer {
             }
         }
         return ordered;
+    }
+
+    public synchronized <C> RegistryContainer on(RegistrationEvent<C> event, RegistrationCallback<? super C> callback) {
+        Objects.requireNonNull(event, "event");
+        Objects.requireNonNull(callback, "callback");
+
+        callbacks.computeIfAbsent(event, ignored -> new ArrayList<>()).add(callback);
+
+        return this;
+    }
+
+    @ApiStatus.Internal
+    public static <C> void dispatchCallbacks(RegistrationEvent<C> event, C context) {
+        Objects.requireNonNull(event, "event");
+        Objects.requireNonNull(context, "context");
+
+        for (RegistryContainer container : List.copyOf(INSTANCES.values())) {
+            container.dispatchLocal(event, context);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private <C> void dispatchLocal(RegistrationEvent<C> event, C context) {
+        List<RegistrationCallback<?>> snapshot;
+
+        synchronized (this) {
+            snapshot = List.copyOf(callbacks.getOrDefault(event, List.of()));
+        }
+
+        for (RegistrationCallback<?> callback : snapshot) {
+            ((RegistrationCallback<C>) callback).register(context);
+        }
     }
 }
